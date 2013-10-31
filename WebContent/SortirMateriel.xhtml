@@ -1,0 +1,40 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:a4j="http://richfaces.org/a4j"
+      xmlns:rich="http://richfaces.org/rich"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:ui="http://java.sun.com/jsf/facelets">
+
+  <head></head>
+
+  <body>
+   <a4j:keepAlive beanName="demandeBine" />
+  	<rich:panel style ="width:600px;font-size:35px;margin-left:250px;">
+  	<f:facet name="header">SORTIE DES MATERIAUX</f:facet>
+  		
+  		<h:form>
+  			<h:panelGrid columns="4">
+  			
+  			<h:outputText value="DEMANDE :" />
+  			<h:selectOneMenu value="#{demandeBine.idDmd}" id="dmd">
+  				<f:selectItems value="#{demandeBine.listDmdEnCourtEtEtudi}"/>
+  				<a4j:support event="onchange" action="#{demandeBine.ecouteChangeDmd}" reRender="mat,qmatacco"/>
+  			</h:selectOneMenu>
+  			
+  			 <h:outputText value="MATERIEL :" />
+  			<h:selectOneMenu value="#{demandeBine.idMateriel}" id="mat">
+  				<f:selectItems value="#{demandeBine.listMatAccordees}"/>
+  				<a4j:support event="onchange" action="#{demandeBine.extraireQteAccordee}" reRender="qmatacco"/>
+  			</h:selectOneMenu>
+  			
+  			<h:outputText value="QUANTITE ACCORDEE :" />
+  			<h:inputText value="#{demandeBine.quantiteMatAccord}" disabled="true" id="qmatacco"/>
+  			
+  			</h:panelGrid>
+  			<a4j:commandButton value="VALIDER" action="#{demandeBine.marquerSortieMat}" data="#{demandeBine.message}" oncomplete="alert(data)" reRender="mat,dmd,qmatacco"/> 
+  		</h:form>
+  		
+  	</rich:panel>
+  </body>
+</html>

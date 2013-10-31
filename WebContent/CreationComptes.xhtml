@@ -1,0 +1,190 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:a4j="http://richfaces.org/a4j"
+      xmlns:rich="http://richfaces.org/rich"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:ui="http://java.sun.com/jsf/facelets">
+
+  <head></head>
+
+  <body>
+  <a4j:keepAlive beanName="bine" />
+  
+  <rich:panel style ="width:700px;font-size:35px;margin-left:250px;" >
+  <f:facet name="header">PAGE DE CREATION DES COMPTES</f:facet>
+  	<h:form id="fo">
+  		<h:panelGrid columns="2">
+  			<h:panelGrid columns="2">
+  				<h:outputText value="LOGIN :" />
+  				<h:inputText value="#{bine.login}" />
+  			</h:panelGrid>
+  		
+  			<h:panelGrid columns="2">
+  				<h:outputText value="PASSWORD :" />
+  				<h:inputText value="#{bine.passWord}" />
+  			</h:panelGrid>
+  		
+   			<h:panelGrid columns="2">
+  				<h:outputText value="PROFIL    :"/>
+  				<h:selectOneMenu value="#{bine.idcategoriePersonne}" id="l1">
+  			 		<f:selectItems value="#{bine.listcategoriespersonnes}"/>
+  			 		<a4j:support event="onchange"  reRender="tab,l2"  actionListener="#{bine.displayFields}"/>
+  				</h:selectOneMenu>
+  			</h:panelGrid>
+ 
+ 			<h:panelGrid columns="1">
+ 				<a4j:outputPanel ajaxRendered="true" id="l2">
+  					<h:panelGrid columns="3" rendered="#{bine.modifierComptel1}" >
+
+  						<h:outputText value="PROPRIETAIRE :"/>
+  						<h:selectOneMenu value="#{bine.idPerso}">
+  							<f:selectItems value="#{bine.listper2}"/>
+  			 			</h:selectOneMenu>
+  					</h:panelGrid>
+  				</a4j:outputPanel>
+  		
+  				<a4j:outputPanel ajaxRendered="true" id="l3">
+  					<h:panelGrid columns="3" rendered="#{bine.modifierCompte}" >
+  						<h:outputText value="PROPRIETAIRE :"/>
+  						<h:selectOneMenu value="#{bine.idCompte}" >
+  							<f:selectItems value="#{bine.listDesPersoAyantLogEtPassW}"/>
+  			 			</h:selectOneMenu>
+  					</h:panelGrid>
+  				</a4j:outputPanel>
+ 		</h:panelGrid>		
+</h:panelGrid>
+  
+  
+ 	<a4j:commandButton value="INSERRER" action="#{bine.insertDansCompte}"  data="#{bine.message}" oncomplete="alert(data)" reRender="tab,fo"/> 		
+ 	
+ 	
+  </h:form>		
+ </rich:panel>
+  	
+
+  	
+  	
+  	
+  	<h:form>
+  	<rich:panel>
+  		<rich:dataTable id="tab" value="#{bine.listDesPersoAyantLogEtPw}" var="per">
+  		<f:facet name="header">LISTE DES #{bine.profil}</f:facet>
+  		
+  		<rich:column>
+  		<f:facet name="header">NUMERO DE LIGNE</f:facet>
+  		#{per.numLigneUtiliseSurPageCompte}
+  		</rich:column>
+  		
+  		<rich:column>
+  		<f:facet name="header">NOM</f:facet>
+  		#{per.nomPersonne}
+  		</rich:column>
+  		
+   		<rich:column>
+  		<f:facet name="header">PRENOM</f:facet>
+  		#{per.prenomPersonne}
+  		</rich:column>
+  		
+    	<rich:column>
+  		<f:facet name="header">DATE DE NAISSANCE</f:facet>
+  		#{per.dateNaissance}
+  		</rich:column>
+  		
+    	<rich:column rendered="#{bine.showDiplome}">
+  		<f:facet name="header">DIPLOME</f:facet>
+  		#{per.diplome}
+  		</rich:column>
+  		
+     	<rich:column rendered="#{bine.showBureau}">
+  		<f:facet name="header">BUREAU</f:facet>
+  		#{per.bureau}
+  		</rich:column>
+  		
+     	<rich:column rendered="#{bine.showTel}">
+  		<f:facet name="header">TELEPHONE</f:facet>
+  		#{per.tel}
+  		</rich:column>
+  		
+  		<rich:column>
+  		<f:facet name="header">LOGIN</f:facet>
+  		#{per.login}
+  		</rich:column>
+  		
+     	<rich:column >
+  		<f:facet name="header">MOT DE PASSE</f:facet>
+  		#{per.passWord}
+  		</rich:column>
+  		
+
+  		
+  		
+  		
+  		<rich:column>
+    		<f:facet name="header">Action</f:facet>
+     			
+      				<a4j:commandLink onclick="#{rich:component('formp')}.show()" value="modifier" reRender="m">
+      				
+      				<f:setPropertyActionListener value="#{per}" target="#{bine.selected}" />
+	  				
+	  				</a4j:commandLink>	
+   		</rich:column>  
+  		
+  		</rich:dataTable>
+  		
+  	</rich:panel>
+  	</h:form>
+  	
+  	
+
+  	
+  	<rich:modalPanel id='formp' width="500" height="300">
+  	
+ 		<f:facet name="header">FORMULAIRE DE MODIFICATION</f:facet>
+  		<f:facet name="controls">
+ 			<h:graphicImage value="/image/close.png" onclick="#{rich:component('formp')}.hide();"/>
+  		</f:facet>
+  		
+  		
+  		
+  	
+  		<h:panelGroup>
+  			<h:form id="m">
+  			  	<h:panelGrid columns="2">
+  					<h:panelGrid columns="2">	
+  						<h:outputText value="ENCIEN LOGIN :     " />
+  						<h:inputText value="#{bine.selected.login}" />
+  					</h:panelGrid>
+  		
+  					<h:panelGrid columns="2">
+  						<h:outputText value="ENCIEN PASSWORD :     " />
+  						<h:inputText value="#{bine.selected.passWord}" />
+  					</h:panelGrid>
+  					
+  					<h:panelGrid columns="2">	
+  						<h:outputText value="NOUVEAU LOGIN :     " />
+  						<h:inputText value="#{bine.selected.nouveauLogin}" />
+  					</h:panelGrid>
+  		
+  					<h:panelGrid columns="2">
+  						<h:outputText value="NOUVEAU PASSWORD :     " />
+  						<h:inputText value="#{bine.selected.nouveauPassWord}" />
+  					</h:panelGrid>  			
+  					
+  				</h:panelGrid>
+  	
+<a4j:commandButton action="#{bine.modifieCompte}" value="MODIFIER" data="#{bine.message}" oncomplete="alert(data)" reRender="tab" />
+		</h:form>
+	</h:panelGroup>
+  </rich:modalPanel> 
+  	
+  	
+  	
+  	
+  	
+  	
+ 
+  	
+  	
+  </body>
+</html>

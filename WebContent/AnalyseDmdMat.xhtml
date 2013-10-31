@@ -1,0 +1,68 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:a4j="http://richfaces.org/a4j"
+      xmlns:rich="http://richfaces.org/rich"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:ui="http://java.sun.com/jsf/facelets">
+
+  <head></head>
+<a4j:keepAlive beanName="demandeBine" />
+  <body>
+  
+  	<rich:panel style ="width:600px;font-size:35px;margin-left:250px;">
+  	<f:facet name="header">TRAITEMENT DES DEMANDES DES MATERIAUX</f:facet>
+  	
+  	<h:form>
+  		
+  			<h:outputText value="DEMANDE :" />
+  			<h:selectOneMenu value="#{demandeBine.idDmd}" id="dmd">
+  				<f:selectItems value="#{demandeBine.listDesDmdNonEtudiees}"/>
+  				<a4j:support event="onchange" action="#{demandeBine.detailPersoPourUneDmd}" reRender="details,mat,detMat"/>
+  			</h:selectOneMenu>
+  		<h:panelGrid columns="4">	
+  			<h:outputText value="MATERIEL :" />
+  			<h:selectOneMenu value="#{demandeBine.idMateriel}" id="mat">
+  				<f:selectItems value="#{demandeBine.listDesMatNonEvalueSeTrouvSurUneDmd}"/>
+  				<a4j:support event="onchange" action="#{demandeBine.detailsMaterielSurDmd}" reRender="detMat,qteDmd"/>
+  			</h:selectOneMenu>
+  			
+  			<h:outputText value="QUANTITE EN STOCK :" />
+  			<h:inputText value="#{demandeBine.quantiteMateriel}" disabled="true" id="detMat"/>
+  			
+  			<h:outputText value="QUANTITE DEMANDEE :" />
+  			<h:inputText value="#{demandeBine.quantiteDmd}" disabled="true" id="qteDmd"/>
+  			
+  			<h:outputText value="QUANTITE ACCORDEE" />
+  			<h:inputText value="#{demandeBine.quantiteMatAccord}" id="qacc"/>
+  			
+  			<h:outputText value="AUTORISATION :" />
+  			<h:selectOneMenu value="#{demandeBine.autorisation}" id="auto">
+  				<f:selectItems value="#{demandeBine.listAutorisation}" />
+  			</h:selectOneMenu>
+  			
+  			<h:outputText value="MOTIVATION :" />
+  			<h:inputTextarea value="#{demandeBine.motivation}" id="moti"/>
+  			
+  		</h:panelGrid>
+  		
+ <a4j:commandButton value="ENREGISTRER" action="#{demandeBine.saveDecisionOnAskedMat}"  data="#{demandeBine.message}" oncomplete="alert(data)" reRender="dmd,qacc,auto,moti,mat"/>
+
+  		
+  	</h:form>
+
+  </rich:panel>
+  
+      <rich:panel id="details" style ="width:600px;font-size:35px;margin-left:250px;">
+  	 <a4j:keepAlive beanName="demandeBine" />
+  	<f:facet name="header">DETAILS DU DEMANDEUR</f:facet>
+  		<h:panelGrid columns="4">
+  			<h:outputText value="NOM :" />
+  			<h:inputText value="#{demandeBine.nom}" disabled="true"/>
+  			<h:outputText value="PRENOM :" />
+  			<h:inputText value="#{demandeBine.prenom}" disabled="true"/>
+  		</h:panelGrid>
+  	</rich:panel>
+
+  </body>
+</html>

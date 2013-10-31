@@ -1,0 +1,87 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:a4j="http://richfaces.org/a4j"
+      xmlns:rich="http://richfaces.org/rich"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:ui="http://java.sun.com/jsf/facelets">
+
+  <head></head>
+
+  <body>
+  <a4j:keepAlive beanName="bine" />
+     <rich:panel style ="width:500px;font-size:35px;margin-left:250px;" >
+    <h:form> 
+  
+<h:panelGrid columns="2">
+  <h:panelGrid columns="2">
+  			<h:outputText value="TYPE    :"/>
+  			<h:selectOneMenu value="#{bine.idType}">
+  			 <f:selectItems value="#{bine.listTypes}"/>
+  			 <a4j:support event="onchange" actionListener="#{bine.displayFields}" reRender="tab"/>
+  			</h:selectOneMenu>
+    </h:panelGrid>
+ 	 
+  	  <a4j:outputPanel ajaxRendered="true">	
+  		<h:panelGrid columns="2" rendered="#{bine.showdesignation}">
+  		<h:outputText value="DESIGNATION  :" />
+  		<h:inputText value="#{bine.designation}" />
+  		</h:panelGrid>
+  		</a4j:outputPanel>
+  		 
+  		 <a4j:outputPanel ajaxRendered="true" >
+  		<h:panelGrid columns="2" rendered="#{bine.showhistorisation}">
+  			<h:outputText value="HISTORISATION :"/>
+  			<h:selectOneMenu value="#{bine.historisation}">
+  			 <f:selectItems value="#{bine.listhistorisation}"/>
+  			 
+  			</h:selectOneMenu>
+  		</h:panelGrid>
+  		</a4j:outputPanel>
+  		
+  		<a4j:outputPanel ajaxRendered="true" id="mo">
+  		<h:panelGrid columns="2" rendered="#{bine.modifier}">
+  			<h:outputText value="QUOI A MODIFIER? :"/>
+  			<h:selectOneMenu value="#{bine.idPerso}">
+  			 <f:selectItems value="#{bine.listMaterielProduit}"/>
+  			 
+  			</h:selectOneMenu>
+  		</h:panelGrid>
+  		</a4j:outputPanel>
+  	 <a4j:commandButton value="ENVOYER" action="#{bine.enregistreMaterielProd}"  data="#{bine.message}" oncomplete="alert(data)" reRender="tab"/>
+  	  <a4j:commandButton value="MODIFIER" reRender="mo" action="#{bine.buildListDesPers}"/> 	
+  </h:panelGrid>
+  </h:form>
+  
+  <rich:panel>
+  		<rich:dataTable id="tab" value="#{bine.listMaterielProduits}" var="mat">
+  		<f:facet name="header">LISTE DES #{bine.type}</f:facet>
+  		
+  		<rich:column rendered="#{bine.showNumeroLigne}">
+  		<f:facet name="header">NUMERO</f:facet>
+  		#{mat.numero}
+  		</rich:column>
+  		
+ 
+    	<rich:column rendered="#{bine.showdesignation}">
+  		<f:facet name="header">DESIGNATION</f:facet>
+  		#{mat.designation}
+  		</rich:column>
+  		
+     	<rich:column rendered="#{bine.showhistorisation}">
+  		<f:facet name="header">HISTORISATION</f:facet>
+  		#{mat.historisation}
+  		</rich:column>
+  		
+      	<rich:column rendered="#{bine.showhistorisation}">
+  		<f:facet name="header">QUANTITE EN STOCKS</f:facet>
+  		#{mat.qtiteMatEnStock}
+  		</rich:column>
+     
+  		</rich:dataTable>
+  	</rich:panel>
+  
+  	</rich:panel>
+  
+  </body>
+</html>

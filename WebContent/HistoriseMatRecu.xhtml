@@ -1,0 +1,157 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:a4j="http://richfaces.org/a4j"
+      xmlns:rich="http://richfaces.org/rich"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:ui="http://java.sun.com/jsf/facelets">
+
+  <head></head>
+
+  <body>
+     <a4j:keepAlive beanName="demandeBine" />
+  	<rich:panel style ="width:600px;font-size:35px;margin-left:250px;">
+  	<f:facet name="header">SORTIE DES MATERIAUX</f:facet>
+  		
+  		<h:form>
+  			<h:panelGrid columns="4">
+  
+  			<h:outputText value="DEMANDE :" />
+  			<h:selectOneMenu value="#{demandeBine.idDmd}" id="dmd">
+  				<f:selectItems value="#{demandeBine.listDmdPourHisto}"/>
+  				<a4j:support event="onchange" action="#{demandeBine.ecouteChangeDmd}" reRender="mat,qmatacco"/>
+  			</h:selectOneMenu>
+  			
+  			<h:outputText value="MATERIEL :" />
+  			<h:selectOneMenu value="#{demandeBine.idMateriel}" id="mat">
+  				<f:selectItems value="#{demandeBine.listDMatPourHisto}"/>
+  				<a4j:support event="onchange" action="#{demandeBine.extraireQteAccordee}" reRender="qmatacco"/>
+  			</h:selectOneMenu>
+  			
+  			<h:outputText value="QUANTITE ACCORDEE :" />
+  			<h:inputText value="#{demandeBine.quantiteMatAccord}" disabled="true" id="qmatacco"/>
+  			
+  			
+  			<h:outputText value="ETAT DU MATERIEL :" />
+  			<h:selectOneMenu value="#{demandeBine.etatMat}" id="etatMat">
+  				<f:selectItems value="#{demandeBine.listDesEtatsDesMat}"/>
+  			</h:selectOneMenu>
+  			
+  			</h:panelGrid>
+  			<a4j:commandButton value="AJOUTER" action="#{demandeBine.ecouteAjouteHisto}"  data="#{demandeBine.message}" oncomplete="alert(data)" reRender="mat,dmd,qmatacco,tab"/> 
+  			<a4j:commandButton value="VALIDER" action="#{demandeBine.updateUnite}"  data="#{demandeBine.message}" oncomplete="alert(data)" reRender="mat,dmd,qmatacco,tab"/> 
+  		
+  		</h:form>
+  		
+  	</rich:panel>
+  	
+  	
+  	
+  <rich:panel style ="width:600px;font-size:35px;margin-left:250px;">
+  		<rich:dataTable id="tab" value="#{demandeBine.listAHistoriser}" var="mate">
+  		<f:facet name="header">LISTE POUR HISTORISATION</f:facet>
+  		
+  		<rich:column>
+  		<f:facet name="header">NOM DU MATERIEL</f:facet>
+  		#{mate.designationMat}
+  		</rich:column>
+  		
+		<rich:column>
+  		<f:facet name="header">ETAT DU MATERIEL</f:facet>
+  		#{mate.etatMatString}
+  		</rich:column>
+
+  		</rich:dataTable>
+  	</rich:panel>
+  	
+  	
+  	
+ 
+ 
+  	
+
+  			<h:form>
+  	 <a4j:keepAlive beanName="demandeBine" />
+  	<rich:panel style ="width:600px;font-size:35px;margin-left:250px;">
+  		<rich:dataTable id="tab1" value="#{demandeBine.listMatHistoriser}" var="per">
+  		<f:facet name="header">LISTE DES MATERIEL POUR HISTORISATION</f:facet>
+  		
+  		<rich:column>
+  		<f:facet name="header">NUMERO DU MATERIEL</f:facet>
+  		#{per.idUnites}
+  		</rich:column>
+  		
+  		<rich:column>
+  		<f:facet name="header">NOM DU MATERIEL</f:facet>
+  		#{per.nomMateriel}
+  		</rich:column>
+  		
+   		<rich:column>
+  		<f:facet name="header">ETAT DU MATERIEL</f:facet>
+  		#{per.etatMatString}
+  		</rich:column>
+  		
+    	<rich:column>
+  		<f:facet name="header">DATE DE DERNIERE MODIFICATION</f:facet>
+  		#{per.dateDrnMod}
+  		</rich:column>
+  		
+    
+  		<rich:column>
+    		<f:facet name="header">Action</f:facet>
+     			
+      				<a4j:commandLink onclick="#{rich:component('formp')}.show()" value="modifier" reRender="m">
+      				
+      				<f:setPropertyActionListener value="#{per}" target="#{demandeBine.selected}" />
+	  				</a4j:commandLink>	
+   		</rich:column>  
+  		
+  		</rich:dataTable>
+  		
+  	</rich:panel>
+  	</h:form>
+  	
+  	
+  	
+  	
+  	<rich:modalPanel id='formp' width="500" height="300">
+  	
+ 		<f:facet name="header">FORMULAIRE DE MODIFICATION</f:facet>
+  		<f:facet name="controls">
+ 			<h:graphicImage value="/image/close.png" onclick="#{rich:component('formp')}.hide();"/>
+  		</f:facet>
+  		
+  		
+  		<h:panelGroup>
+  			<h:form id="m">
+  			  	<h:panelGrid columns="2">
+  			  	
+  					<h:panelGrid columns="2">	
+  						<h:outputText value="NUMERO DU MATERIEL :     " />
+  						<h:inputText value="#{demandeBine.selected.idUnites}" disabled="true"/>
+  					</h:panelGrid>
+  		
+  					<h:panelGrid columns="2">
+  						<h:outputText value="DESIGNATION DU MATERIEL :     " />
+  						<h:inputText value="#{demandeBine.selected.nomMateriel}" disabled="true"/>
+  					</h:panelGrid>
+
+  					
+  				<h:panelGrid columns="2">
+  					<h:outputText value="ETAT DU MATERIEL :" />
+  			 		<h:selectOneMenu value="#{demandeBine.selected.etatMat}" id="etatMat">
+  					<f:selectItems value="#{demandeBine.listDesEtatsDesMat1}"/>
+  					</h:selectOneMenu>
+  				</h:panelGrid>	
+			
+  					
+  				</h:panelGrid>
+  	<a4j:commandButton action="#{demandeBine.modifierEtatMat}" value="MODIFIER" data="#{demandeBine.message}" oncomplete="alert(data)" reRender="tab1" />
+  	
+		</h:form>
+	</h:panelGroup>
+  </rich:modalPanel> 
+  
+  	
+  </body>
+</html>

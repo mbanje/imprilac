@@ -1,0 +1,206 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:a4j="http://richfaces.org/a4j"
+      xmlns:rich="http://richfaces.org/rich"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:ui="http://java.sun.com/jsf/facelets">
+
+  <head></head>
+
+  <body>
+  <a4j:keepAlive beanName="bine" />
+  
+  <rich:panel style ="width:700px;font-size:35px;margin-left:250px;" >
+  <f:facet name="header">PAGE D'ENREGISTREMENT DE PERSONNES</f:facet>
+  	<h:form id="fo">
+  	<h:panelGrid columns="2">
+  	
+  		<h:panelGrid columns="2">	
+  			<h:outputText value="NOM :     " />
+  			<h:inputText value="#{bine.nomPersonne}" />
+  		</h:panelGrid>
+  		
+  		<h:panelGrid columns="2">
+  			<h:outputText value="PRENOM :     " />
+  			<h:inputText value="#{bine.prenomPersonne}" />
+  		</h:panelGrid>
+  			
+  		<h:panelGrid columns="2">
+  			<h:outputText value="DATE DE NAISSANCE :" />
+  			<rich:calendar value="#{bine.dateNaissance}" datePattern="dd/MM/yyyy"/>
+  		</h:panelGrid>
+  			
+  		<h:panelGrid columns="2">
+  			<h:outputText value="CATEGORIE    :"/>
+  			<h:selectOneMenu value="#{bine.idcategoriePersonne}">
+  			 <f:selectItems value="#{bine.listcategoriespersonnes}"/>
+  			 <a4j:support event="onchange" actionListener="#{bine.displayFields}" reRender="tab"/>
+  			</h:selectOneMenu>
+  		</h:panelGrid>
+  		
+  		<a4j:outputPanel ajaxRendered="true">	
+  		<h:panelGrid columns="2" rendered="#{bine.showDiplome}">
+  			<h:outputText value="DIPLOME   :" />
+  			<h:inputText value="#{bine.diplome}" />
+  		</h:panelGrid>
+  		 </a4j:outputPanel>
+  		 
+  		 <a4j:outputPanel ajaxRendered="true">
+  		<h:panelGrid columns="2" rendered="#{bine.showBureau}" >	
+  			<h:outputText value="BUREAU    :" />
+  			<h:inputText value="#{bine.bureau}" />
+  		</h:panelGrid>
+  		</a4j:outputPanel>
+  		
+  		<a4j:outputPanel ajaxRendered="true">
+  		<h:panelGrid columns="2" rendered="#{bine.showTel}" >
+  			<h:outputText value="TELEPHONE  :" />
+  			<h:inputText value="#{bine.tel}" />
+  		</h:panelGrid>
+  		</a4j:outputPanel>
+  		
+  		<a4j:outputPanel ajaxRendered="true" id="mo">
+  		<h:panelGrid columns="2" rendered="#{bine.modifier}">
+  			<h:outputText value="QUI A MODIFIER? :"/>
+  			<h:selectOneMenu value="#{bine.idPerso}">
+  			 <f:selectItems value="#{bine.listper}"/>
+  			 
+  			</h:selectOneMenu>
+  		</h:panelGrid>
+  		</a4j:outputPanel>
+  		
+  	</h:panelGrid>
+  		
+  <a4j:commandButton value="INSERRER" action="#{bine.insertPersonne}"  data="#{bine.message}" oncomplete="alert(data)" reRender="tab,fo"/> 		
+ 	</h:form>	
+ </rich:panel>
+  	
+
+  	
+  	
+  	
+  	<h:form>
+  	<rich:panel style ="width:700px;font-size:35px;margin-left:250px;">
+  		<rich:dataTable id="tab" value="#{bine.listPesonnes}" var="per">
+  		<f:facet name="header">LISTE DES #{bine.profil}</f:facet>
+ 
+   		<rich:column>
+  		<f:facet name="header">NUMERO</f:facet>
+  		#{per.idPersonn}
+  		</rich:column>
+ 		
+  		<rich:column>
+  		<f:facet name="header">NOM</f:facet>
+  		#{per.nomPersonne}
+  		</rich:column>
+  		
+   		<rich:column>
+  		<f:facet name="header">PRENOM</f:facet>
+  		#{per.prenomPersonne}
+  		</rich:column>
+  		
+    	<rich:column>
+  		<f:facet name="header">DATE DE NAISSANCE</f:facet>
+  		#{per.dateNaissance}
+  		</rich:column>
+  		
+    	<rich:column rendered="#{bine.showDiplome}">
+  		<f:facet name="header">DIPLOME</f:facet>
+  		#{per.diplome}
+  		</rich:column>
+  		
+     	<rich:column rendered="#{bine.showBureau}">
+  		<f:facet name="header">BUREAU</f:facet>
+  		#{per.bureau}
+  		</rich:column>
+  		
+     	<rich:column rendered="#{bine.showTel}">
+  		<f:facet name="header">TELEPHONE</f:facet>
+  		#{per.tel}
+  		</rich:column>
+  		
+  		
+  		
+  		<rich:column>
+    		<f:facet name="header">Action</f:facet>
+     			
+      				<a4j:commandLink onclick="#{rich:component('formp')}.show()" value="modifier" reRender="m">
+      				
+      				<f:setPropertyActionListener value="#{per}" target="#{bine.selected}" />
+	  				
+	  				</a4j:commandLink>	
+   		</rich:column>  
+  		
+  		</rich:dataTable>
+  	</rich:panel>
+  	</h:form>
+  	
+  	
+
+  	
+  	<rich:modalPanel id='formp' width="500" height="300">
+  	
+ 		<f:facet name="header">FORMULAIRE DE MODIFICATION</f:facet>
+  		<f:facet name="controls">
+ 			<h:graphicImage value="/image/close.png" onclick="#{rich:component('formp')}.hide();"/>
+  		</f:facet>
+  		
+  		
+  		
+  	
+  		<h:panelGroup>
+  			<h:form id="m">
+  			  	<h:panelGrid columns="2">
+  					<h:panelGrid columns="2">	
+  						<h:outputText value="NOM :     " />
+  						<h:inputText value="#{bine.selected.nomPersonne}" />
+  					</h:panelGrid>
+  		
+  					<h:panelGrid columns="2">
+  						<h:outputText value="PRENOM :     " />
+  						<h:inputText value="#{bine.selected.prenomPersonne}" />
+  					</h:panelGrid>
+  			
+  					<h:panelGrid columns="2">
+  						<h:outputText value="DATE DE NAISSANCE :" />
+  						<rich:calendar value="#{bine.selected.dateNaissance}" datePattern="dd/MM/yyyy"/>
+  					</h:panelGrid>
+  			
+  		
+  		 			<a4j:outputPanel ajaxRendered="true">	
+  					<h:panelGrid columns="2" rendered="#{bine.showDiplome}">
+  					<h:outputText value="DIPLOME   :" />
+  					<h:inputText value="#{bine.selected.diplome}" />
+  					</h:panelGrid>
+  		 			</a4j:outputPanel>
+  		 
+  		 			<a4j:outputPanel ajaxRendered="true">
+  					<h:panelGrid columns="2" rendered="#{bine.showBureau}" >	
+  					<h:outputText value="BUREAU    :" />
+  					<h:inputText value="#{bine.selected.bureau}" />
+  					</h:panelGrid>
+  					</a4j:outputPanel>
+  		
+  					<a4j:outputPanel ajaxRendered="true">
+  					<h:panelGrid columns="2" rendered="#{bine.showTel}" >
+  					<h:outputText value="TELEPHONE  :" />
+  					<h:inputText value="#{bine.selected.tel}" />
+  					</h:panelGrid>
+  					</a4j:outputPanel>
+  		
+  				
+  				</h:panelGrid>
+  	
+<a4j:commandButton action="#{bine.modifierPersonne}" value="MODIFIER" data="#{bine.message}" oncomplete="alert(data)" reRender="tab" />
+		</h:form>
+	</h:panelGroup>
+	
+	
+  </rich:modalPanel> 
+  	
+  	
+  	
+  	
+  </body>
+</html>

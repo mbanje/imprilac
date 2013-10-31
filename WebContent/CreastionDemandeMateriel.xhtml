@@ -1,0 +1,62 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:a4j="http://richfaces.org/a4j"
+      xmlns:rich="http://richfaces.org/rich"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:ui="http://java.sun.com/jsf/facelets">
+
+  <head></head>
+
+  <body>
+    <a4j:keepAlive beanName="demandeBine" />
+     
+<rich:panel style ="width:500px;font-size:35px;margin-left:250px;" >
+    
+<h:form> 
+  <h:panelGrid columns="2">
+ 	<h:panelGrid columns="2">
+  			<h:outputText value="MATERIEL    :"/>
+  			<h:selectOneMenu value="#{demandeBine.idMateriel}">
+  				<f:selectItems value="#{bine.listMat}"/>
+  			</h:selectOneMenu>
+	</h:panelGrid>
+    
+    <h:panelGrid columns="2">
+    	<h:outputText value="QUANTITE :" />
+    	<h:inputText value="#{demandeBine.quantiteMateriel}" />
+    </h:panelGrid>
+    
+      <a4j:commandButton value="AJOUTER" action="#{demandeBine.ajouteMatSurCmd}"  reRender="tab"/>
+  	  <a4j:commandButton value="VALIDER" reRender="tab" action="#{demandeBine.creerDmdMateriel}" data="#{demandeBine.message}" oncomplete="alert(data)"/> 	
+ 
+ </h:panelGrid>
+    </h:form>  
+    
+    
+     <rich:panel>
+  		<rich:dataTable id="tab" value="#{demandeBine.listDesProdDmd}" var="per">
+  		<f:facet name="header">LISTE DES MATERIELS FIGURANT SUR UNE COMMANDE</f:facet>
+  		
+  		<rich:column>
+  		<f:facet name="header">NUMERO MATERIEL</f:facet>
+  		#{per.idMateriel}
+  		</rich:column>
+  		
+		<rich:column>
+  		<f:facet name="header">DESIGNATION MATERIEL</f:facet>
+  		#{per.designationMat}
+  		</rich:column>
+
+  		
+   		<rich:column>
+  		<f:facet name="header">QUANTITE</f:facet>
+  		#{per.quantiteMateriel}
+  		</rich:column>
+
+  		</rich:dataTable>
+  	</rich:panel>
+
+  </rich:panel>	
+  </body>
+</html>

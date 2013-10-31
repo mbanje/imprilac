@@ -1,0 +1,51 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:a4j="http://richfaces.org/a4j"
+      xmlns:rich="http://richfaces.org/rich"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:ui="http://java.sun.com/jsf/facelets">
+
+  <head></head>
+
+  <body>
+  <rich:panel style ="width:500px;font-size:35px;margin-left:250px;">
+  <f:facet name="header">ENREGISTER L'AUGMENTATION DE LA QUANTITE DU MATERIEL EN STOCKS</f:facet>
+  <h:form>
+  	<h:panelGrid columns="4">
+  		  	<h:outputText value="MATERIEL :" />
+  			<h:selectOneMenu value="#{demandeBine.idMateriel}">
+  				<f:selectItems value="#{bine.listMat}"/>
+  			
+  			</h:selectOneMenu>
+  			
+  			<h:outputText value="QUANTITE :" />
+  			<h:inputText value="#{demandeBine.quantiteMateriel}" id="q"/>
+  	</h:panelGrid>
+  	<a4j:commandButton value="ENVOYER" action="#{demandeBine.ajouteQuantiteMat}"  data="#{demandeBine.message}" oncomplete="alert(data)" reRender="tab,q"/>
+  </h:form>
+  </rich:panel>
+  
+  <rich:panel style ="width:500px;font-size:35px;margin-left:250px;">
+  
+  	
+  		<rich:dataTable id="tab" value="#{demandeBine.listDesMateriaux}" var="mat">
+  		<f:facet name="header">ETAT DU STOCK</f:facet>
+  		
+
+    	<rich:column>
+  		<f:facet name="header">DESIGNATION</f:facet>
+  		#{mat.designationMat}
+  		</rich:column>
+
+  		
+      	<rich:column>
+  		<f:facet name="header">QUANTITE EN STOCKS</f:facet>
+  		#{mat.quantiteMateriel}
+  		</rich:column>
+     
+  		</rich:dataTable>
+  		
+  </rich:panel>
+  </body>
+</html>
