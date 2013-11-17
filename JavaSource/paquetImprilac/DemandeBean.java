@@ -10,6 +10,18 @@ import javax.faces.model.SelectItem;
 
 public class DemandeBean {
 	
+	private int idPersonneConnecte;
+	
+	public int getIdPersonneConnecte() {
+		return idPersonneConnecte;
+	}
+	public void setIdPersonneConnecte(int idPersonneConnecte) {
+		this.idPersonneConnecte = idPersonneConnecte;
+	}
+
+	
+	
+	
 	private String message;
 
 	private int idMateriel=0;
@@ -52,7 +64,7 @@ public class DemandeBean {
 	//private boolean ajoute=true;
 	
 	
-	
+	private int idM=0;
 	
 	
 	
@@ -64,6 +76,12 @@ public class DemandeBean {
 	
 
 
+	public int getIdM() {
+		return idM;
+	}
+	public void setIdM(int idM) {
+		this.idM = idM;
+	}
 	public DemandeBean getSelected() {
 		return selected;
 	}
@@ -295,7 +313,10 @@ public class DemandeBean {
 		else
 			listDmdEnCourtEtEtudi.clear();
 		
-		res=Connecteur.Extrairedonnees("Select * from demande where Etatdmd='ETUDE EN COURT' or Etatdmd='ETUDIEE' and Iddemande in (select Iddmd from unite_dmde u where u.Idgestion is null and u.Autorisation='OUI')");
+		//res=Connecteur.Extrairedonnees("Select * from demande where Etatdmd='ETUDE EN COURT' or Etatdmd='ETUDIEE' and Iddemande in (select Iddmd from unite_dmde u where u.Idgestion is null and u.Autorisation='OUI')");
+		
+		res=Connecteur.Extrairedonnees("Select * from demande where (Etatdmd='ETUDE EN COURT' or Etatdmd='ETUDIEE') and Iddemande in (select Iddmd from unite_dmde u where u.Idgerant is not null and u.Idgestion is null and u.Autorisation='OUI')");
+		
 		
 		listDmdEnCourtEtEtudi.add(new SelectItem(0," "));
 		
@@ -511,16 +532,23 @@ public class DemandeBean {
 	{j++;
 		}
 
+/*	if((this.listDesProdDmd.size()==1)&&(this.listDesProdDmd.get(0).idMateriel==this.idMateriel))
+		j=0;*/
+	//if(listDesProdDmd.size()!=0)
 	if(j<listDesProdDmd.size())
 	{listDesProdDmd.get(j).quantiteMateriel+=this.quantiteMateriel;
 	return;
 	}
+	
+	
+	
 	System.out.println("Size  :"+listDesProdDmd.size());
 
 	ResultSet r=Connecteur.Extrairedonnees("Select * from materiel where Idmateriel="+this.idMateriel+"");
 	DemandeBean i=new DemandeBean();
 
 	i.idMateriel=this.idMateriel;
+	i.idM=this.listDesProdDmd.size();
 	i.quantiteMateriel=this.quantiteMateriel;
 
 	try {
@@ -563,12 +591,12 @@ public class DemandeBean {
 //SE TROUVANT SUR CETTE COMMANDE.
 	public void creerDmdMateriel()
 	{int idDmd;
-	if(listDesProdDmd.size()==0)	
+	if((listDesProdDmd==null)||(listDesProdDmd.size()==0))	
 		{message="LA COMMANDE EST VIDE!!!";
 		return;
 		}
 	int i=-1;
-	i=Connecteur.Insererdonnees("insert into demande (Idchefprod,Datedmd,Etatdmd) values (3,now(),'NON ETUDIEE')");
+	i=Connecteur.Insererdonnees("insert into demande (Idchefprod,Datedmd,Etatdmd) values ("+this.idPersonneConnecte+",now(),'NON ETUDIEE')");
 
 	if(i==-1)
 	{message="CREATION DEMANDE ECHOUEE!!!";
@@ -578,6 +606,8 @@ public class DemandeBean {
 	int k;
 	for(k=0;k<listDesProdDmd.size();k++)
 	{System.out.println("Avant");
+	System.out.println("idDmd"+idDmd);
+	
 	i=Connecteur.Insererdonnees("insert into unite_dmde(Iddmd,Idmateriel,Qtitedmd,Autorisation) values ("+idDmd+","+listDesProdDmd.get(k).idMateriel+","+listDesProdDmd.get(k).quantiteMateriel+",'NON')");
 	System.out.println("Apres");
 	}
@@ -746,7 +776,7 @@ public class DemandeBean {
 			return;
 		}
 		System.out.println("nnnnnnnnnn");
-	n=Connecteur.Insererdonnees("update unite_dmde set Idgerant=9,Autorisation='"+this.autorisation+"',Motivation='"+this.motivation+"',Dateanalyse=now(),Qtiteaccorde="+this.quantiteMatAccord+" where Iddmd="+this.idDmd+" and Idmateriel="+this.idMateriel+"");
+	n=Connecteur.Insererdonnees("update unite_dmde set Idgerant="+this.idPersonneConnecte+",Autorisation='"+this.autorisation+"',Motivation='"+this.motivation+"',Dateanalyse=now(),Qtiteaccorde="+this.quantiteMatAccord+" where Iddmd="+this.idDmd+" and Idmateriel="+this.idMateriel+"");
 	System.out.println("ooooooooooo");
 	if(n==-1)
 	{message="INSERTION ECHOUEE!!";
@@ -844,9 +874,23 @@ public class DemandeBean {
 	public void marquerSortieMat()
 	{	ResultSet res=null;
 		int n=-1,m=-1;
+		
+		if(this.idDmd==0)
+		{
+			message="SELECTIONNER LA DEMANDE S'IL VOUS PLAIT!!";
+			return;
+		}
+		
+		if(this.idMateriel==0)
+		{
+			message="SELECTIONNER LE MATERIEL S'IL VOUS PLAIT!!";
+			return;
+		}
+		
+		
 		//ON MARQUE LA SORTIE DU MATERIEL.TOUT CE MATERIEL EST SORTI
 		//D'UN COUP
-		n=Connecteur.Insererdonnees("update unite_dmde set Idgestion=15,Historise='NON' where Iddmd="+this.idDmd+" and Idmateriel="+this.idMateriel+"");
+		n=Connecteur.Insererdonnees("update unite_dmde set Idgestion="+this.idPersonneConnecte+",Historise='NON' where Iddmd="+this.idDmd+" and Idmateriel="+this.idMateriel+"");
    //ON VERIFIE S'IL Y AURAIT ENCORE DU MATERIEL A SORTIR SUR CETTE DEMANDE
 		res=Connecteur.Extrairedonnees("select * from unite_dmde where Iddmd="+this.idDmd+" and Autorisation='OUI' and Idgestion is null");	
 try {//SI PLUS DU MATERIEL A SORTIR SUR CETTE DEMANDE
@@ -1046,11 +1090,26 @@ this.listAHistoriser.clear();
 
 public void modifierEtatMat()
 {int n=-1;
+ResultSet res=null;
+
 if(this.selected.etatMat==0)
 	{System.out.println("this.selected.etatMat"+this.selected.etatMat);
 	message="VOUS N'AVEZ RIEN CHANGE!!";
 	return;
 	}
+
+res=Connecteur.Extrairedonnees("select * from unites un where un.etat is not null and un.Idunite="+this.selected.idUnites+"");
+try {
+	if(!res.next())
+	{message="VOUS N'AVEZ PAS ACCUEILLI CE MATERIEL!!";
+	return;	
+	}
+} catch (SQLException e) {
+	// TODO Auto-generated catch block
+	e.printStackTrace();
+}
+
+
 if(this.selected.etatMat==1)
 	this.selected.etatMatString="BON ETAT";
 if(this.selected.etatMat==2)
@@ -1063,6 +1122,13 @@ if(n==-1)
 message="ECHEC DE MISE A JOUR!!";
 else
 message="MISE A JOUR REUSSIE!!";
+
+this.selected=null;
 }
+
+public void ecouteAnnulerCmd()
+{if(this.listDesProdDmd!=null)
+	this.listDesProdDmd=null;
+	}
 
 }

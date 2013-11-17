@@ -9,6 +9,49 @@
   <head></head>
 
   <body>
-  
+  <a4j:keepAlive beanName="bine" />
+    <rich:panel style ="width:500px;font-size:35px;margin-left:250px;" >
+  	<f:facet name="header">PAGE D'ACCUIEL DES CHEFS DE PRODUCTION</f:facet>
+  	
+  	<h:form>
+  		<h:selectOneMenu value="#{bine.idPersonneConnecte}" style ="visibility: hidden;">
+  			<f:selectItems value="#{bine.listPersonneConnecte}"/>
+  		</h:selectOneMenu>
+  		<h:selectOneMenu value="#{demandeBine.idPersonneConnecte}" style ="visibility: hidden;">
+  			<f:selectItems value="#{bine.listPersonneConnecte}"/>
+  		</h:selectOneMenu>
+  		
+  		
+		<rich:toolBar>
+			<rich:dropDownMenu>
+			<f:facet name="label">
+				<h:outputText value="FICHIER" />
+			</f:facet>
+				<rich:menuItem submitMode="ajax" value="ENREGISTRER UNE PERSONNE" action="savePersonne"/>
+				<rich:menuItem submitMode="ajax" value="ENREGISTRER UN MATERIEL OU UN PRODUIT" action="saveMatOuProd"/>
+			</rich:dropDownMenu>
+
+
+			<rich:dropDownMenu>
+			<f:facet name="label">
+				<h:outputText value="OPERATION" />
+			</f:facet>
+				<rich:menuItem submitMode="ajax" value="DONNER COMPTE" action="donneCompte"/>
+				<rich:menuItem submitMode="ajax" value="DEMANDE MATERIEL" action="dmdMateriel"/>
+				<rich:menuItem submitMode="ajax" value="HISTORISER MATERIEL" action="historiserMat"/>
+			</rich:dropDownMenu>
+				
+				
+			<rich:dropDownMenu>
+			<f:facet name="label">
+				<h:outputText value="AIDE" />
+			</f:facet>
+				<rich:menuItem submitMode="ajax" value="About"/>
+			</rich:dropDownMenu>
+		</rich:toolBar>
+  		
+  	</h:form>
+  	
+  	</rich:panel>
   </body>
 </html>

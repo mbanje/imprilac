@@ -9,6 +9,10 @@
   <head></head>
 
   <body>
+  <a4j:keepAlive beanName="bine" />
+  <rich:panel style ="width:500px;font-size:35px;margin-left:250px;" >
+  <f:facet name="header">FORMULAIRE D'AUTHENTIFICATION</f:facet>
+  
   <h:form>
   <h:panelGrid columns="2">
   	 <h:outputText value="LOGIN :" />
@@ -20,6 +24,8 @@
   	
   	 <a4j:commandButton value="ENVOYER" action="#{bine.identification}"  data="#{bine.message}" oncomplete="alert(data)"/>	
   </h:form>
+  
+   </rich:panel>
   
   </body>
 </html>

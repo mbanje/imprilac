@@ -15,6 +15,11 @@
   	
   	<h:form>
   		
+  		<h:selectOneMenu value="#{demandeBine.idPersonneConnecte}" style ="visibility: visible;">
+  		<f:selectItems value="#{bine.listPersonneConnecte}"/>
+  		</h:selectOneMenu>
+  		
+  		
   			<h:outputText value="DEMANDE :" />
   			<h:selectOneMenu value="#{demandeBine.idDmd}" id="dmd">
   				<f:selectItems value="#{demandeBine.listDesDmdNonEtudiees}"/>

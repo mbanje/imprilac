@@ -5,13 +5,86 @@
  <managed-bean>
   <managed-bean-name>bine</managed-bean-name>
   <managed-bean-class>paquetImprilac.ImprilacBean</managed-bean-class>
-  <managed-bean-scope>request</managed-bean-scope>
+  <managed-bean-scope>session</managed-bean-scope>
  </managed-bean>
  <managed-bean>
   <managed-bean-name>demandeBine</managed-bean-name>
   <managed-bean-class>paquetImprilac.DemandeBean</managed-bean-class>
-  <managed-bean-scope>request</managed-bean-scope>
+  <managed-bean-scope>session</managed-bean-scope>
  </managed-bean>
+ <navigation-rule>
+  <display-name>identif</display-name>
+  <from-view-id>/Identification.xhtml</from-view-id>
+  <navigation-case>
+   <from-outcome>chef</from-outcome>
+   <to-view-id>/PageAccuielChefProd.xhtml</to-view-id>
+   <redirect/>
+  </navigation-case>
+  <navigation-case>
+   <from-outcome>gera</from-outcome>
+   <to-view-id>/PageAccuielGerant.xhtml</to-view-id>
+   <redirect/>
+  </navigation-case>
+  <navigation-case>
+   <from-outcome>gest</from-outcome>
+   <to-view-id>/PageAccuielGestionr.xhtml</to-view-id>
+   <redirect/>
+  </navigation-case>
+  <navigation-case>
+   <from-outcome>prod</from-outcome>
+   <to-view-id>/PageAccuielEmploye.xhtml</to-view-id>
+   <redirect/>
+  </navigation-case>
+  <navigation-case>
+   <from-outcome>caisse</from-outcome>
+   <to-view-id>/PageAccuielCaissier.xhtml</to-view-id>
+   <redirect/>
+  </navigation-case>
+ </navigation-rule>
+ <navigation-rule>
+  <from-view-id>/PageAccuielChefProd.xhtml</from-view-id>
+  <navigation-case>
+   <from-outcome>dmdMateriel</from-outcome>
+   <to-view-id>/CreastionDemandeMateriel.xhtml</to-view-id>
+   <redirect/>
+  </navigation-case>
+  <navigation-case>
+   <from-outcome>historiserMat</from-outcome>
+   <to-view-id>/HistoriseMatRecu.xhtml</to-view-id>
+   <redirect/>
+  </navigation-case>
+  <navigation-case>
+   <from-outcome>savePersonne</from-outcome>
+   <to-view-id>/EnregistrementPersonnes.xhtml</to-view-id>
+   <redirect/>
+  </navigation-case>
+  <navigation-case>
+   <from-outcome>saveMatOuProd</from-outcome>
+   <to-view-id>/CreationMateriel_Produit.xhtml</to-view-id>
+   <redirect/>
+  </navigation-case>
+  <navigation-case>
+   <from-outcome>donneCompte</from-outcome>
+   <to-view-id>/CreationComptes.xhtml</to-view-id>
+   <redirect/>
+  </navigation-case>
+ </navigation-rule>
+ <navigation-rule>
+  <from-view-id>/PageAccuielGerant.xhtml</from-view-id>
+  <navigation-case>
+   <from-outcome>analyseDmd</from-outcome>
+   <to-view-id>/AnalyseDmdMat.xhtml</to-view-id>
+   <redirect/>
+  </navigation-case>
+ </navigation-rule>
+ <navigation-rule>
+  <from-view-id>/PageAccuielGestionr.xhtml</from-view-id>
+  <navigation-case>
+   <from-outcome>marquerSortieMat</from-outcome>
+   <to-view-id>/SortirMateriel.xhtml</to-view-id>
+   <redirect/>
+  </navigation-case>
+ </navigation-rule>
  <application>
   <view-handler>com.sun.facelets.FaceletViewHandler</view-handler>
  </application>

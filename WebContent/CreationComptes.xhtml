@@ -14,6 +14,12 @@
   <rich:panel style ="width:700px;font-size:35px;margin-left:250px;" >
   <f:facet name="header">PAGE DE CREATION DES COMPTES</f:facet>
   	<h:form id="fo">
+  	
+  	  	<h:selectOneMenu value="#{bine.idPersonneConnecte}" style ="visibility: visible;">
+  		<f:selectItems value="#{bine.listPersonneConnecte}"/>
+  		</h:selectOneMenu>
+  	
+  	
   		<h:panelGrid columns="2">
   			<h:panelGrid columns="2">
   				<h:outputText value="LOGIN :" />

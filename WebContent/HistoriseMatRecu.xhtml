@@ -10,10 +10,20 @@
 
   <body>
      <a4j:keepAlive beanName="demandeBine" />
+     
+
+     
   	<rich:panel style ="width:600px;font-size:35px;margin-left:250px;">
-  	<f:facet name="header">SORTIE DES MATERIAUX</f:facet>
+  	<f:facet name="header">HISTORISATION DES MATERIAUX</f:facet>
   		
   		<h:form>
+  		
+   		<h:selectOneMenu value="#{demandeBine.idPersonneConnecte}" style ="visibility: visible;">
+  			<f:selectItems value="#{bine.listPersonneConnecte}"/>
+  		</h:selectOneMenu> 		
+  		
+  		
+  		
   			<h:panelGrid columns="4">
   
   			<h:outputText value="DEMANDE :" />
@@ -39,7 +49,7 @@
   			
   			</h:panelGrid>
   			<a4j:commandButton value="AJOUTER" action="#{demandeBine.ecouteAjouteHisto}"  data="#{demandeBine.message}" oncomplete="alert(data)" reRender="mat,dmd,qmatacco,tab"/> 
-  			<a4j:commandButton value="VALIDER" action="#{demandeBine.updateUnite}"  data="#{demandeBine.message}" oncomplete="alert(data)" reRender="mat,dmd,qmatacco,tab"/> 
+  			<a4j:commandButton value="VALIDER" action="#{demandeBine.updateUnite}"  data="#{demandeBine.message}" oncomplete="alert(data)" reRender="mat,dmd,qmatacco,tab,tab1,etatMat,form,m"/> 
   		
   		</h:form>
   		
@@ -47,7 +57,7 @@
   	
   	
   	
-  <rich:panel style ="width:600px;font-size:35px;margin-left:250px;">
+  <rich:panel style ="width:600px;font-size:35px;margin-left:250px;" id="richpa" rendered="true">
   		<rich:dataTable id="tab" value="#{demandeBine.listAHistoriser}" var="mate">
   		<f:facet name="header">LISTE POUR HISTORISATION</f:facet>
   		

@@ -12,6 +12,10 @@
   <a4j:keepAlive beanName="bine" />
      <rich:panel style ="width:500px;font-size:35px;margin-left:250px;" >
     <h:form> 
+    
+      	<h:selectOneMenu value="#{demandeBine.idPersonneConnecte}" style ="visibility: visible;">
+  		<f:selectItems value="#{bine.listPersonneConnecte}"/>
+  		</h:selectOneMenu>
   
 <h:panelGrid columns="2">
   <h:panelGrid columns="2">
@@ -22,25 +26,24 @@
   			</h:selectOneMenu>
     </h:panelGrid>
  	 
-  	  <a4j:outputPanel ajaxRendered="true">	
-  		<h:panelGrid columns="2" rendered="#{bine.showdesignation}">
-  		<h:outputText value="DESIGNATION  :" />
-  		<h:inputText value="#{bine.designation}" />
-  		</h:panelGrid>
+  	 	<a4j:outputPanel ajaxRendered="true" id="des">	
+  			<h:panelGrid columns="2" rendered="#{bine.showdesignation}">
+  			<h:outputText value="DESIGNATION  :" />
+  			<h:inputText value="#{bine.designation}" />
+  			</h:panelGrid>
   		</a4j:outputPanel>
   		 
-  		 <a4j:outputPanel ajaxRendered="true" >
-  		<h:panelGrid columns="2" rendered="#{bine.showhistorisation}">
+  		<a4j:outputPanel ajaxRendered="true" >
+  			<h:panelGrid columns="2" rendered="#{bine.showhistorisation}">
   			<h:outputText value="HISTORISATION :"/>
-  			<h:selectOneMenu value="#{bine.historisation}">
-  			 <f:selectItems value="#{bine.listhistorisation}"/>
-  			 
+  			<h:selectOneMenu value="#{bine.historisation}" id="hist">
+  			 <f:selectItems value="#{bine.listhistorisation}" />
   			</h:selectOneMenu>
-  		</h:panelGrid>
+  			</h:panelGrid>
   		</a4j:outputPanel>
   		
   		<a4j:outputPanel ajaxRendered="true" id="mo">
-  		<h:panelGrid columns="2" rendered="#{bine.modifier}">
+  			<h:panelGrid columns="2" rendered="#{bine.modifier}">
   			<h:outputText value="QUOI A MODIFIER? :"/>
   			<h:selectOneMenu value="#{bine.idPerso}">
   			 <f:selectItems value="#{bine.listMaterielProduit}"/>
@@ -48,14 +51,14 @@
   			</h:selectOneMenu>
   		</h:panelGrid>
   		</a4j:outputPanel>
-  	 <a4j:commandButton value="ENVOYER" action="#{bine.enregistreMaterielProd}"  data="#{bine.message}" oncomplete="alert(data)" reRender="tab"/>
-  	  <a4j:commandButton value="MODIFIER" reRender="mo" action="#{bine.buildListDesPers}"/> 	
+  	 <a4j:commandButton value="ENVOYER" action="#{bine.enregistreMaterielProd}"  data="#{bine.message}" oncomplete="alert(data)" reRender="tab,hist,des"/>
+  	  <a4j:commandButton value="MODIFIER" reRender="mo" action="#{bine.ecouteModMatProd}"/> 	
   </h:panelGrid>
   </h:form>
   
   <rich:panel>
   		<rich:dataTable id="tab" value="#{bine.listMaterielProduits}" var="mat">
-  		<f:facet name="header">LISTE DES #{bine.type}</f:facet>
+  		<f:facet name="header">LISTE #{bine.type}</f:facet>
   		
   		<rich:column rendered="#{bine.showNumeroLigne}">
   		<f:facet name="header">NUMERO</f:facet>

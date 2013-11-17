@@ -11,10 +11,16 @@
   <body>
     <a4j:keepAlive beanName="demandeBine" />
      
-<rich:panel style ="width:500px;font-size:35px;margin-left:250px;" >
+<rich:panel style ="width:600px;font-size:35px;margin-left:250px;" >
     
 <h:form> 
-  <h:panelGrid columns="2">
+
+  		<h:selectOneMenu value="#{demandeBine.idPersonneConnecte}" style ="visibility: visible;">
+  			<f:selectItems value="#{bine.listPersonneConnecte}"/>
+  		</h:selectOneMenu>
+
+
+  <h:panelGrid columns="3">
  	<h:panelGrid columns="2">
   			<h:outputText value="MATERIEL    :"/>
   			<h:selectOneMenu value="#{demandeBine.idMateriel}">
@@ -28,6 +34,7 @@
     </h:panelGrid>
     
       <a4j:commandButton value="AJOUTER" action="#{demandeBine.ajouteMatSurCmd}"  reRender="tab"/>
+  	  <a4j:commandButton value="ANNULER" action="#{demandeBine.ecouteAnnulerCmd}"  reRender="tab"/>
   	  <a4j:commandButton value="VALIDER" reRender="tab" action="#{demandeBine.creerDmdMateriel}" data="#{demandeBine.message}" oncomplete="alert(data)"/> 	
  
  </h:panelGrid>
@@ -40,7 +47,7 @@
   		
   		<rich:column>
   		<f:facet name="header">NUMERO MATERIEL</f:facet>
-  		#{per.idMateriel}
+  		#{per.idM}
   		</rich:column>
   		
 		<rich:column>

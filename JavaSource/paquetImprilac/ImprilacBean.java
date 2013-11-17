@@ -13,6 +13,8 @@ import java.util.List;
 import javax.faces.event.ActionEvent;
 import javax.faces.model.SelectItem;
 
+import com.sun.corba.se.spi.orbutil.fsm.Guard.Result;
+
 
 
 
@@ -20,7 +22,30 @@ import javax.faces.model.SelectItem;
 
 public class ImprilacBean {
 
-	
+//CETTE VARIABLE CONTIENT L'ID DE LA PERSONNE QUI A PROVOQUE
+//L'INSTANCIATION DE CETTE BEAN
+private int idPersonneConnecte;
+public int getIdPersonneConnecte() {
+	return idPersonneConnecte;
+}
+public void setIdPersonneConnecte(int idPersonneConnecte) {
+	this.idPersonneConnecte = idPersonneConnecte;
+}
+
+
+private List<SelectItem> listPersonneConnecte=new ArrayList<SelectItem>();
+
+public List<SelectItem> getListPersonneConnecte() {
+	listPersonneConnecte.clear();
+	listPersonneConnecte.add(new SelectItem(this.idPersonneConnecte,""+this.idPersonneConnecte+""));
+	return listPersonneConnecte;
+}
+
+public void setListPersonneConnecte(List<SelectItem> listPersonneConnecte) {
+	this.listPersonneConnecte = listPersonneConnecte;
+}
+
+
 
 
 //Debut proprietes des personnes
@@ -715,6 +740,57 @@ public void setTel(String tel) {
 private static List<ImprilacBean> listPesonnes;
 
 
+public void ecouteModMatProd()
+{
+if(this.modifier==false)
+	this.modifier=true;
+else
+	this.modifier=false;
+
+ResultSet res=null;
+
+if(listMaterielProduit==null)
+	listMaterielProduit=new ArrayList<SelectItem>();
+else
+	listMaterielProduit.clear();
+
+listMaterielProduit.add(new SelectItem(0,"    "));
+
+
+if(idType==1)//ON MODIFIE LES MATERIELS
+{
+	res=Connecteur.Extrairedonnees("select * from materiel ");
+
+	try {
+		while(res.next())
+		{listMaterielProduit.add(new SelectItem(res.getInt("Idmateriel"),res.getInt("Idmateriel")+" "+res.getString("Designation")));
+
+		}
+	} catch (SQLException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}
+
+}
+if(idType==2)//ON MODIFIE LES PRODUITS
+{
+	res=Connecteur.Extrairedonnees("select * from produits ");
+
+	try {
+		while(res.next())
+		{listMaterielProduit.add(new SelectItem(res.getInt("Idprod"),res.getInt("Idprod")+" "+res.getString("Type")));
+
+		}
+	} catch (SQLException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}
+
+}
+
+	}
+
+
 
 public void buildListDesPers()//DEBUT DE LA FONCTION QUI NOUS PERMET DE PASSER AU MODE MODIFIER ET DE CONSTRUIRE LA LISTE DES PERSONNES D'UNE CATEGORIE CHOISIE
 {this.modifier=true;
@@ -729,12 +805,12 @@ else
 
 listper.add(new SelectItem(0,"    "));
 
-if(listMaterielProduit==null)
+/*if(listMaterielProduit==null)
 	listMaterielProduit=new ArrayList<SelectItem>();
 else
 	listMaterielProduit.clear();
 
-listMaterielProduit.add(new SelectItem(0,"    "));
+listMaterielProduit.add(new SelectItem(0,"    "));*/
 
 
 System.out.println("JE SUIS DANS ECOUTEMODIFIER!!");
@@ -831,7 +907,7 @@ if(idcategoriePersonne==6)//ON A CHOISIE LE PROFIL DU CAISSIER
 }
 
 
-if(idType==1)//ON MODIFIE LES MATERIELS
+/*if(idType==1)//ON MODIFIE LES MATERIELS
 {
 	res=Connecteur.Extrairedonnees("select * from materiel ");
 
@@ -860,7 +936,7 @@ if(idType==2)//ON MODIFIE LES PRODUITS
 		e.printStackTrace();
 	}
 
-}
+}*/
 	
 	}//FIN DE LA FONCTION QUI CONSTRUIT LA LISTE DES PERSONNES
 
@@ -1187,11 +1263,11 @@ public void enregistreMaterielProd()
 	   {
 	    message="CHOISIR LE TYPE S'IL VOUS PLAIT!";
 	    return;
-	   }  
-	
+	   } 
+	 ResultSet res=null;
 	 
 	if(this.idType==1)//ON INSERT UN MATERIEL
-	  {  ResultSet res=null;
+	  {  
 		if(this.designation==null||this.designation=="")
 	      { 
 		   message="TAPEZ LE NOM DU MATERIEL S'IL VOUS PLAIT!";
@@ -1227,7 +1303,7 @@ public void enregistreMaterielProd()
 	
 	if(this.idType==2)//ON INSERT UN PRODUIT
 	  {n=-1;
-	  ResultSet res=null;
+	  //ResultSet res=null;
 		if(this.designation==null||this.designation=="")
 	    {  
 		message="TAPEZ LE NOM DU PRODUIT S'IL VOUS PLAIT!";
@@ -1266,7 +1342,7 @@ public void enregistreMaterielProd()
 			return;
 		}
 		
-		
+		ResultSet res=null;
 		
 		if(this.idType==1)
 		{	
@@ -1276,6 +1352,20 @@ public void enregistreMaterielProd()
 			
 			return;
 			}
+			
+		      res=Connecteur.Extrairedonnees("select * from materiel where Designation='"+this.designation+"'");
+		      try {
+				if(res.next())
+				  {this.designation=null;
+				  this.historisation=null;
+					message="CE MATERIEL EXISTE DEJA!!";
+					return; 
+				  }
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
 			
 			if(this.designation.length()>0)
 			{
@@ -1304,6 +1394,20 @@ public void enregistreMaterielProd()
 		
 		if(this.idType==2)
 		{
+			res=Connecteur.Extrairedonnees("select * from produits where Type='"+this.designation+"'");
+			try {
+				if(res.next())
+				{this.designation=null;
+				this.historisation=null;
+				message="CE PRODUIT EST DEJA ENREGISTRE!!";
+				return;
+				}
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+			
 		if(this.designation.length()>0)
 		{n=-1;
 			n=Connecteur.Insererdonnees("update produits set Type ='"+this.designation+"' where Idprod="+idPerso);
@@ -1324,7 +1428,8 @@ public void enregistreMaterielProd()
 	
 	
 	//Fin de la partie pour les materiaux et produits
-
+this.designation=null;
+this.historisation=null;
 
 	}
 
@@ -1835,16 +1940,16 @@ public void ecouteModifierCompte()
 this.modifierComptel1=false;
 	}
 
-public void identification()
+public String identification()
 { 	ResultSet r=null;
 
 	if(this.login.length()==0)
 	{message="SAISISSER LE LOGIN S'IL VOUS PLAIT!!!";
-	return;
+	return null;
 	}
 	if(this.passWord.length()==0)
 	{message="SAISISSER LE MOT DE PASSE S'IL VOUS PLAIT!!!";
-	return;
+	return null;
 	}
 	
    //DEBUT DU TEST QUE LA PERSONNE EST UN CHEF DE PRODUCTION
@@ -1852,7 +1957,18 @@ public void identification()
 	try {
 		if(r.next())
 			{message="VOUS ETES RECONNU COMME CHEF DE PRODUCTION!!!";
-			return;
+			
+			
+			System.out.println("this.idPersonneConnecte"+this.idPersonneConnecte);
+			System.out.println("this.idPersonneConnecte"+this.idPersonneConnecte);
+			
+			this.idPersonneConnecte=r.getInt("p.Idpersonne");
+			
+			System.out.println("this.idPersonneConnecte"+this.idPersonneConnecte);
+			System.out.println("this.idPersonneConnecte"+this.idPersonneConnecte);
+			
+			
+			return "chef";
 			}
 	} catch (SQLException e) {
 		// TODO Auto-generated catch block
@@ -1865,7 +1981,8 @@ public void identification()
 	try {
 		if(r.next())
 			{message="VOUS ETES RECONNU COMME GERANT!!!";
-			return;
+			this.idPersonneConnecte=r.getInt("p.Idpersonne");
+			return "gera";
 			}
 	} catch (SQLException e) {
 		// TODO Auto-generated catch block
@@ -1878,7 +1995,8 @@ public void identification()
 	try {
 		if(r.next())
 			{message="VOUS ETES RECONNU COMME GESTIONNAIRE!!!";
-			return;
+			this.idPersonneConnecte=r.getInt("p.Idpersonne");
+			return "gest";
 			}
 	} catch (SQLException e) {
 		// TODO Auto-generated catch block
@@ -1891,7 +2009,8 @@ public void identification()
 	try {
 		if(r.next())
 			{message="VOUS ETES RECONNU COMME PRODUCTEUR!!!";
-			return;
+			this.idPersonneConnecte=r.getInt("p.Idpersonne");
+			return "prod";
 			}
 	} catch (SQLException e) {
 		// TODO Auto-generated catch block
@@ -1904,7 +2023,8 @@ public void identification()
 	try {
 		if(r.next())
 			{message="VOUS ETES RECONNU COMME CAISSIER!!!";
-			return;
+			this.idPersonneConnecte=r.getInt("p.Idpersonne");
+			return "caisse";
 			}
 	} catch (SQLException e) {
 		// TODO Auto-generated catch block
@@ -1914,9 +2034,7 @@ public void identification()
 	
 	message="VOUS N'ETES PAS RECONNU PAR LE SYSTEME!!!";
 	
+	return null;
 }
-
-
-
 
 }

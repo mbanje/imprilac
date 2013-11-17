@@ -9,11 +9,17 @@
   <head></head>
 
   <body>
+  
    <a4j:keepAlive beanName="demandeBine" />
   	<rich:panel style ="width:600px;font-size:35px;margin-left:250px;">
   	<f:facet name="header">SORTIE DES MATERIAUX</f:facet>
   		
   		<h:form>
+  		
+  		<h:selectOneMenu value="#{demandeBine.idPersonneConnecte}" style ="visibility: visible;">
+  		<f:selectItems value="#{bine.listPersonneConnecte}"/>
+  		</h:selectOneMenu>
+  		
   			<h:panelGrid columns="4">
   			
   			<h:outputText value="DEMANDE :" />
