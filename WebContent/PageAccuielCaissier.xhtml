@@ -10,5 +10,50 @@
 
   <body>
   
+  
+    <a4j:keepAlive beanName="bine" />
+    <rich:panel style ="width:500px;font-size:35px;margin-left:250px;" >
+  	<f:facet name="header">PAGE D'ACCUIEL DU GESTIONNAIRE</f:facet>
+  	
+  	<h:form>
+  		<h:selectOneMenu value="#{bine.idPersonneConnecte}" style ="visibility: hidden;">
+  			<f:selectItems value="#{bine.listPersonneConnecte}"/>
+  		</h:selectOneMenu>
+  		<h:selectOneMenu value="#{demandeBine.idPersonneConnecte}" style ="visibility: hidden;">
+  			<f:selectItems value="#{bine.listPersonneConnecte}"/>
+  		</h:selectOneMenu>
+  		
+  		
+		<rich:toolBar>
+			<rich:dropDownMenu>
+			<f:facet name="label">
+				<h:outputText value="FICHIER" />
+			</f:facet>
+			
+			
+			</rich:dropDownMenu>
+
+
+			<rich:dropDownMenu>
+			<f:facet name="label">
+				<h:outputText value="OPERATION" />
+			</f:facet>
+				<rich:menuItem submitMode="ajax" value="MARQUER UNE SORTIE" action="marquerSortieMat"/>
+			</rich:dropDownMenu>
+				
+				
+			<rich:dropDownMenu>
+			<f:facet name="label">
+				<h:outputText value="AIDE" />
+			</f:facet>
+				<rich:menuItem submitMode="ajax" value="About"/>
+			</rich:dropDownMenu>
+		</rich:toolBar>
+  		
+  	</h:form>
+  	
+  	</rich:panel>
+  	
+  	
   </body>
 </html>

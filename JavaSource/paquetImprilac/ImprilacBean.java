@@ -2,6 +2,7 @@ package paquetImprilac;
 
 
 
+import java.awt.Event;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
@@ -1942,13 +1943,13 @@ this.modifierComptel1=false;
 
 public String identification()
 { 	ResultSet r=null;
-
+System.out.println("@@@@@");
 	if(this.login.length()==0)
-	{message="SAISISSER LE LOGIN S'IL VOUS PLAIT!!!";
+	{this.showmessage2=true;
 	return null;
 	}
 	if(this.passWord.length()==0)
-	{message="SAISISSER LE MOT DE PASSE S'IL VOUS PLAIT!!!";
+	{this.showPassWord1=true;
 	return null;
 	}
 	
@@ -2036,5 +2037,41 @@ public String identification()
 	
 	return null;
 }
+
+
+//--------------------------------------------------------------------
+private boolean showmessage1=false;
+private boolean showmessage2=false;
+private boolean showPassWord1=false;
+
+
+public boolean isShowPassWord1() {
+	return showPassWord1;
+}
+public void setShowPassWord1(boolean showPassWord1) {
+	this.showPassWord1 = showPassWord1;
+}
+public boolean getShowmessage1() {
+	return showmessage1;
+}
+public void setShowmessage1(boolean showmessage1) {
+	this.showmessage1 = showmessage1;
+}
+public boolean isShowmessage2() {
+	return showmessage2;
+}
+public void setShowmessage2(boolean showmessage2) {
+	this.showmessage2 = showmessage2;
+}
+
+public void listernInPutLogin(ActionEvent e)
+{Controleur c=new Controleur();
+this.showmessage1=c.isStringOfCharAndNumbers(this.login);
+this.showmessage2=false;
+	}
+public void listernInPutPassWord(ActionEvent e){
+	this.showPassWord1=false;
+}
+
 
 }

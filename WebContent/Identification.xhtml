@@ -10,19 +10,43 @@
 
   <body>
   <a4j:keepAlive beanName="bine" />
-  <rich:panel style ="width:500px;font-size:35px;margin-left:250px;" >
-  <f:facet name="header">FORMULAIRE D'AUTHENTIFICATION</f:facet>
+  <rich:panel style ="width:500px;font-size:35px;margin-left:250px;background-color:#00BFFF;" >
+  <f:facet name="header" style ="text-align:center;">FORMULAIRE D'AUTHENTIFICATION</f:facet>
   
-  <h:form>
+  <h:form id="fo">
   <h:panelGrid columns="2">
-  	 <h:outputText value="LOGIN :" />
- 	 <h:inputText value="#{bine.login}" />
-  
-  	<h:outputText value="PASSWORD :" />
-  	<h:inputText value="#{bine.passWord}" />
-  </h:panelGrid>
   	
-  	 <a4j:commandButton value="ENVOYER" action="#{bine.identification}"  data="#{bine.message}" oncomplete="alert(data)"/>	
+						
+						
+			<h:outputText value="LOGIN" />
+			<h:panelGrid columns="1">
+  				<a4j:outputPanel id="messageLog1">
+					<h:outputText value="LE LOGIN DOIT ETRE COMPOSE DE LETTRES ET/OU CHIFFRES ET/OU '_' UNIQUEMENT!!" rendered="#{bine.showmessage1}"/> 
+				</a4j:outputPanel>
+				<a4j:outputPanel id="messageLog2">
+					<h:outputText value="SAISISSER LE LOGIN S'IL VOUS PLAIT!!"  rendered="#{bine.showmessage2}"/>
+				</a4j:outputPanel>
+				
+				<h:inputText id="username" value="#{bine.login}">
+				<a4j:support event="onkeyup" actionListener="#{bine.listernInPutLogin}" reRender="messageLog1,messageLog2" />
+				</h:inputText>
+			</h:panelGrid>	
+			
+			<h:outputText value="PASSWORD" />
+			<h:panelGrid columns="1">
+				<a4j:outputPanel id="messagePass1">
+					<h:outputText value="SAISISSEZ LE MOT DE PASSE S'IL VOUS PLAIT!!"  rendered="#{bine.showPassWord1}" />						
+				</a4j:outputPanel>
+				<h:inputSecret id="password" value="#{bine.passWord}" >				
+				<a4j:support event="onkeyup" actionListener="#{bine.listernInPutPassWord}" reRender="messagePass1"/>	
+				</h:inputSecret>
+			</h:panelGrid>					
+						
+
+
+  </h:panelGrid>
+  
+  	 <a4j:commandButton value="ENVOYER" action="#{bine.identification}"  data="#{bine.message}" reRender="messageLog1,messagePass1,messageLog2"/>
   </h:form>
   
    </rich:panel>
