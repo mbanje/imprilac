@@ -11,7 +11,7 @@
   <body>
   <a4j:keepAlive beanName="bine" />
   
-  <rich:panel style ="width:700px;font-size:35px;margin-left:250px;" >
+  <rich:panel style ="width:700px;font-size:35px;margin-left:250px;background-color:#00BFFF;" >
   <f:facet name="header">PAGE D'ENREGISTREMENT DE PERSONNES</f:facet>
   	<h:form id="fo">
   	
@@ -24,12 +24,26 @@
   	
   		<h:panelGrid columns="2">	
   			<h:outputText value="NOM :     " />
-  			<h:inputText value="#{bine.nomPersonne}" />
+  			<h:panelGrid columns="1">
+  			<a4j:outputPanel id="messageAboutName">
+					<h:outputText value="LE NOM PEUT ETRE COMPOSE DE LETTRES ET/OU CHIFFRES UNIQUEMENT!!" rendered="#{bine.showMessageErrorForPersoName}"/> 
+			</a4j:outputPanel>
+  			<h:inputText value="#{bine.nomPersonne}" >
+				<a4j:support event="onkeyup" actionListener="#{bine.listernInputPersoName}" reRender="messageAboutName" /> 			
+  			</h:inputText>
+  			</h:panelGrid>
   		</h:panelGrid>
   		
   		<h:panelGrid columns="2">
   			<h:outputText value="PRENOM :     " />
-  			<h:inputText value="#{bine.prenomPersonne}" />
+  			<h:panelGrid columns="1">
+  			<a4j:outputPanel id="messageAboutPrenom">
+					<h:outputText value="LE PRENOM PEUT ETRE COMPOSE DE LETTRES ET/OU CHIFFRES ET/OU '_' UNIQUEMENT!!" rendered="#{bine.showMessageErrorForPersoPrenom}" /> 
+			</a4j:outputPanel>
+  			<h:inputText value="#{bine.prenomPersonne}" >
+  				<a4j:support event="onkeyup" actionListener="#{bine.listernInputPersoPrenom}" reRender="messageAboutPrenom" /> 			
+  			</h:inputText>
+  			</h:panelGrid>
   		</h:panelGrid>
   			
   		<h:panelGrid columns="2">
@@ -46,9 +60,17 @@
   		</h:panelGrid>
   		
   		<a4j:outputPanel ajaxRendered="true">	
-  		<h:panelGrid columns="2" rendered="#{bine.showDiplome}">
+  	
+  		<h:panelGrid columns="2" rendered="#{bine.showDiplome}" >
   			<h:outputText value="DIPLOME   :" />
-  			<h:inputText value="#{bine.diplome}" />
+  			<h:panelGrid columns="1">
+  			<a4j:outputPanel id="messageAboutDiplo">
+					<h:outputText value="LE NOM DU DIPLOME PEUT ETRE COMPOSE DE LETTRES ET/OU CHIFFRES ET/OU '_' UNIQUEMENT!!" rendered="#{bine.showMessageErrorForDiplo}" /> 
+			</a4j:outputPanel>
+  			<h:inputText value="#{bine.diplome}" id="diplo">
+  			  	<a4j:support event="onkeyup" actionListener="#{bine.listernInputDiplome}" reRender="messageAboutDiplo" /> 			
+  			</h:inputText>
+  			</h:panelGrid>
   		</h:panelGrid>
   		 </a4j:outputPanel>
   		 
@@ -87,7 +109,7 @@
   	
   	
   	<h:form>
-  	<rich:panel style ="width:700px;font-size:35px;margin-left:250px;">
+  	<rich:panel style ="width:700px;font-size:35px;margin-left:250px;background-color:#00BFFF;">
   		<rich:dataTable id="tab" value="#{bine.listPesonnes}" var="per">
   		<f:facet name="header">LISTE DES #{bine.profil}</f:facet>
  
@@ -145,7 +167,7 @@
   	
 
   	
-  	<rich:modalPanel id='formp' width="500" height="300">
+  	<rich:modalPanel id='formp' width="700" height="300" style="background-color:#00BFFF;">
   	
  		<f:facet name="header">FORMULAIRE DE MODIFICATION</f:facet>
   		<f:facet name="controls">
@@ -156,8 +178,8 @@
   		
   	
   		<h:panelGroup>
-  			<h:form id="m">
-  			  	<h:panelGrid columns="2">
+  			<h:form id="m" >
+  			  	<h:panelGrid columns="2" >
   					<h:panelGrid columns="2">	
   						<h:outputText value="NOM :     " />
   						<h:inputText value="#{bine.selected.nomPersonne}" />

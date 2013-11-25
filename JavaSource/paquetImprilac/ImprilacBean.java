@@ -10,11 +10,14 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Dictionary;
 import java.util.List;
+import java.util.ServiceLoader;
 
 import javax.faces.event.ActionEvent;
 import javax.faces.model.SelectItem;
+import javax.swing.FocusManager;
 
 import com.sun.corba.se.spi.orbutil.fsm.Guard.Result;
+import com.sun.servicetag.ServiceTag;
 
 
 
@@ -1664,10 +1667,17 @@ this.tel=null;
 }
 //FIN DE LA FONCTION UTILISEE POUR INSERRER DANS LES TABLES DES PERSONNES
 
-
 public void modifierPersonne()
 {int n;
-System.out.println("momomomo");
+boolean nomP;
+
+Controleur c=new Controleur();
+nomP=c.isStringOfLettersAndNumbersOnly(this.selected.nomPersonne);
+if(nomP)
+{message="LE NOM DOIT ETRE COMPOSE DE LETTRES UNIQUEMENT";
+return;
+	}
+
 
 n=-1;
 
@@ -1943,7 +1953,7 @@ this.modifierComptel1=false;
 
 public String identification()
 { 	ResultSet r=null;
-System.out.println("@@@@@");
+
 	if(this.login.length()==0)
 	{this.showmessage2=true;
 	return null;
@@ -1952,6 +1962,8 @@ System.out.println("@@@@@");
 	{this.showPassWord1=true;
 	return null;
 	}
+	if(this.showmessage1==true)
+		return null;
 	
    //DEBUT DU TEST QUE LA PERSONNE EST UN CHEF DE PRODUCTION
 	r=Connecteur.Extrairedonnees("select * from personne p,chef_production c,compte co where p.Idpersonne=c.Idcheprod and p.Idpersonne=co.Idpersonne and co.Login='"+this.login+"' and co.Password='"+this.passWord+"'");
@@ -2072,6 +2084,45 @@ this.showmessage2=false;
 public void listernInPutPassWord(ActionEvent e){
 	this.showPassWord1=false;
 }
+//---------------------------------------------------------
+private boolean showMessageErrorForPersoName=false;
+private boolean showMessageErrorForPersoPrenom=false;
+private boolean showMessageErrorForDiplo=false;
 
+
+public boolean isShowMessageErrorForDiplo() {
+	return showMessageErrorForDiplo;
+}
+public void setShowMessageErrorForDiplo(boolean showMessageErrorForDiplo) {
+	this.showMessageErrorForDiplo = showMessageErrorForDiplo;
+}
+public boolean isShowMessageErrorForPersoPrenom() {
+	return showMessageErrorForPersoPrenom;
+}
+public void setShowMessageErrorForPersoPrenom(
+		boolean showMessageErrorForPersoPrenom) {
+	this.showMessageErrorForPersoPrenom = showMessageErrorForPersoPrenom;
+}
+public boolean isShowMessageErrorForPersoName() {
+	return showMessageErrorForPersoName;
+}
+public void setShowMessageErrorForPersoName(boolean showMessageErrorForPersoName) {
+	this.showMessageErrorForPersoName = showMessageErrorForPersoName;
+}
+public void listernInputPersoName(ActionEvent e)
+{Controleur c=new Controleur();
+this.showMessageErrorForPersoName=c.isStringOfLettersAndNumbersOnly(this.nomPersonne);
+this.showDiplome=true;
+
+}
+
+public void listernInputPersoPrenom(ActionEvent e)
+{
+	}
+
+public void listernInputDiplome(ActionEvent e)
+{Controleur c=new Controleur();
+this.showMessageErrorForDiplo=c.isStringOfCharAndNumbers(this.diplome);
+	}
 
 }

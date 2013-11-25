@@ -25,19 +25,59 @@ public class Controleur {
 	conclusion=matcher1.find();
 	return conclusion;
 	}
+
+	
+	//This function checks if "chaine" is a String composed by only
+	//Letters and/or numbers only
+	//It returns: 
+	//-false if in "chaine" there is only Letters and/or numbers
+	//-true if there an other character(not letter or number or "_")
+	public boolean isStringOfLettersAndNumbersOnly(String chaine)
+	{boolean conclusion=false;
+	String motif="[^a-zA-Z]";
+	pattern1 = Pattern.compile(motif);
+	matcher1 = pattern1.matcher(chaine);
+	conclusion=matcher1.find();
+	return conclusion;
+	}
+	
+	public boolean isStringForPernom(String chaine)
+	{boolean b1,b2,conclusion=false;
+	String motif1="[\\S&&\\W]";
+	String motif2="\\W";
+	pattern1 = Pattern.compile(motif1);
+	matcher1 = pattern1.matcher(chaine);
+	b1=matcher1.find();
+/*	pattern1 = Pattern.compile(motif2);
+	matcher1 = pattern1.matcher(chaine);
+	b2=matcher1.find();
+	if(b1 && b2)
+		conclusion=true;
+	else
+		conclusion=false;*/
+	return conclusion;
+	}
+	
+	
 	
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 		Controleur  c=new Controleur();
 		boolean b;
 
-		b=c.isStringOfCharAndNumbers("Verna-ck233hgy");
+		b=c.isStringForPernom("Verna-ck23hgy");
 		System.out.println(b);
-		b=c.isStringOfCharAndNumbers("V)j 23 dhd$");
+		b=c.isStringForPernom("ç 23 $");
 		System.out.println(b);	
-		b=c.isStringOfCharAndNumbers("V)j23dhd$");
+		b=c.isStringForPernom("V)j23dhd$");
 		System.out.println(b);
-		b=c.isStringOfCharAndNumbers("32_3");
+		b=c.isStringForPernom("323 iuj");
+		System.out.println(b);
+		b=c.isStringForPernom("Gtw");
+		System.out.println(b);
+		b=c.isStringForPernom("Gt_w");
+		System.out.println(b);
+		b=c.isStringForPernom("");
 		System.out.println(b);
 	}
 
