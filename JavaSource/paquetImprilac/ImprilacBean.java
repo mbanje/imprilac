@@ -1282,7 +1282,7 @@ public void enregistreMaterielProd()
 	      message="DIRER S'IL NECESSAIRE D'HISTORISER OU PAS SVP!";
 	      return;
 	      }  
-	      
+	      this.designation=this.designation.toUpperCase();
 	      res=Connecteur.Extrairedonnees("select * from materiel where Designation='"+this.designation+"'");
 	      try {
 			if(res.next())
@@ -1313,7 +1313,7 @@ public void enregistreMaterielProd()
 		message="TAPEZ LE NOM DU PRODUIT S'IL VOUS PLAIT!";
 		return;
 	    }
-		
+		this.designation=this.designation.toUpperCase();
 		res=Connecteur.Extrairedonnees("select * from produits where Type='"+this.designation+"'");
 		try {
 			if(res.next())
@@ -1567,7 +1567,7 @@ if(this.modifier!=true)//ON FAIT L'INSERTION PAS LA MODIFICATION
 		{message="TAPEZ LE NOM S'IL VOUS PLAIT!";
 		return;
 		}
-    
+    this.nomPersonne=this.nomPersonne.toUpperCase();
 	if(this.prenomPersonne==null||this.prenomPersonne=="")
     	{message="TAPEZ LE PRENOM S'IL VOUS PLAIT!";
         return;
@@ -1582,7 +1582,12 @@ if(this.modifier!=true)//ON FAIT L'INSERTION PAS LA MODIFICATION
 
 	//DEBUT D'INSERTION DANS LA TABLE PERSONNE
 	if(this.dateNaissance!=null)
+	{	if(this.dateNaissance.getYear()>=new java.util.Date().getYear()-15)
+		{message="CETTE PERSONNE EST TRES JEUNE!!";
+		return;
+		}
 		n=Connecteur.Insererdonnees("insert into personne(Nompersonne,Prenompersonne,Datenaissance)values('"+this.nomPersonne+"','"+this.prenomPersonne+"','"+changeDateFormat(dateNaissance)+"')");
+	}
 	else
 		n=Connecteur.Insererdonnees("insert into personne(Nompersonne,Prenompersonne)values('"+this.nomPersonne+"','"+this.prenomPersonne+"')");
 	//FIN D'INSERTION DANS LA TABLE PERSONNE
@@ -1679,10 +1684,23 @@ return;
 	}
 
 
-n=-1;
+System.out.println(changeDateFormat(this.selected.dateNaissance));
+System.out.println(changeDateFormat(this.selected.dateNaissance));
 
+n=-1;
+	
+
+ if(this.selected.dateNaissance!=null)
+ {if(this.selected.dateNaissance.getYear()>=new java.util.Date().getYear()-15)
+	{message="LA DATE DE NAISSANCE N'EST PAS VALIDE!!";
+	return;
+	}
 	n=Connecteur.Insererdonnees("update personne set Nompersonne='"+this.selected.nomPersonne+"',Prenompersonne='"+this.selected.prenomPersonne+"',Datenaissance='"+changeDateFormat(this.selected.dateNaissance)+"' where Idpersonne="+selected.idPersonn);
-	if(n==-1)
+ } 
+else
+	n=Connecteur.Insererdonnees("update personne set Nompersonne='"+this.selected.nomPersonne+"',Prenompersonne='"+this.selected.prenomPersonne+"',Datenaissance=NULL where Idpersonne="+selected.idPersonn);
+	 
+ if(n==-1)
 	{
 		message="ECHEC DE MISE A JOUR!";
 		return;
@@ -1777,15 +1795,24 @@ n=-1;
 public void modifieCompte()
 {int n;
 	if((this.selected.nouveauLogin.length()>0)&&(this.selected.nouveauLogin.length()<4))
-	{message="SAISISSER UNE CHAINE D'AU MOINS 4 CARACTERE S'IL VOUS PLAIT!!";
+	{message="SAISISSER UN LOGIN D'AU MOINS 4 CARACTERES S'IL VOUS PLAIT!!";
 	return;
 	}
 
 	if((this.selected.nouveauPassWord.length()>0)&&(this.selected.nouveauPassWord.length()<4))
-	{message="SAISISSER UNE CHAINE D'AU MOINS 4 CARACTERE S'IL VOUS PLAIT!!";
+	{message="SAISISSER UN MOT DE PASSE D'AU MOINS 4 CARACTERES S'IL VOUS PLAIT!!";
 	return;
 	}
 
+	if(new Controleur().isStringOfCharAndNumbers(this.selected.nouveauLogin)==true)
+	{
+		message="LE LOGIN SAISI CONTIENT DES CARACTERES INVALIDES!!";
+		return;
+	}
+	
+	boolean miseAJourHappened=false;
+	
+	
 	if(this.selected.nouveauPassWord.length()>0)
 	{
 	
@@ -1797,7 +1824,10 @@ public void modifieCompte()
 		return;
 		}
 	else
+	{
 		message="MISE A JOUR REUSSIE!!";
+		miseAJourHappened=true;
+	}
 	
 	}
 	
@@ -1806,12 +1836,20 @@ public void modifieCompte()
 	n=-1;
 	n=Connecteur.Insererdonnees("UPDATE COMPTE SET Login='"+this.selected.nouveauLogin+"' where Login='"+this.selected.login+"'");
 	if(n==-1)
+	{
 		message="MISE A JOUR ECHOUEE!!";
+		return;
+	}
 	else
+	{
 		message="MISE A JOUR REUSSIE!!";
+		miseAJourHappened=true;
+	}
 		
 	}
-	
+
+if(miseAJourHappened==false)
+	message="RIEN N'A ETE MIS A JOUR!!";
 
 }
 
@@ -1833,12 +1871,12 @@ String pkCompte=null;
 if(this.modifierCompte==false)//ON FAIT L'INSERTION DANS LA TABLE COMPTE
 {
 	if(this.login.length()<4)
-	{message="SAISISSER UNE CHAINE D'AU MOINS 4 CARACTERE S'IL VOUS PLAIT!!";
+	{message="SAISISSER UN LOGIN D'AU MOINS 4 CARACTERE S'IL VOUS PLAIT!!";
 	return;
 	}
 
 	if(this.passWord.length()<4)
-	{message="SAISISSER UNE CHAINE D'AU MOINS 4 CARACTERE S'IL VOUS PLAIT!!";
+	{message="SAISISSER UN MOT DE PASSE D'AU MOINS 4 CARACTERE S'IL VOUS PLAIT!!";
 	return;
 	}
 
@@ -1846,7 +1884,11 @@ if(this.modifierCompte==false)//ON FAIT L'INSERTION DANS LA TABLE COMPTE
 	{message="CHOISISSER LA CATEGORIE S'IL VOUS PLAIT!!";
 	return;
 	}
-
+	
+	if(this.showmessage1==true)
+	{message="CE LOGIN N'EST PAS VALIDE!!";
+		return;
+	}
 	
 	r=Connecteur.Extrairedonnees("select * from compte where Login='"+this.login+"'");
 	

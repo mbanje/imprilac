@@ -11,7 +11,7 @@
   <body>
   <a4j:keepAlive beanName="bine" />
   
-  <rich:panel style ="width:700px;font-size:35px;margin-left:250px;" >
+  <rich:panel style ="width:750px;font-size:35px;margin-left:200px;background-color:#00BFFF;" >
   <f:facet name="header">PAGE DE CREATION DES COMPTES</f:facet>
   	<h:form id="fo">
   	
@@ -23,7 +23,17 @@
   		<h:panelGrid columns="2">
   			<h:panelGrid columns="2">
   				<h:outputText value="LOGIN :" />
-  				<h:inputText value="#{bine.login}" />
+  				<h:panelGrid columns="1">
+  				
+  				<a4j:outputPanel id="messageLog1">
+					<h:outputText value="LE LOGIN DOIT ETRE COMPOSE DE LETTRES ET/OU CHIFFRES ET/OU '_' UNIQUEMENT!!" rendered="#{bine.showmessage1}"/> 
+				</a4j:outputPanel>
+
+  				
+  				<h:inputText value="#{bine.login}" >
+<a4j:support event="onkeyup" actionListener="#{bine.listernInPutLogin}" reRender="messageLog1" />		
+  				</h:inputText>
+  				</h:panelGrid>
   			</h:panelGrid>
   		
   			<h:panelGrid columns="2">
@@ -73,7 +83,7 @@
   	
   	
   	<h:form>
-  	<rich:panel>
+  	<rich:panel style ="width:750px;font-size:35px;margin-left:200px;background-color:#00BFFF;" >
   		<rich:dataTable id="tab" value="#{bine.listDesPersoAyantLogEtPw}" var="per">
   		<f:facet name="header">LISTE DES #{bine.profil}</f:facet>
   		
@@ -144,7 +154,7 @@
   	
 
   	
-  	<rich:modalPanel id='formp' width="500" height="300">
+  	<rich:modalPanel id='formp' width="700" height="300" style ="background-color:#00BFFF;">
   	
  		<f:facet name="header">FORMULAIRE DE MODIFICATION</f:facet>
   		<f:facet name="controls">
@@ -156,7 +166,7 @@
   	
   		<h:panelGroup>
   			<h:form id="m">
-  			  	<h:panelGrid columns="2">
+  			  	<h:panelGrid columns="2"  >
   					<h:panelGrid columns="2">	
   						<h:outputText value="ENCIEN LOGIN :     " />
   						<h:inputText value="#{bine.selected.login}" />

@@ -59,25 +59,34 @@ public class Controleur {
 	}
 	
 	
+	public boolean isNumber(String chaine)
+	{boolean conclusion=false;
+	String motif="[^0-9]";
+	pattern1 = Pattern.compile(motif);
+	matcher1 = pattern1.matcher(chaine);
+	conclusion=matcher1.find();
+		return conclusion;
+	}
+	
 	
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 		Controleur  c=new Controleur();
 		boolean b;
 
-		b=c.isStringForPernom("Verna-ck23hgy");
+		b=c.isNumber("Verna-ck23hgy");
 		System.out.println(b);
-		b=c.isStringForPernom("ç 23 $");
+		b=c.isNumber("ç 23 $");
 		System.out.println(b);	
-		b=c.isStringForPernom("V)j23dhd$");
+		b=c.isNumber("V)j23dhd$");
 		System.out.println(b);
-		b=c.isStringForPernom("323 iuj");
+		b=c.isNumber("323");
 		System.out.println(b);
-		b=c.isStringForPernom("Gtw");
+		b=c.isNumber("Gtw");
 		System.out.println(b);
-		b=c.isStringForPernom("Gt_w");
+		b=c.isNumber("Gt_w");
 		System.out.println(b);
-		b=c.isStringForPernom("");
+		b=c.isNumber("");
 		System.out.println(b);
 	}
 

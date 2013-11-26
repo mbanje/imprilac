@@ -1,11 +1,13 @@
 package paquetImprilac;
 
+import java.awt.Event;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import javax.faces.event.ActionEvent;
 import javax.faces.model.SelectItem;
 
 public class DemandeBean {
@@ -64,6 +66,11 @@ public class DemandeBean {
 	//private boolean ajoute=true;
 	
 	
+	
+	private boolean showMessageAboutQuantite=false;
+	private boolean showMessageAboutNomMat=false;
+	
+	
 	private int idM=0;
 	
 	
@@ -74,8 +81,35 @@ public class DemandeBean {
 	
 	
 	
-
-
+	public void listernInPutQuantite(ActionEvent e)
+	{	System.out.println("Dans quantiteMateriel il y a"+this.quantiteMateriel);
+		this.showMessageAboutQuantite=false;
+	}
+	
+	public void listernInPutNomMat(ActionEvent e)
+	{if(this.idMateriel==0)
+		this.showMessageAboutNomMat=true;
+	else
+		this.showMessageAboutNomMat=false;
+		
+	}
+	
+	
+	
+	
+	
+	public boolean isShowMessageAboutNomMat() {
+		return showMessageAboutNomMat;
+	}
+	public void setShowMessageAboutNomMat(boolean showMessageAboutNomMat) {
+		this.showMessageAboutNomMat = showMessageAboutNomMat;
+	}
+	public boolean isShowMessageAboutQuantite() {
+		return showMessageAboutQuantite;
+	}
+	public void setShowMessageAboutQuantite(boolean showMessageAboutQuantite) {
+		this.showMessageAboutQuantite = showMessageAboutQuantite;
+	}
 	public int getIdM() {
 		return idM;
 	}
@@ -518,13 +552,17 @@ public class DemandeBean {
 	if(this.idMateriel==0)
 		{message="CHOISISSER LE MATERIEL S'IL VOUS PLAIT!!!";
 		System.out.println("Dans idMateriel==0 "+idMateriel);
+		this.showMessageAboutNomMat=true;
 		return;
 		}
-	if(this.quantiteMateriel==0)
+	
+	System.out.println("Dans quantiteMateriel il y a"+this.quantiteMateriel);
+	
+	if(this.quantiteMateriel<=0)
 		{message="SAISISSER LA QUANTITE S'IL VOUS PLAIT!!!";
-		System.out.println("LA QUANTITE EST 0");
+		this.showMessageAboutQuantite=true;
 		return;
-		}	
+		}
 	if(listDesProdDmd==null)
 		listDesProdDmd=new ArrayList<DemandeBean>();
 	System.out.println("Size  :"+listDesProdDmd.size());
@@ -753,12 +791,19 @@ public class DemandeBean {
 		System.out.println("this.autorisation"+this.autorisation);
 		System.out.println("this.quantiteMatAccord"+this.quantiteMatAccord);
 		
-		if((this.quantiteMatAccord==0)&&(this.autorisation.equalsIgnoreCase("OUI")))
+		if((this.quantiteMatAccord<=0)&&(this.autorisation.equalsIgnoreCase("OUI")))
 		{
-			message="SAISISSER LA QUANTITE ACCORDEE S'IL VOUS PLAIT!!";
+			message="SAISISSER LA QUANTITE ACCORDEE VALIDE S'IL VOUS PLAIT!!";
 			return;
 		}
 		System.out.println("lllllllll");
+		if((this.quantiteMatAccord>0)&&(this.autorisation.equalsIgnoreCase("NON")))
+		{
+			message="OPERATION NON COMPRISE!!";
+			return;
+		}		
+		
+		
 		if(this.quantiteMateriel<this.quantiteMatAccord)
 		{
 			message="LA QUANTITE ACCORDEE N'EST PAS DISPONNIBLE!!";
@@ -842,6 +887,28 @@ public class DemandeBean {
 	public void ecouteChangeDmd()
 	{
 		this.quantiteMatAccord=0;
+		
+		if(this.idDmd==0)
+		{
+			this.nom="";
+			this.prenom="";
+			return;
+		}
+		ResultSet res=null;
+		res=Connecteur.Extrairedonnees("select * from personne p,chef_production c,demande d where d.Iddemande="+this.idDmd+" and d.Idchefprod=c.Idcheprod and c.Idcheprod=p.Idpersonne");
+		
+		try {
+			if(res.next())
+			{this.nom=res.getString("Nompersonne");
+			this.prenom=res.getString("Prenompersonne");
+			}
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		this.quantiteMateriel=0;
+		
 	}
 	//FIN DE LA FONCTION QUI ECOUTE LE CHANGEMENT DE LA DEMANDE	
 	

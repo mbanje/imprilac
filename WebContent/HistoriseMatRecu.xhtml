@@ -13,7 +13,7 @@
      
 
      
-  	<rich:panel style ="width:600px;font-size:35px;margin-left:250px;">
+  	<rich:panel style ="width:650px;font-size:35px;margin-left:250px;background-color:#00BFFF;">
   	<f:facet name="header">HISTORISATION DES MATERIAUX</f:facet>
   		
   		<h:form>
@@ -57,7 +57,7 @@
   	
   	
   	
-  <rich:panel style ="width:600px;font-size:35px;margin-left:250px;" id="richpa" rendered="true">
+  <rich:panel style ="width:650px;font-size:35px;margin-left:250px;background-color:#00BFFF;" id="richpa" rendered="true">
   		<rich:dataTable id="tab" value="#{demandeBine.listAHistoriser}" var="mate">
   		<f:facet name="header">LISTE POUR HISTORISATION</f:facet>
   		
@@ -82,7 +82,7 @@
 
   			<h:form>
   	 <a4j:keepAlive beanName="demandeBine" />
-  	<rich:panel style ="width:600px;font-size:35px;margin-left:250px;">
+  	<rich:panel style ="width:650px;font-size:35px;margin-left:250px;background-color:#00BFFF;">
   		<rich:dataTable id="tab1" value="#{demandeBine.listMatHistoriser}" var="per">
   		<f:facet name="header">LISTE DES MATERIEL POUR HISTORISATION</f:facet>
   		
@@ -124,10 +124,10 @@
   	
   	
   	
-  	<rich:modalPanel id='formp' width="500" height="300">
+  	<rich:modalPanel id='formp' width="600" height="300" style="background-color:#00BFFF;">
   	
  		<f:facet name="header">FORMULAIRE DE MODIFICATION</f:facet>
-  		<f:facet name="controls">
+		<f:facet name="controls">
  			<h:graphicImage value="/image/close.png" onclick="#{rich:component('formp')}.hide();"/>
   		</f:facet>
   		

@@ -11,7 +11,7 @@
   <body>
     <a4j:keepAlive beanName="demandeBine" />
      
-<rich:panel style ="width:600px;font-size:35px;margin-left:250px;" >
+<rich:panel style ="width:700px;font-size:35px;margin-left:250px;background-color:#00BFFF;" >
     
 <h:form>
 
@@ -23,17 +23,33 @@
   <h:panelGrid columns="3">
  	<h:panelGrid columns="2">
   			<h:outputText value="MATERIEL    :"/>
+  			
+  			<h:panelGrid columns="1">
+  			<a4j:outputPanel id="messageNomMat">
+			<h:outputText value="SELECTIONNER LE NOM DU MATERIEL!!" rendered="#{demandeBine.showMessageAboutNomMat}"/> 
+			</a4j:outputPanel>
+  			
   			<h:selectOneMenu value="#{demandeBine.idMateriel}">
   				<f:selectItems value="#{bine.listMat}"/>
+ 				<a4j:support event="onchange" actionListener="#{demandeBine.listernInPutNomMat}" reRender="messageNomMat" />   	
   			</h:selectOneMenu>
+  			</h:panelGrid>
 	</h:panelGrid>
     
     <h:panelGrid columns="2">
-    	<h:outputText value="QUANTITE :" />
-    	<h:inputText value="#{demandeBine.quantiteMateriel}" />
+    		<h:outputText value="QUANTITE :" />
+			<h:panelGrid columns="1">
+  				<a4j:outputPanel id="messageQuanti">
+					<h:outputText value="LA QUANTITE DOIT ETRE UN NOMBRE SUPERIEURE A ZERO!!" rendered="#{demandeBine.showMessageAboutQuantite}"/> 
+				</a4j:outputPanel>
+			   	
+    		<h:inputText value="#{demandeBine.quantiteMateriel}" >
+ 				<a4j:support event="onkeyup" actionListener="#{demandeBine.listernInPutQuantite}" reRender="messageQuanti" />   	
+    		</h:inputText>
+    		</h:panelGrid>
     </h:panelGrid>
     
-      <a4j:commandButton value="AJOUTER" action="#{demandeBine.ajouteMatSurCmd}"  reRender="tab"/>
+      <a4j:commandButton value="AJOUTER" action="#{demandeBine.ajouteMatSurCmd}"  reRender="tab,messageQuanti,messageNomMat"/>
   	  <a4j:commandButton value="ANNULER" action="#{demandeBine.ecouteAnnulerCmd}"  reRender="tab"/>
   	  <a4j:commandButton value="VALIDER" reRender="tab" action="#{demandeBine.creerDmdMateriel}" data="#{demandeBine.message}" oncomplete="alert(data)"/> 	
  
@@ -41,7 +57,7 @@
     </h:form>  
     
     
-     <rich:panel>
+     <rich:panel style="background-color:#00BFFF;">
   		<rich:dataTable id="tab" value="#{demandeBine.listDesProdDmd}" var="per">
   		<f:facet name="header">LISTE DES MATERIELS FIGURANT SUR UNE COMMANDE</f:facet>
   		
