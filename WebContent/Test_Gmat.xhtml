@@ -9,15 +9,10 @@
   <head></head>
 
   <body>
-  
   <rich:panel>
-  	<h:form>
-  		<h:outputText value="DEMANDE :" />
-  		<h:selectOneMenu value="#{demandeBine.idDmd}">
-  			<f:selectItems value="#{demandeBine.listDesDmdNonEtudiees}"/>
-  		</h:selectOneMenu>
-  	</h:form>
+ 	<f:view contentType="text/html">
+  	<rich:gmap lat ="48.44"  lng = "2.24"  zoom = "5"/>
+  	</f:view>
   </rich:panel>
-  
   </body>
 </html>

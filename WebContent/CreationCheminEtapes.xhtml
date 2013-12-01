@@ -1,0 +1,135 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:a4j="http://richfaces.org/a4j"
+      xmlns:rich="http://richfaces.org/rich"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:ui="http://java.sun.com/jsf/facelets">
+
+  <head></head>
+
+  <body>
+  <a4j:keepAlive beanName="bine" />
+     <rich:panel style ="width:500px;font-size:35px;margin-left:250px;background-color:#00BFFF;" >
+    <f:facet name="header">PAGE D'ENREGISTREMENT DES CHEMINS ET DES ETAPES</f:facet>
+    <h:form> 
+    
+      	<h:selectOneMenu value="#{bine.idPersonneConnecte}" style ="visibility: hidden;">
+  		<f:selectItems value="#{bine.listPersonneConnecte}"/>
+  		</h:selectOneMenu>
+  
+<h:panelGrid columns="2">
+  			<h:panelGrid columns="2" id="typ">
+  				<h:outputText value="TYPE    :"/>
+  				<h:selectOneMenu value="#{bine.idEtCh}" >
+  			 	<f:selectItems value="#{bine.listEtCh}" />
+  			 	<a4j:support event="onchange" actionListener="#{bine.ecouteChangeType}" reRender="tab,prix"/>
+  				</h:selectOneMenu>
+    		</h:panelGrid>
+ 	 
+  	 		
+  			<h:panelGrid columns="2" id="des">
+  				<h:outputText value="DESIGNATION  :" />
+  				<h:inputText value="#{bine.designa}" />
+  			</h:panelGrid>
+  			
+  			
+  			 <a4j:outputPanel ajaxRendered="true" id="prix">	
+  				<h:panelGrid columns="2" rendered="#{bine.showPrixU}">
+  				<h:outputText value="PRIX UNITAIRE  :" />
+  				<h:inputText value="#{bine.prixUni}" />
+  				</h:panelGrid>
+  			</a4j:outputPanel>
+  			
+  </h:panelGrid>
+   	 <a4j:commandButton value="ENVOYER" action="#{bine.enregistrerChemEtap}"  data="#{bine.message}" oncomplete="alert(data)" reRender="des,typ,tab"/>
+ 
+   </h:form>
+   
+   <h:form>
+  <rich:panel>
+  		<rich:dataTable id="tab" value="#{bine.listCheminEtape}" var="c">
+  		<f:facet name="header">LISTE DES #{bine.types}</f:facet>
+  		
+  		<rich:column>
+  		<f:facet name="header">NUMERO</f:facet>
+  		#{c.idChemOuEtap}
+  		</rich:column>
+  		
+ 
+    	<rich:column>
+  		<f:facet name="header">DESIGNATION</f:facet>
+  		#{c.designation}
+  		</rich:column>
+  		
+  		
+  		<rich:column rendered="#{bine.showPrixU}">
+  		<f:facet name="header">PRIX UNITAIRE</f:facet>
+  		#{c.prixUni}
+  		</rich:column>
+  		
+  		
+  		<rich:column>
+    		<f:facet name="header">ACTION</f:facet>
+     			
+      				<a4j:commandLink onclick="#{rich:component('formp')}.show()" value="modifier" reRender="m">
+      				
+      				<f:setPropertyActionListener value="#{c}" target="#{bine.sele}" />
+	  				
+	  				</a4j:commandLink>	
+   		</rich:column> 
+  		
+  		
+  	</rich:dataTable>
+  
+  	</rich:panel>
+  </h:form>
+  	</rich:panel>
+  	
+  	
+  	
+  	
+  	
+  	
+  	
+  	<rich:modalPanel id='formp' width="700" height="300" style ="background-color:#00BFFF;">
+  	
+ 		<f:facet name="header">FORMULAIRE DE MODIFICATION</f:facet>
+  		<f:facet name="controls">
+ 			<h:graphicImage value="/image/close.png" onclick="#{rich:component('formp')}.hide();"/>
+  		</f:facet>
+  		
+  		
+  		
+  	
+  		<h:panelGroup>
+  			<h:form id="m">
+  			  	<h:panelGrid columns="2">
+ 	 
+  	 		
+  			<h:panelGrid columns="2" id="des">
+  				<h:outputText value="DESIGNATION  :" />
+  				<h:inputText value="#{bine.sele.designation}" />
+  			</h:panelGrid>
+  			
+  			
+  			 <a4j:outputPanel ajaxRendered="true" id="prix">	
+  				<h:panelGrid columns="2" rendered="#{bine.showPrixU}">
+  				<h:outputText value="PRIX UNITAIRE  :" />
+  				<h:inputText value="#{bine.sele.prixUni}" />
+  				</h:panelGrid>
+  			</a4j:outputPanel>
+  			
+  </h:panelGrid>
+  	
+<a4j:commandButton action="#{bine.modifierCheEtaCharge}" value="MODIFIER" data="#{bine.message}" oncomplete="alert(data)" reRender="tab" />
+		</h:form>
+	</h:panelGroup>
+  </rich:modalPanel> 
+  	
+  	
+  	
+  	
+  
+  </body>
+</html>

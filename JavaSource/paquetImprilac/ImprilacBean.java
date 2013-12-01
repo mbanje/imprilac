@@ -2167,4 +2167,312 @@ public void listernInputDiplome(ActionEvent e)
 this.showMessageErrorForDiplo=c.isStringOfCharAndNumbers(this.diplome);
 	}
 
+
+//------------------------------DEBUT CREATION DES CHEMINS ET DES ETAPES-------------
+private int idEtCh;
+private static List<SelectItem> listEtCh;
+private String designa;
+private String types;
+
+
+
+public String getTypes() {
+	return types;
+}
+public void setTypes(String types) {
+	this.types = types;
+}
+public int getIdEtCh() {
+	return idEtCh;
+}
+public void setIdEtCh(int idEtCh) {
+	this.idEtCh = idEtCh;
+}
+public List<SelectItem> getListEtCh() {
+	if(listEtCh==null)
+		listEtCh=new ArrayList<SelectItem>();
+	else 
+		listEtCh.clear();
+	listEtCh.add(new SelectItem(0,""));
+	listEtCh.add(new SelectItem(1,"CHEMIN"));
+	listEtCh.add(new SelectItem(2,"ETAPE"));
+	listEtCh.add(new SelectItem(3,"CHARGE"));
+	return listEtCh;
+}
+public void setListEtCh(List<SelectItem> listEtCh) {
+	ImprilacBean.listEtCh = listEtCh;
+}
+public String getDesigna() {
+	return designa;
+}
+public void setDesigna(String designa) {
+	this.designa = designa;
+}
+
+public void enregistrerChemEtap()
+{	int n=-1;
+	 if(this.idEtCh==0)
+	   {
+	    message="CHOISIR LE TYPE S'IL VOUS PLAIT!";
+	    return;
+	   } 
+	 ResultSet res=null;
+	 
+	if(this.idEtCh==1)//ON INSERT UN UN CHEMIN
+	  {  
+		if(this.designa==null||this.designa=="")
+	      { 
+		   message="TAPEZ LE NOM DU CHEMIN S'IL VOUS PLAIT!";
+		   return; 
+	      } 
+	      this.designa=this.designa.toUpperCase();
+	      res=Connecteur.Extrairedonnees("select * from chemin where Designation='"+this.designa+"'");
+	      try {
+			if(res.next())
+			  {message="CE CHEMIN EXISTE DEJA!!";
+				return; 
+			  }
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	      
+		   n=Connecteur.Insererdonnees("insert into chemin(Designation) values ('"+this.designa+"')");
+		   if(n!=-1)
+			  message="INSERTION REUSSIE!";
+		 else
+			 message="ECHEC D'INSERTION!";
+
+	  }
+	
+	
+	if(this.idEtCh==2)//ON INSERT UNE ETAPE
+	  {n=-1;
+	  //ResultSet res=null;
+		if(this.designa==null||this.designa=="")
+	    {  
+		message="TAPEZ LE NOM DE L'ETAPE S'IL VOUS PLAIT!";
+		return;
+	    }
+		this.designa=this.designa.toUpperCase();
+		res=Connecteur.Extrairedonnees("select * from etapes where Designation='"+this.designa+"'");
+		try {
+			if(res.next())
+			{message="CETTE ETAPE EST DEJA ENREGISTRE!!";
+			return;
+			}
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		n=Connecteur.Insererdonnees("insert into etapes (Designation) values ('"+this.designa+"')");
+		 if(n!=-1)
+			  message="INSERTION REUSSIE!";
+		 else
+			 message="ECHEC D'INSERTION!";
+
+	  }
+	
+	if(this.idEtCh==3)//ON INSERT UNE CHARGE
+	  {  
+		if(this.designa==null||this.designa=="")
+	      { 
+		   message="TAPEZ LE NOM DU CHEMIN S'IL VOUS PLAIT!";
+		   return; 
+	      } 
+		if(this.prixUni==0)
+	      { 
+		   message="TAPEZ LE PRIX UNITAIRE S'IL VOUS PLAIT!";
+		   return; 
+	      } 
+	      this.designa=this.designa.toUpperCase();
+	      res=Connecteur.Extrairedonnees("select * from charges where Designation='"+this.designa+"'");
+	      try {
+			if(res.next())
+			  {message="CETTE CHARGE EXISTE DEJA!!";
+				return; 
+			  }
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	      
+		   n=Connecteur.Insererdonnees("insert into charges(Designation,PU) values ('"+this.designa+"',"+this.prixUni+")");
+		   if(n!=-1)
+			  message="INSERTION REUSSIE!";
+		 else
+			 message="ECHEC D'INSERTION!";
+
+	  }
+	
+	
+	  this.designa=null;
+	  //this.idEtCh=0;
+	  this.prixUni=0;
+	}
+
+
+private List<CheminOuEtape> listCheminEtape;
+public List<CheminOuEtape> getListCheminEtape() {
+	ResultSet res=null;
+	int num=1;
+	if(listCheminEtape==null)
+		listCheminEtape=new ArrayList<CheminOuEtape>();
+	else 
+		listCheminEtape.clear();
+	
+	if(this.idEtCh==1)
+	{
+		res=Connecteur.Extrairedonnees("select * from chemin");
+		this.types="CHEMINS";
+	}
+	if(this.idEtCh==2)
+	{
+		res=Connecteur.Extrairedonnees("select * from etapes");
+		this.types="ETAPES";
+	}
+	if(this.idEtCh==3)
+	{
+		res=Connecteur.Extrairedonnees("select * from charges");
+		this.types="CHARGES";
+	}
+	if((this.idEtCh==1)||(this.idEtCh==2))
+	{try {
+		while(res.next())
+		{CheminOuEtape p=new CheminOuEtape();
+		p.setIdChemOuEtap(num);
+		if(this.idEtCh==1)//ON CONSTRUIT LA LISTE DES CHEMINS
+		p.setId(res.getInt("Idchemin"));
+		else//ON CONSTRUIT LA LISTE DES ETAPES
+		p.setId(res.getInt("Idetape"));
+		p.setDesignation(res.getString("Designation"));
+		this.listCheminEtape.add(p);
+		num++;
+		}
+	} catch (SQLException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}
+		
+	}
+	if(this.idEtCh==3)
+	{try {
+		while(res.next())
+		{CheminOuEtape p=new CheminOuEtape();
+		p.setIdChemOuEtap(num);
+		p.setId(res.getInt("Idcharge"));
+		p.setDesignation(res.getString("Designation"));
+		p.setPrixUni(res.getFloat("PU"));
+		this.listCheminEtape.add(p);
+		num++;
+		}
+	} catch (SQLException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}
+		
+	}
+	
+	return listCheminEtape;
+}
+public void setListCheminEtape(List<CheminOuEtape> listCheminEtape) {
+	this.listCheminEtape = listCheminEtape;
+}
+
+private boolean showPrixU=false;
+public boolean isShowPrixU() {
+	return showPrixU;
+}
+public void setShowPrixU(boolean showPrixU) {
+	this.showPrixU = showPrixU;
+}
+private float prixUni=0;
+public float getPrixUni() {
+	return prixUni;
+}
+public void setPrixUni(float prixUni) {
+	this.prixUni = prixUni;
+}
+public void ecouteChangeType(ActionEvent e)
+{if(this.idEtCh==3)
+	this.showPrixU=true;
+else
+	this.showPrixU=false;
+	}
+
+private CheminOuEtape sele=null;
+public CheminOuEtape getSele() {
+	return sele;
+}
+public void setSele(CheminOuEtape sele) {
+	this.sele = sele;
+}
+
+public void modifierCheEtaCharge()
+{int n=-1;
+ if(this.idEtCh==1)//ON MODIFIE UN CHEMIN
+	{
+	 if((this.sele.getDesignation()==null)||(this.sele.getDesignation()==""))
+		 message="VOUS N'AVEZ RIEN MODIFIER!!";
+	 else
+	 {
+		 n=-1;
+		 this.sele.setDesignation(this.sele.getDesignation().toUpperCase());
+		 n=Connecteur.Insererdonnees("update chemin set Designation='"+this.sele.getDesignation()+"' where Idchemin="+this.sele.getId()+"");
+		 message="MISE A JOUR REUSSIE";
+	 }
+	 
+	}
+ if(this.idEtCh==2)//ON MODIFIE UNE ETAPE
+ 	{
+	 if((this.sele.getDesignation()==null)||(this.sele.getDesignation()==""))
+		 message="VOUS N'AVEZ RIEN MODIFIER!!";
+	 else
+	 {
+		 n=-1;
+		 this.sele.setDesignation(this.sele.getDesignation().toUpperCase());
+		 n=Connecteur.Insererdonnees("update etapes set Designation='"+this.sele.getDesignation()+"' where Idetape="+this.sele.getId()+"");
+		 message="MISE A JOUR REUSSIE";
+	 }
+ 	}
+ if(this.idEtCh==3)//ON MODIFIE UNE CHARGE
+	{boolean mod=false;
+
+	 if(((this.sele.getDesignation()==null)||(this.sele.getDesignation()==""))&&(this.sele.getPrixUni()==0))
+	 {
+		 message="VOUS N'AVEZ RIEN MODIFIER!!";
+		 return;
+	 }
+  System.out.println("this.sele.getDesignation() "+this.sele.getDesignation());
+	 if((this.sele.getDesignation().length()>0))//ON MODIFIE LA DESIGNATION
+	 {
+		 n=-1;
+		 this.sele.setDesignation(this.sele.getDesignation().toUpperCase());
+		 n=Connecteur.Insererdonnees("update charges set Designation='"+this.sele.getDesignation()+"' where Idcharge="+this.sele.getId()+"");
+		 mod=true;
+		 if(n!=-1)
+		 message="MISE A JOUR REUSSIE";
+		 else
+		 message="MISE A JOUR ECHOUEE";	 
+	 }
+	 
+	 
+	 if(this.sele.getPrixUni()!=0)//ON MODIFIE LE PRIX
+	 { n=-1;
+	 n=Connecteur.Insererdonnees("update charges set PU='"+this.sele.getPrixUni()+"' where Idcharge="+this.sele.getId()+"");
+	 mod=true;
+	 if(n!=-1)
+	 message="MISE A JOUR REUSSIE";
+	 else
+	 message="MISE A JOUR ECHOUEE";	 
+	 }
+		 
+	}
+}
+
+//------------------------------FIN CREATION DES CHEMINS ET DES ETAPES---------------
+
+
+
 }
