@@ -1,0 +1,121 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:a4j="http://richfaces.org/a4j"
+      xmlns:rich="http://richfaces.org/rich"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:ui="http://java.sun.com/jsf/facelets">
+
+  <head></head>
+
+  <body>
+  
+  <a4j:keepAlive beanName="commandeBine" />
+ 
+  
+  <rich:panel style ="width:600px;font-size:35px;margin-left:250px;background-color:#00BFFF;">
+  <f:facet name="header">PAGE DE CREATION DES COMMANDES</f:facet>
+    	<h:form>
+    	
+    	<h:panelGrid columns="6">
+    		
+  		 	<h:outputText value="NOM DU CLIENT :" />
+  			<h:selectOneMenu value="#{}" id="cli">
+  				<f:selectItems value="#{}"/>
+  				<a4j:support event="onchange" reRender=""/>
+  			</h:selectOneMenu>
+  			
+  			<h:outputText value="NIF  :" />
+  			<h:inputText value="#{}" />
+  			
+  			<h:outputText value="SOCIETE  :" />
+  			<h:inputText value="#{}" />
+    	
+    	</h:panelGrid>
+   	 <a4j:commandButton value="VALIDER" action="#{}"  data="#{bine.message}" oncomplete="alert(data)" reRender="des,typ,tab"/>
+
+		
+		<h:panelGrid columns="8">
+		
+			<h:outputText value="COMMANDE DE  :" />
+  			<h:inputText value="#{}" desabled="true"/>
+  			
+
+  		 	<h:outputText value="TYPE DU PRODUIT :" />
+  			<h:selectOneMenu value="#{}" id="typPro">
+  				<f:selectItems value="#{}"/>
+  				<a4j:support event="onchange" reRender=""/>
+  			</h:selectOneMenu> 	
+  		
+			<h:outputText value="NOM DU PRODUIT  :" />
+  			<h:inputText value="#{}"/>
+
+			<h:outputText value="NOMBRE D'EXEMPLAIRES  :" />
+  			<h:inputText value="#{}"/>
+  			
+  			<h:outputText value="MAQUETTE PRESENTE  :" />
+  						
+  			<h:selectOneRadio value="">
+  				
+  				<f:selectItem itemValue="OUI" itemLabel="OUI"/>
+   				<f:selectItem itemValue="NON" itemLabel="NON" itemDisabled="true"/>
+  				
+  			</h:selectOneRadio> 
+  			
+  			<h:outputText value="CHEMIN :" />
+  			<h:selectOneMenu value="#{}" id="chem">
+  				<f:selectItems value="#{}"/>
+  				<a4j:support event="onchange" reRender=""/>
+  			</h:selectOneMenu> 
+  					
+			
+		</h:panelGrid>
+
+   	 <a4j:commandButton value="VALIDER" action="#{}"  data="#{bine.message}" oncomplete="alert(data)" reRender="des,typ,tab"/>
+
+	<h:panelGrid columns="4">
+	
+		    <h:outputText value="PRODUIT SUR COMMANDE :" />
+  			<h:selectOneMenu value="#{}" id="p">
+  				<f:selectItems value="#{}"/>
+  				<a4j:support event="onchange" reRender=""/>
+  			</h:selectOneMenu> 
+  			
+  			<h:outputText value="CHARGES :" />
+  			<h:selectOneMenu value="#{}" id="char">
+  				<f:selectItems value="#{}"/>
+  				<a4j:support event="onchange" reRender=""/>
+  			</h:selectOneMenu> 
+  			
+			<h:outputText value="QUANTITE DES CHARGES  :" />
+  			<h:inputText value="#{}"/>
+	
+	</h:panelGrid>
+    	
+ <a4j:commandButton value="AJOUTER" action="#{}"  data="#{bine.message}" oncomplete="alert(data)" reRender="des,typ,tab"/>
+
+    	</h:form>
+    	
+    	
+    	<rich:panel>
+  		<rich:dataTable id="tab" value="#{}" var="c">
+  		<f:facet name="header">#{}</f:facet>
+  		
+  		<rich:column>
+  		<f:facet name="header">NUMERO</f:facet>
+  		#{}
+  		</rich:column>
+  		
+  		<rich:column>
+  		<f:facet name="header">DESIGNATION DE LA CHARGE</f:facet>
+  		#{}
+  		</rich:column>
+  		
+
+  		</rich:dataTable>
+  		</rich:panel>
+    	
+   </rich:panel>
+  
+  </body>
+</html>

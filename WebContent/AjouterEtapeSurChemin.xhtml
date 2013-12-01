@@ -1,0 +1,70 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:a4j="http://richfaces.org/a4j"
+      xmlns:rich="http://richfaces.org/rich"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:ui="http://java.sun.com/jsf/facelets">
+
+  <head></head>
+<a4j:keepAlive beanName="commandeBine" />
+  <body>
+  <rich:panel style ="width:600px;font-size:35px;margin-left:250px;background-color:#00BFFF;">
+  <f:facet name="header">AJOUT DES ETAPES SUR LES CHEMINS</f:facet>
+  
+  
+    	<h:form>
+  		
+  		<h:selectOneMenu value="#{commandeBine.idPersonneConnecte}" style ="visibility: hidden;">
+  		<f:selectItems value="#{bine.listPersonneConnecte}"/>
+  		</h:selectOneMenu>
+  		
+  		
+  		
+  		 <h:panelGrid columns="4">	
+  		 
+  		 	<h:outputText value="CHEMIN :" />
+  			<h:selectOneMenu value="#{commandeBine.idChemin}" id="che">
+  				<f:selectItems value="#{commandeBine.listDesChemin}"/>
+  				<a4j:support event="onchange" reRender="etap,tab"/>
+  			</h:selectOneMenu>
+  			
+  			
+  			<h:outputText value="ETAPE :" />
+  			<h:selectOneMenu value="#{commandeBine.idEtape}" id="etap">
+  				<f:selectItems value="#{commandeBine.listDesEtapesNonSurCheminDonn}"/>
+  			</h:selectOneMenu>
+  			
+  		</h:panelGrid>
+  		
+  	    <a4j:commandButton value="ENVOYER" action="#{commandeBine.mettreEtapeSurChemin}"  data="#{commandeBine.message}" oncomplete="alert(data)" reRender="etap,tab"/>
+  	
+  		
+  		
+  		
+  		
+  		<rich:panel>
+  		<rich:dataTable id="tab" value="#{commandeBine.listCheEta}" var="c">
+  		<f:facet name="header">#{commandeBine.titre}</f:facet>
+  		
+  		<rich:column>
+  		<f:facet name="header">NUMERO</f:facet>
+  		#{c.num}
+  		</rich:column>
+  		
+  		<rich:column>
+  		<f:facet name="header">DESIGNATION DE L'ETAPE</f:facet>
+  		#{c.designationEta}
+  		</rich:column>
+  		
+
+  		</rich:dataTable>
+  		</rich:panel>
+  			
+  	</h:form>
+  			
+  </rich:panel>
+  	
+  
+  </body>
+</html>
