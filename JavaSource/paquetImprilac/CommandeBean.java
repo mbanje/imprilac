@@ -301,6 +301,36 @@ public void setCom(Commande com) {
 	this.com = com;
 }
 
+private boolean activenif=false;
+private boolean activesociete=false;
+private boolean desactiveNomClient=false;
+
+
+
+public boolean isDesactiveNomClient() {
+	return desactiveNomClient;
+}
+
+public void setDesactiveNomClient(boolean desactiveNomClient) {
+	this.desactiveNomClient = desactiveNomClient;
+}
+
+public boolean isActivenif() {
+	return activenif;
+}
+
+public void setActivenif(boolean activenif) {
+	this.activenif = activenif;
+}
+
+public boolean isActivesociete() {
+	return activesociete;
+}
+
+public void setActivesociete(boolean activesociete) {
+	this.activesociete = activesociete;
+}
+
 public void instancierCmd()
 {System.out.println("!!!!!!");
 if(this.idClient==0)
@@ -308,6 +338,12 @@ if(this.idClient==0)
 System.out.println("???????");
 return;
 	}
+
+if((this.activenif==true)||(this.activesociete==true))
+{message="VOUS VOULER CREER UNE AUTRE COMMANDE ALORS QU'IL Y A UNE AUTRE EN COURT!";
+return;
+}
+	
 
 this.com=new Commande();//INSTANCIATION D'UNE COMMANDE
 //DEBUT INITIALISATION
@@ -319,12 +355,25 @@ if(this.societe!=null)
 com.setListProd(new ArrayList<Produit>());
 com.setMontantTotal(0);
 //FIN INITIALISATION
-
+if(this.com!=null)
+{
 message="IL FAUT ENSUITE METTRE LES PRODUITS SUR CETTE COMMANDE!!";
+//ON DESACTIVE LE NIF ET LA SOCIETE, SIGNE QU'IL Y A UNE INSTANCE D'UNE COMMANDE
+this.activenif=true;
+this.activesociete=true;
+this.desactiveNomClient=true;
+this.showMessageCmd=true;
+this.desactiveChemin=false;
+this.desactiveMaqPres=false;
+this.desactiveNbreEx=false;
+this.desactiveProd=false;
+this.desactiveTitre=false;
+this.desactiveListProSurDmd=false;
+}
+else
+message="CRETION DE LA DEMANDE ECHOUEE!!";
 	}
-public void supprimerCmd()
-{this.com=null;
-	}
+
 //=================================================PRODUIT========================
 private List<SelectItem> listDesProd;
 public List<SelectItem> getListDesProd() {
@@ -353,6 +402,28 @@ public List<SelectItem> getListDesProd() {
 	
 	return listDesProd;
 }
+
+public void supprimerCmd()
+{if(this.com==null)
+{message="IL N'Y A PAS DE COMMANDE A SUPPRIMER!!";
+return;
+	}
+this.com=null;
+this.activenif=false;
+this.activesociete=false;
+this.desactiveNomClient=false;
+this.showMessageCmd=false;
+this.idClient=0;
+
+this.desactiveChemin=true;
+this.desactiveMaqPres=true;
+this.desactiveNbreEx=true;
+this.desactiveProd=true;
+this.desactiveTitre=true;
+
+this.desactiveListProSurDmd=true;
+message="SUPPRESSION REUSSIE!!";
+	}
 
 public void setListDesProd(List<SelectItem> listDesProd) {
 	this.listDesProd = listDesProd;
@@ -392,7 +463,15 @@ public void setMaqPresente(String maqPresente) {
 }
 //========================================================================
 public void ajouterProdSurCmd()
-{if((this.idClient==0)||(this.com==null))
+{if(this.com==null)
+{message="VOUS N'AVEZ PAS CREE UNE COMMANDE";
+return;
+	}
+if(this.desactiveProd==true)
+{message="CREER D'ABORD LA COMMANDE S'IL VOUS PLAIT!!";
+return;
+}
+if((this.idClient==0)||(this.com==null))
 	{message="CREER D'ABORD LA COMMANDE S'IL VOUS PLAIT!!";
 	return;
 	}
@@ -403,7 +482,7 @@ if(this.idProd==0)
 	return;
 	}
 System.out.println("bbb");
-if(this.titreProd==null)
+if(this.titreProd.length()==0)
 	{message="DONNER UN TITRE A CE PRODUIT S'IL VOUS PLAIT!!";
 	return;
 	}
@@ -413,58 +492,74 @@ if(this.nbrExemplaires==0)
 	return;
 	}
 System.out.println("ddd");
-if(this.maqPresente==null)
+if(this.maqPresente.length()==0)
 	{message="INDIQUER SI LA MAQUETTE EST PRESENTE OU NON S'IL VOUS PLAIT!!";
 	return;
 	}
-System.out.println("eee");
+System.out.println("this.idChemin"+this.idChemin);
 if(this.idChemin==0)
 	{message="INDIQUER LE CHEMIN QUE VA PRENDRE LE PRODUIT S'IL VOUS PLAIT!!";
 	return;
 	}
 System.out.println("fff");
 
+//============FIN DE CONTROLE DES CHAMPS DE SAISI==================
+
+Produit p=new Produit();
+ResultSet res=null;
+
+//ON INITIALISE UN PRODUIT AVANT DE L'AJOUTER SUR LA LISTE
+p.setIdProduit(this.idProd);
+p.setTitre(this.titreProd);
+p.setNbre_exemplaire_prod(this.nbrExemplaires);
+if(this.maqPresente=="OUI")
+	p.setMaq_presentee(true);
+else
+	p.setMaq_presentee(false);
+p.setIdChemin(this.idChemin);
+
+
+res=Connecteur.Extrairedonnees("select * from chemin where Idchemin="+this.idChemin+"");
+try {
+	if(res.next())
+	{
+p.setMontantTotalProd(res.getFloat("cout"));
+	}
+} catch (SQLException e) {
+	// TODO Auto-generated catch block
+	e.printStackTrace();
+}
+
+
 //ON VERIFIE D'ABORD S'IL N'Y AURAIT PAS DEJA SUR CETTE COMMANDE UN PRODUIT
 //DU MEME NOM ET DU MEME TITRE.
+
 int j=0;
-for(j=0;j<this.com.getListProd().size();j++)
-{if((this.com.getListProd().get(j).getIdProduit()==this.idProd)&&(this.com.getListProd().get(j).getTitre()==this.titreProd))
-	{message="DONNER UN AUTRE TITRE A CE PRODUIT S'IL VOUS PLAIT!!";
-	break;
-	}
+if(this.com.getListProd()!=null)//LA LISTE DES PRODUITS EXISTE
+{
+	if(this.com.getListProd().size()>0)//IL Y A DES PRODUITS SUR LA LISTE DES PRODUITS
+	{
+		for(j=0;j<this.com.getListProd().size();j++)
+		{if((this.com.getListProd().get(j).getIdProduit()==this.idProd)&&(this.com.getListProd().get(j).getTitre()==this.titreProd))
+				{message="DONNER UN AUTRE TITRE A CE PRODUIT S'IL VOUS PLAIT!!";
+				break;
+				}
+		}
+		if(j<this.com.getListProd().size())
+		{
+			message="DONNER UN AUTRE TITRE A CE PRODUIT!!";
+			return;
+		}
 	}
 
-ResultSet res=null;
-if(j>this.com.getListProd().size())//UN PRODUIT DU MEME NOM ET TITRE N'A PAS ETE TROUVE
-	{Produit p=new Produit();
-	
-	//ON INITIALISE UN PRODUIT AVANT DE L'AJOUTER SUR LA LISTE
-	p.setIdProduit(this.idProd);
-	p.setTitre(this.titreProd);
-	p.setNbre_exemplaire_prod(this.nbrExemplaires);
-	if(this.maqPresente=="OUI")
-		p.setMaq_presentee(true);
-	else
-		p.setMaq_presentee(false);
-	p.setIdChemin(this.idChemin);
-	
-	
-res=Connecteur.Extrairedonnees("select * from chemin where Idchemin="+this.idChemin+"");
-	try {
-		if(res.next())
-		{
-	p.setMontantTotalProd(res.getFloat("cout"));
-		}
-	} catch (SQLException e) {
-		// TODO Auto-generated catch block
-		e.printStackTrace();
-	}
-	
-	j--;
-	this.com.getListProd().get(j).setProduit(p);
-	
-	
-	}
+ }
+else//LA LISTE DES PRODUITS N'EXISTE PAS
+{this.com.setListProd(new ArrayList<Produit>());
+}
+
+this.com.getListProd().add(p);
+message="OPERATION REUSSIE!!";
+
 	}
 
 private List<SelectItem> listDeroulanteDesProd;
@@ -498,6 +593,73 @@ public int getIdProd2() {
 
 public void setIdProd2(int idProd2) {
 	this.idProd2 = idProd2;
+}
+private boolean showMessageCmd=false;
+public boolean isShowMessageCmd() {
+	return showMessageCmd;
+}
+
+public void setShowMessageCmd(boolean showMessageCmd) {
+	this.showMessageCmd = showMessageCmd;
+}
+
+//=============================================
+private boolean desactiveProd=true;
+private boolean desactiveTitre=true;
+private boolean desactiveNbreEx=true;
+private boolean desactiveChemin=true;
+private boolean desactiveMaqPres=true;
+
+
+public boolean isDesactiveMaqPres() {
+	return desactiveMaqPres;
+}
+
+public void setDesactiveMaqPres(boolean desactiveMaqPres) {
+	this.desactiveMaqPres = desactiveMaqPres;
+}
+
+public boolean isDesactiveProd() {
+	return desactiveProd;
+}
+
+public void setDesactiveProd(boolean desactiveProd) {
+	this.desactiveProd = desactiveProd;
+}
+
+public boolean isDesactiveTitre() {
+	return desactiveTitre;
+}
+
+public void setDesactiveTitre(boolean desactiveTitre) {
+	this.desactiveTitre = desactiveTitre;
+}
+
+public boolean isDesactiveNbreEx() {
+	return desactiveNbreEx;
+}
+
+public void setDesactiveNbreEx(boolean desactiveNbreEx) {
+	this.desactiveNbreEx = desactiveNbreEx;
+}
+
+public boolean isDesactiveChemin() {
+	return desactiveChemin;
+}
+
+public void setDesactiveChemin(boolean desactiveChemin) {
+	this.desactiveChemin = desactiveChemin;
+}
+
+//=============================================
+
+private boolean desactiveListProSurDmd=true;
+public boolean isDesactiveListProSurDmd() {
+	return desactiveListProSurDmd;
+}
+
+public void setDesactiveListProSurDmd(boolean desactiveListProSurDmd) {
+	this.desactiveListProSurDmd = desactiveListProSurDmd;
 }
 
 
