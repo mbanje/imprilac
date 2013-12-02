@@ -2209,6 +2209,23 @@ public void setDesigna(String designa) {
 	this.designa = designa;
 }
 
+//====================
+private boolean showCout=false;
+private float cout;
+
+public boolean isShowCout() {
+	return showCout;
+}
+public void setShowCout(boolean showCout) {
+	this.showCout = showCout;
+}
+public float getCout() {
+	return cout;
+}
+public void setCout(float cout) {
+	this.cout = cout;
+}
+//====================
 public void enregistrerChemEtap()
 {	int n=-1;
 	 if(this.idEtCh==0)
@@ -2225,6 +2242,10 @@ public void enregistrerChemEtap()
 		   message="TAPEZ LE NOM DU CHEMIN S'IL VOUS PLAIT!";
 		   return; 
 	      } 
+		if(this.cout==0)
+			{message="INDIQUER LE COUT DE CHEMIN S'IL VOUS PLAIT!!";
+			return;
+			}
 	      this.designa=this.designa.toUpperCase();
 	      res=Connecteur.Extrairedonnees("select * from chemin where Designation='"+this.designa+"'");
 	      try {
@@ -2237,12 +2258,12 @@ public void enregistrerChemEtap()
 			e.printStackTrace();
 		}
 	      
-		   n=Connecteur.Insererdonnees("insert into chemin(Designation) values ('"+this.designa+"')");
+		   n=Connecteur.Insererdonnees("insert into chemin(Designation,cout) values ('"+this.designa+"',"+this.cout+")");
 		   if(n!=-1)
 			  message="INSERTION REUSSIE!";
 		 else
 			 message="ECHEC D'INSERTION!";
-
+		 this.cout=0;
 	  }
 	
 	
@@ -2337,7 +2358,28 @@ public List<CheminOuEtape> getListCheminEtape() {
 		res=Connecteur.Extrairedonnees("select * from charges");
 		this.types="CHARGES";
 	}
-	if((this.idEtCh==1)||(this.idEtCh==2))
+	if(this.idEtCh==1)
+	{try {
+		while(res.next())
+		{CheminOuEtape p=new CheminOuEtape();
+		p.setIdChemOuEtap(num);
+		//if(this.idEtCh==1)//ON CONSTRUIT LA LISTE DES CHEMINS
+		p.setId(res.getInt("Idchemin"));
+		//else//ON CONSTRUIT LA LISTE DES ETAPES
+		//p.setId(res.getInt("Idetape"));
+		p.setDesignation(res.getString("Designation"));
+		p.setCout(res.getFloat("cout"));
+		this.listCheminEtape.add(p);
+		num++;
+		}
+	} catch (SQLException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}
+		
+	}
+	
+	if(this.idEtCh==2)
 	{try {
 		while(res.next())
 		{CheminOuEtape p=new CheminOuEtape();
@@ -2356,6 +2398,7 @@ public List<CheminOuEtape> getListCheminEtape() {
 	}
 		
 	}
+	
 	if(this.idEtCh==3)
 	{try {
 		while(res.next())
@@ -2399,6 +2442,11 @@ public void ecouteChangeType(ActionEvent e)
 	this.showPrixU=true;
 else
 	this.showPrixU=false;
+
+if(this.idEtCh==1)
+	this.showCout=true;
+else
+	this.showCout=false;
 	}
 
 private CheminOuEtape sele=null;
@@ -2413,14 +2461,29 @@ public void modifierCheEtaCharge()
 {int n=-1;
  if(this.idEtCh==1)//ON MODIFIE UN CHEMIN
 	{
-	 if((this.sele.getDesignation()==null)||(this.sele.getDesignation()==""))
-		 message="VOUS N'AVEZ RIEN MODIFIER!!";
-	 else
+	 if(((this.sele.getDesignation()==null)||(this.sele.getDesignation()==""))&&(this.sele.getCout()==0))
+		 {message="VOUS N'AVEZ RIEN MODIFIER!!";
+		 return;
+		 
+		 }
+	 if((this.sele.getDesignation().length()>0))
 	 {
 		 n=-1;
 		 this.sele.setDesignation(this.sele.getDesignation().toUpperCase());
 		 n=Connecteur.Insererdonnees("update chemin set Designation='"+this.sele.getDesignation()+"' where Idchemin="+this.sele.getId()+"");
-		 message="MISE A JOUR REUSSIE";
+		 if(n!=-1)
+			 message="MISE A JOUR REUSSIE";
+		 else
+			 message="ECHEC DE MISE A JOUR!!";
+	 }
+	 if(this.sele.getCout()!=0)
+	 {
+		 n=-1;
+		 n=Connecteur.Insererdonnees("update chemin set cout='"+this.sele.getCout()+"' where Idchemin="+this.sele.getId()+"");
+		 if(n!=-1)
+			 message="MISE A JOUR REUSSIE!!";
+		 else
+			 message="ECHEC DE MISE A JOUR!!";
 	 }
 	 
 	}

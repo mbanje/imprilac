@@ -41,6 +41,13 @@
   				</h:panelGrid>
   			</a4j:outputPanel>
   			
+  			<a4j:outputPanel ajaxRendered="true" id="cout">	
+  				<h:panelGrid columns="2" rendered="#{bine.showCout}">
+  				<h:outputText value="COUT DU CHEMIN  :" />
+  				<h:inputText value="#{bine.cout}" />
+  				</h:panelGrid>
+  			</a4j:outputPanel>
+  			
   </h:panelGrid>
    	 <a4j:commandButton value="ENVOYER" action="#{bine.enregistrerChemEtap}"  data="#{bine.message}" oncomplete="alert(data)" reRender="des,typ,tab"/>
  
@@ -66,6 +73,11 @@
   		<rich:column rendered="#{bine.showPrixU}">
   		<f:facet name="header">PRIX UNITAIRE</f:facet>
   		#{c.prixUni}
+  		</rich:column>
+
+  		<rich:column rendered="#{bine.showCout}">
+  		<f:facet name="header">COUT DU CHEMIN</f:facet>
+  		#{c.cout}
   		</rich:column>
   		
   		
@@ -117,6 +129,13 @@
   				<h:panelGrid columns="2" rendered="#{bine.showPrixU}">
   				<h:outputText value="PRIX UNITAIRE  :" />
   				<h:inputText value="#{bine.sele.prixUni}" />
+  				</h:panelGrid>
+  			</a4j:outputPanel>
+  			
+  			<a4j:outputPanel ajaxRendered="true" id="cout">	
+  				<h:panelGrid columns="2" rendered="#{bine.showCout}">
+  				<h:outputText value="COUT DU CHEMIN  :" />
+  				<h:inputText value="#{bine.sele.cout}" />
   				</h:panelGrid>
   			</a4j:outputPanel>
   			

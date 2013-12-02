@@ -235,6 +235,270 @@ public void setListCheEta(List<CheminOuEtape> listCheEta) {
 	this.listCheEta = listCheEta;
 }
 
-
+private List<SelectItem> listDesClients;
+public List<SelectItem> getListDesClients() {
 	
+	ResultSet res=null;
+	
+	if(listDesClients==null)
+		listDesClients=new ArrayList<SelectItem>();
+	else
+		listDesClients.clear();
+	
+	listDesClients.add(new SelectItem(0,""));
+	
+	res=Connecteur.Extrairedonnees("select * from personne p,client c where p.Idpersonne=c.Idclient");
+
+	try {
+		while(res.next())
+		{listDesClients.add(new SelectItem(res.getInt("Idpersonne"),res.getString("Nompersonne")+" "+res.getString("Prenompersonne")));
+
+		}
+	} catch (SQLException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}
+	
+	return listDesClients;
+}
+
+public void setListDesClients(List<SelectItem> listDesClients) {
+	this.listDesClients = listDesClients;
+}
+
+private int idClient;
+public int getIdClient() {
+	return idClient;
+}
+
+public void setIdClient(int idClient) {
+	this.idClient = idClient;
+}
+
+private String nif=null;
+private String societe=null;
+public String getNif() {
+	return nif;
+}
+
+public void setNif(String nif) {
+	this.nif = nif;
+}
+
+public String getSociete() {
+	return societe;
+}
+
+public void setSociete(String societe) {
+	this.societe = societe;
+}
+Commande com=null;
+public Commande getCom() {
+	return com;
+}
+
+public void setCom(Commande com) {
+	this.com = com;
+}
+
+public void instancierCmd()
+{System.out.println("!!!!!!");
+if(this.idClient==0)
+{message="SELECTIONNER LE CLIENT A QUI APPARTIENDRA LA COMMANDE S'IL VOUS PLAIT!!";
+System.out.println("???????");
+return;
+	}
+
+this.com=new Commande();//INSTANCIATION D'UNE COMMANDE
+//DEBUT INITIALISATION
+com.setIdClient(this.idClient);
+if(this.nif!=null)
+	com.setNif(this.nif);
+if(this.societe!=null)
+	com.setSociete(this.societe);
+com.setListProd(new ArrayList<Produit>());
+com.setMontantTotal(0);
+//FIN INITIALISATION
+
+message="IL FAUT ENSUITE METTRE LES PRODUITS SUR CETTE COMMANDE!!";
+	}
+public void supprimerCmd()
+{this.com=null;
+	}
+//=================================================PRODUIT========================
+private List<SelectItem> listDesProd;
+public List<SelectItem> getListDesProd() {
+	
+	ResultSet res=null;
+	
+	if(listDesProd==null)
+		listDesProd=new ArrayList<SelectItem>();
+	else
+		listDesProd.clear();
+	
+	listDesProd.add(new SelectItem(0,""));
+	//ON SELECTIONNE LES ETAPES NON ENCORE SUR LE CHEMIN DONNE
+	res=Connecteur.Extrairedonnees("select * from produits");
+
+	try {
+		while(res.next())
+		{listDesProd.add(new SelectItem(res.getInt("Idprod"),res.getString("Type")));
+
+		}
+	} catch (SQLException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}
+	
+	
+	return listDesProd;
+}
+
+public void setListDesProd(List<SelectItem> listDesProd) {
+	this.listDesProd = listDesProd;
+}
+
+private int idProd;
+public int getIdProd() {
+	return idProd;
+}
+
+public void setIdProd(int idProd) {
+	this.idProd = idProd;
+}
+private String titreProd;
+public String getTitreProd() {
+	return titreProd;
+}
+
+public void setTitreProd(String titreProd) {
+	this.titreProd = titreProd;
+}
+private int nbrExemplaires;
+public int getNbrExemplaires() {
+	return nbrExemplaires;
+}
+
+public void setNbrExemplaires(int nbrExemplaires) {
+	this.nbrExemplaires = nbrExemplaires;
+}
+private String maqPresente;
+public String getMaqPresente() {
+	return maqPresente;
+}
+
+public void setMaqPresente(String maqPresente) {
+	this.maqPresente = maqPresente;
+}
+//========================================================================
+public void ajouterProdSurCmd()
+{if((this.idClient==0)||(this.com==null))
+	{message="CREER D'ABORD LA COMMANDE S'IL VOUS PLAIT!!";
+	return;
+	}
+System.out.println("aaa");
+if(this.idProd==0)
+	{message="SELECTIONNER UN PRODUIT S'IL VOUS PLAIT!!";
+	System.out.println("aaabbb");
+	return;
+	}
+System.out.println("bbb");
+if(this.titreProd==null)
+	{message="DONNER UN TITRE A CE PRODUIT S'IL VOUS PLAIT!!";
+	return;
+	}
+System.out.println("ccc");
+if(this.nbrExemplaires==0)
+	{message="SAISISSER LE NOMBRE D'EXEMPLAIRES COMMANDES S'IL VOUS PLAIT!!";
+	return;
+	}
+System.out.println("ddd");
+if(this.maqPresente==null)
+	{message="INDIQUER SI LA MAQUETTE EST PRESENTE OU NON S'IL VOUS PLAIT!!";
+	return;
+	}
+System.out.println("eee");
+if(this.idChemin==0)
+	{message="INDIQUER LE CHEMIN QUE VA PRENDRE LE PRODUIT S'IL VOUS PLAIT!!";
+	return;
+	}
+System.out.println("fff");
+
+//ON VERIFIE D'ABORD S'IL N'Y AURAIT PAS DEJA SUR CETTE COMMANDE UN PRODUIT
+//DU MEME NOM ET DU MEME TITRE.
+int j=0;
+for(j=0;j<this.com.getListProd().size();j++)
+{if((this.com.getListProd().get(j).getIdProduit()==this.idProd)&&(this.com.getListProd().get(j).getTitre()==this.titreProd))
+	{message="DONNER UN AUTRE TITRE A CE PRODUIT S'IL VOUS PLAIT!!";
+	break;
+	}
+	}
+
+ResultSet res=null;
+if(j>this.com.getListProd().size())//UN PRODUIT DU MEME NOM ET TITRE N'A PAS ETE TROUVE
+	{Produit p=new Produit();
+	
+	//ON INITIALISE UN PRODUIT AVANT DE L'AJOUTER SUR LA LISTE
+	p.setIdProduit(this.idProd);
+	p.setTitre(this.titreProd);
+	p.setNbre_exemplaire_prod(this.nbrExemplaires);
+	if(this.maqPresente=="OUI")
+		p.setMaq_presentee(true);
+	else
+		p.setMaq_presentee(false);
+	p.setIdChemin(this.idChemin);
+	
+	
+res=Connecteur.Extrairedonnees("select * from chemin where Idchemin="+this.idChemin+"");
+	try {
+		if(res.next())
+		{
+	p.setMontantTotalProd(res.getFloat("cout"));
+		}
+	} catch (SQLException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}
+	
+	j--;
+	this.com.getListProd().get(j).setProduit(p);
+	
+	
+	}
+	}
+
+private List<SelectItem> listDeroulanteDesProd;
+public List<SelectItem> getListDeroulanteDesProd() {
+	
+	if((this.com==null)||(this.com.getListProd()==null))
+	{	this.listDeroulanteDesProd=new ArrayList<SelectItem>();
+		listDeroulanteDesProd.add(new SelectItem(0,""));
+	}
+	else
+	{int j=0;
+		listDeroulanteDesProd.add(new SelectItem(0,""));
+		for(j=0;j<this.com.getListProd().size();j++)
+		{
+		this.listDeroulanteDesProd.add(new SelectItem(this.com.getListProd().get(j).getIdProduit(), ""+this.com.getListProd().get(j).getTitre()+""));
+		}
+		
+	}
+	
+	return listDeroulanteDesProd;
+}
+
+public void setListDeroulanteDesProd(List<SelectItem> listDeroulanteDesProd) {
+	this.listDeroulanteDesProd = listDeroulanteDesProd;
+}
+
+private int idProd2;
+public int getIdProd2() {
+	return idProd2;
+}
+
+public void setIdProd2(int idProd2) {
+	this.idProd2 = idProd2;
+}
+
+
 }

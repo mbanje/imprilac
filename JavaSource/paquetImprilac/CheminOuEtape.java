@@ -9,9 +9,15 @@ public class CheminOuEtape {
 	
 	private String designationChe;
 	private String designationEta;
+	private float cout;
 	
 	
-	
+	public float getCout() {
+		return cout;
+	}
+	public void setCout(float cout) {
+		this.cout = cout;
+	}
 	public int getNum() {
 		return num;
 	}
