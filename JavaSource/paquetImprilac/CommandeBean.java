@@ -368,7 +368,7 @@ this.desactiveMaqPres=false;
 this.desactiveNbreEx=false;
 this.desactiveProd=false;
 this.desactiveTitre=false;
-this.desactiveListProSurDmd=false;
+//this.desactiveListProSurDmd=false;
 }
 else
 message="CRETION DE LA DEMANDE ECHOUEE!!";
@@ -420,6 +420,8 @@ this.desactiveMaqPres=true;
 this.desactiveNbreEx=true;
 this.desactiveProd=true;
 this.desactiveTitre=true;
+this.desactiveListCharges=true;
+this.desactiveQuantiteCharges=true;
 
 this.desactiveListProSurDmd=true;
 message="SUPPRESSION REUSSIE!!";
@@ -539,12 +541,29 @@ if(this.com.getListProd()!=null)//LA LISTE DES PRODUITS EXISTE
 {
 	if(this.com.getListProd().size()>0)//IL Y A DES PRODUITS SUR LA LISTE DES PRODUITS
 	{
-		for(j=0;j<this.com.getListProd().size();j++)
+		/*for(j=0;j<this.com.getListProd().size();j++)
 		{if((this.com.getListProd().get(j).getIdProduit()==this.idProd)&&(this.com.getListProd().get(j).getTitre()==this.titreProd))
 				{message="DONNER UN AUTRE TITRE A CE PRODUIT S'IL VOUS PLAIT!!";
 				break;
 				}
+		
+		}*/
+		
+		//while((j<this.com.getListProd().size())&&!((this.com.getListProd().get(j).getIdProduit()==this.idProd)&&(this.com.getListProd().get(j).getTitre()==this.titreProd)))
+		while((j<this.com.getListProd().size())&&!((this.com.getListProd().get(j).getIdProduit()==this.idProd)&&(this.com.getListProd().get(j).getTitre().equalsIgnoreCase(this.titreProd))))		
+		{System.out.println("''''''''");
+		System.out.println(" sans !"+((this.com.getListProd().get(j).getIdProduit()==this.idProd)&&(this.com.getListProd().get(j).getTitre()==this.titreProd)));
+		System.out.println(" avec !"+!((this.com.getListProd().get(j).getIdProduit()==this.idProd)&&(this.com.getListProd().get(j).getTitre()==this.titreProd)));
+		
+		System.out.println("this.com.getListProd().get(j).getIdProduit() "+this.com.getListProd().get(j).getIdProduit());
+		System.out.println("this.idProd "+this.idProd);
+		System.out.println("this.com.getListProd().get(j).getTitre() "+this.com.getListProd().get(j).getTitre());
+		System.out.println("this.titreProd "+this.titreProd);
+		System.out.println("j "+j);
+			j++;
+		System.out.println("j "+j);
 		}
+		
 		if(j<this.com.getListProd().size())
 		{
 			message="DONNER UN AUTRE TITRE A CE PRODUIT!!";
@@ -558,19 +577,40 @@ else//LA LISTE DES PRODUITS N'EXISTE PAS
 }
 
 this.com.getListProd().add(p);
-message="OPERATION REUSSIE!!";
+message="METTEZ ENSUITE LES CHARGES SUR CE PRODUIT!!";
+
+//ON DESACTIVE LES CHAMPS POUR L'AJOUT DES CHARGES SUR UN PRODUIT
+this.desactiveListCharges=false;
+this.desactiveQuantiteCharges=false;
+this.desactiveListProSurDmd=false;
+
+//ON DESACTIVE LES CHAMPS POUR L'AJOUT DES PRODUITS SUR UNE COMMANDE
+this.desactiveProd=true;
+this.desactiveTitre=true;
+this.desactiveNbreEx=true;
+this.desactiveChemin=true;
+this.desactiveMaqPres=true;
 
 	}
 
 private List<SelectItem> listDeroulanteDesProd;
+
 public List<SelectItem> getListDeroulanteDesProd() {
+	
+
+	if(this.listDeroulanteDesProd==null)
+		this.listDeroulanteDesProd=new ArrayList<SelectItem>();
+	else
+		this.listDeroulanteDesProd.clear();
+	
 	
 	if((this.com==null)||(this.com.getListProd()==null))
 	{	this.listDeroulanteDesProd=new ArrayList<SelectItem>();
-		listDeroulanteDesProd.add(new SelectItem(0,""));
+		this.listDeroulanteDesProd.add(new SelectItem(0,""));
 	}
 	else
 	{int j=0;
+		
 		listDeroulanteDesProd.add(new SelectItem(0,""));
 		for(j=0;j<this.com.getListProd().size();j++)
 		{
@@ -662,5 +702,132 @@ public void setDesactiveListProSurDmd(boolean desactiveListProSurDmd) {
 	this.desactiveListProSurDmd = desactiveListProSurDmd;
 }
 
+//=================================CHARGES==========================
+private boolean desactiveListCharges=true;
+private boolean desactiveQuantiteCharges=true;
+private int idCharge;
+private float quantiteCharge;
+private List<SelectItem> listDesChargesNonEncoreAjouter;
+
+
+
+public List<SelectItem> getListDesChargesNonEncoreAjouter() {
+	
+	ResultSet res=null;
+	if(listDesChargesNonEncoreAjouter==null)
+		listDesChargesNonEncoreAjouter=new ArrayList<SelectItem>();
+	else
+		listDesChargesNonEncoreAjouter.clear();
+	
+	res=Connecteur.Extrairedonnees("select * from charges");
+	
+	listDesChargesNonEncoreAjouter.add(new SelectItem(0," "));
+	try {
+		while(res.next())
+		{
+			listDesChargesNonEncoreAjouter.add(new SelectItem(res.getInt("Idcharge"),res.getString("Designation")+" "+res.getFloat("PU")));
+		}
+	} catch (SQLException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}
+	
+	return listDesChargesNonEncoreAjouter;
+}
+
+public void setListDesChargesNonEncoreAjouter(
+		List<SelectItem> listDesChargesNonEncoreAjouter) {
+	this.listDesChargesNonEncoreAjouter = listDesChargesNonEncoreAjouter;
+}
+
+public float getQuantiteCharge() {
+	return quantiteCharge;
+}
+
+public void setQuantiteCharge(float quantiteCharge) {
+	this.quantiteCharge = quantiteCharge;
+}
+
+public int getIdCharge() {
+	return idCharge;
+}
+
+public void setIdCharge(int idCharge) {
+	this.idCharge = idCharge;
+}
+
+public boolean isDesactiveListCharges() {
+	return desactiveListCharges;
+}
+
+public void setDesactiveListCharges(boolean desactiveListCharges) {
+	this.desactiveListCharges = desactiveListCharges;
+}
+
+public boolean isDesactiveQuantiteCharges() {
+	return desactiveQuantiteCharges;
+}
+
+public void setDesactiveQuantiteCharges(boolean desactiveQuantiteCharges) {
+	this.desactiveQuantiteCharges = desactiveQuantiteCharges;
+}
+
+
+//FONCTION D'AJOUT DES CHARGES SUR UNE COMMANDE
+public void ajouterChargesSurProduit()
+{
+System.out.println("this.titreProd "+this.titreProd);
+System.out.println("this.titreProd.length() "+this.titreProd.length());
+if(this.titreProd.length()==0)
+{message="SELECTIONNER UN TITRE DU PRODUIT S'IL VOUS PLAIT!!";
+return;
+	}
+if(this.idCharge==0)
+{message="SELECTIONNER UNE CHARGE S'IL VOUS PLIT!!";
+return;
+	}
+if(this.quantiteCharge==0)
+{message="SASISSER LA QUATITE DE CETTE CHARGE NECESSAIRE POUR CE PRODUIT!!";
+return;
+	}
+if((this.desactiveListProSurDmd)||(this.desactiveListCharges)||(this.desactiveQuantiteCharges))
+{message="VOUS DEVEZ D'ABORD AJOUTER LE PREDUIT SUR UNE COMMANDE!!";
+return;
+	}
+
+if(this.com==null)
+{message="VOUS DEVEZ D'ABORD CREER UNE COMMANDE!!";
+return;
+	}
+
+if((this.com.getListProd()==null)||(this.com.getListProd().size()==0))
+{message="VOUS DEVEZ D'ABORD METTRE UN PRODUIT SUR UNE COMMANDE";
+return;
+	}
+
+//PREPARONS UNE CHARGE
+
+Charge c=new Charge();
+c.setIdCharge(this.idCharge);
+c.setQuantiteCharge(this.quantiteCharge);
+
+int i=0;
+
+while((i<this.com.getListProd().size())&&!(this.titreProd.equalsIgnoreCase(this.com.getListProd().get(i).getTitre())))
+{
+	i++;
+	}
+
+if(i<this.com.getListProd().size())
+{
+	if(this.com.getListProd().get(i).getListCharges()==null)
+		this.com.getListProd().get(i).setListCharges(new ArrayList<Charge>());
+	
+	this.com.getListProd().get(i).getListCharges().add(c);
+
+message="VOUS ETES EN TRAIN D'AJOUTER UNE CHARGE SUR UN PRODUIT!!";
+	}
+message="CAS BIZARRE!!";
+}
 
 }

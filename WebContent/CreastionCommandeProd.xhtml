@@ -83,22 +83,32 @@
 			
 		</h:panelGrid>
 
-   	 <a4j:commandButton value="AJOUTER" action="#{commandeBine.ajouterProdSurCmd}"  data="#{commandeBine.message}" oncomplete="alert(data)" reRender="pro"/>
+   	 <a4j:commandButton value="AJOUTER" action="#{commandeBine.ajouterProdSurCmd}"  data="#{commandeBine.message}" oncomplete="alert(data)" reRender="pro,char,qtteChar,typPro,nomPr,nbrEx,maqPre,chem"/>
 		
 		
 		</rich:panel>
 		
 		
-		<rich:panel>
+		<rich:panel style ="background-color:#00BFFF;">
 			<h:panelGrid columns="4">
 			
-			<h:outputText value="PRODUIT SUR COMMANDE :" />
-  			<h:selectOneMenu value="#{commandeBine.idProd2}" id="pro" disabled="#{commandeBine.desactiveListProSurDmd}">
+			<h:outputText value="PRODUITS SUR COMMANDE :" />
+  			<h:selectOneMenu value="#{commandeBine.titreProd}" id="pro" disabled="#{commandeBine.desactiveListProSurDmd}">
   				<f:selectItems value="#{commandeBine.listDeroulanteDesProd}"/>
-  			
   			</h:selectOneMenu> 
 			
+			<h:outputText value="LISTE DES CHARGES :" />
+  			<h:selectOneMenu value="#{commandeBine.idCharge}" id="char" disabled="#{commandeBine.desactiveListCharges}">
+  				<f:selectItems value="#{commandeBine.listDesChargesNonEncoreAjouter}"/>
+  			</h:selectOneMenu>
+  			
+			<h:outputText value="QUANTITE DE LA CHARGE  :" />
+  			<h:inputText value="#{commandeBine.quantiteCharge}" id="qtteChar" disabled="#{commandeBine.desactiveQuantiteCharges}"/>
+  			
+			
 			</h:panelGrid>
+			
+ <a4j:commandButton value="AJOUTER" action="#{commandeBine.ajouterChargesSurProduit}"  data="#{commandeBine.message}" oncomplete="alert(data)" reRender="pro"/>
 		
 		</rich:panel>
 	
