@@ -10,7 +10,6 @@
 
   <body>
   
-  <a4j:keepAlive beanName="commandeBine" />
  
   
   <rich:panel style ="width:700px;font-size:35px;margin-left:200px;background-color:#00BFFF;">
@@ -42,7 +41,7 @@
  			   	
     	</h:panelGrid>
    	 <a4j:commandButton value="VALIDER" action="#{commandeBine.instancierCmd}"  data="#{commandeBine.message}" oncomplete="alert(data)" reRender="ni,so,msgCmd,cli,typPro,nomPr,nbrEx,maqPre,chem,pro"/>
-   	 <a4j:commandButton value="SUPRIMER" action="#{commandeBine.supprimerCmd}"  data="#{commandeBine.message}" oncomplete="alert(data)" reRender="ni,so,msgCmd,cli,typPro,nomPr,nbrEx,maqPre,chem,pro"/>
+   	 <a4j:commandButton value="SUPRIMER" action="#{commandeBine.supprimerCmd}"  data="#{commandeBine.message}" oncomplete="alert(data)" reRender="ni,so,msgCmd,cli,typPro,nomPr,nbrEx,maqPre,chem,pro,char,qtteChar"/>
 		
 		</rich:panel>
 		
@@ -80,11 +79,12 @@
   				<a4j:support event="onchange" />
   			</h:selectOneMenu> 
   					
-			
+		
 		</h:panelGrid>
 
    	 <a4j:commandButton value="AJOUTER" action="#{commandeBine.ajouterProdSurCmd}"  data="#{commandeBine.message}" oncomplete="alert(data)" reRender="pro,char,qtteChar,typPro,nomPr,nbrEx,maqPre,chem"/>
-		
+   	 <a4j:commandButton value="FINIR" action="#{commandeBine.finirAjoutDesProdSurCmd}"  data="#{commandeBine.message}" oncomplete="alert(data)" reRender="msgCmd,cli,ni,so,pro,char,qtteChar,typPro,nomPr,nbrEx,maqPre,chem"/>
+	
 		
 		</rich:panel>
 		
@@ -93,8 +93,9 @@
 			<h:panelGrid columns="4">
 			
 			<h:outputText value="PRODUITS SUR COMMANDE :" />
-  			<h:selectOneMenu value="#{commandeBine.titreProd}" id="pro" disabled="#{commandeBine.desactiveListProSurDmd}">
+  			<h:selectOneMenu value="#{commandeBine.titreProduit}" id="pro" disabled="#{commandeBine.desactiveListProSurDmd}">
   				<f:selectItems value="#{commandeBine.listDeroulanteDesProd}"/>
+    			<a4j:support event="onchange" reRender="tab"/>				
   			</h:selectOneMenu> 
 			
 			<h:outputText value="LISTE DES CHARGES :" />
@@ -108,8 +109,32 @@
 			
 			</h:panelGrid>
 			
- <a4j:commandButton value="AJOUTER" action="#{commandeBine.ajouterChargesSurProduit}"  data="#{commandeBine.message}" oncomplete="alert(data)" reRender="pro"/>
+ <a4j:commandButton value="AJOUTER" action="#{commandeBine.ajouterChargesSurProduit}"  data="#{commandeBine.message}" oncomplete="alert(data)" reRender="pro,tab"/>
+
+ <a4j:commandButton value="FINIR AJOUT DES CHARGES" action="#{commandeBine.finirAjoutDesCharges}"  data="#{commandeBine.message}" oncomplete="alert(data)" reRender="tab,typPro,nomPr,nbrEx,maqPre,chem,pro,char,qtteChar"/>
+
+		</rich:panel>
 		
+		
+		<rich:panel style ="background-color:#00BFFF;">
+		
+		<rich:dataTable id="tab" value="#{commandeBine.listDesChargePr1Prod}" var="c">
+		
+  		<f:facet name="header">LISTE DES CHARGES</f:facet>
+  		
+  		<rich:column>
+  		<f:facet name="header">CHARGE</f:facet>
+  		#{c.designation}
+  		</rich:column>
+  		
+ 
+    	<rich:column>
+  		<f:facet name="header">QUANTITE NECESSAIRE</f:facet>
+  		#{c.quantiteCharge}
+  		</rich:column>
+  		
+  		</rich:dataTable>
+  		
 		</rich:panel>
 	
 	</h:form>

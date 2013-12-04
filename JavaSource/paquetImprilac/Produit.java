@@ -13,8 +13,16 @@ private Produit produit;
 private List<Charge> listCharges;
 private float montantTotalProd;
 
+private Charge charge=null;
 
 
+
+public Charge getCharge() {
+	return charge;
+}
+public void setCharge(Charge charge) {
+	this.charge = charge;
+}
 public float getMontantTotalProd() {
 	return montantTotalProd;
 }
