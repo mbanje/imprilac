@@ -741,33 +741,44 @@ private List<SelectItem> listDesChargesNonEncoreAjouter;
 
 public List<SelectItem> getListDesChargesNonEncoreAjouter() {
 	
+	System.out.println("DEBUT DE getListDesChargesNonEncoreAjouter()");
+	
 	ResultSet res=null;
 	if(listDesChargesNonEncoreAjouter==null)
 		listDesChargesNonEncoreAjouter=new ArrayList<SelectItem>();
 	else
 		listDesChargesNonEncoreAjouter.clear();
 	
+	listDesChargesNonEncoreAjouter.add(new SelectItem(0," "));
 	//IL FAUT D'ABORT SAVOIR LES CHARGES QUI SONT DEJA SUR LE PRODUIT
 	//SELECTIONNE
+	res=Connecteur.Extrairedonnees("select * from charges");
+int i=0;	
 	
 if((this.com!=null)&&(this.com.getListProd()!=null)&&(this.com.getListProd().size()>0))
 {
+	System.out.println("bon-");
 	
-	}
-	
-	res=Connecteur.Extrairedonnees("select * from charges");
-	
-	listDesChargesNonEncoreAjouter.add(new SelectItem(0," "));
-	try {
-		while(res.next())
-		{
-			listDesChargesNonEncoreAjouter.add(new SelectItem(res.getInt("Idcharge"),res.getString("Designation")+" "+res.getFloat("PU")));
+//if(this.titreProduit!=null)
+//{
+
+
+		try {
+			while(res.next())
+			{
+listDesChargesNonEncoreAjouter.add(new SelectItem(res.getInt("Idcharge"),res.getString("Designation")+" "+res.getFloat("PU")));
+			}
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
-	} catch (SQLException e) {
-		// TODO Auto-generated catch block
-		e.printStackTrace();
-	}
-	
+
+//}
+//FIN DU BLOC DE SI this.titreProduit!=null
+
+}
+System.out.println("aimez?");
+System.out.println("FIN DE getListDesChargesNonEncoreAjouter()");
 	return listDesChargesNonEncoreAjouter;
 }
 
@@ -812,7 +823,7 @@ public void setDesactiveQuantiteCharges(boolean desactiveQuantiteCharges) {
 //FONCTION D'AJOUT DES CHARGES SUR UNE COMMANDE
 public void ajouterChargesSurProduit()
 {
-
+System.out.println("DEBUT DE public void ajouterChargesSurProduit()");
 System.out.println("this.titreProduit "+this.titreProduit);
 System.out.println("this.titreProduit.length() "+this.titreProduit.length());
 
@@ -910,6 +921,8 @@ message="VOUS ETES EN TRAIN D'AJOUTER UNE CHARGE SUR UN PRODUIT!!";
 	}
 else
 message="CAS BIZARRE!!";
+
+System.out.println("FIN DE public void ajouterChargesSurProduit()");
 }
 
 

@@ -9,7 +9,7 @@
   <head></head>
 
   <body>
-  
+  <a4j:keepAlive beanName="commandeBine" />
  
   
   <rich:panel style ="width:700px;font-size:35px;margin-left:200px;background-color:#00BFFF;">
@@ -95,7 +95,7 @@
 			<h:outputText value="PRODUITS SUR COMMANDE :" />
   			<h:selectOneMenu value="#{commandeBine.titreProduit}" id="pro" disabled="#{commandeBine.desactiveListProSurDmd}">
   				<f:selectItems value="#{commandeBine.listDeroulanteDesProd}"/>
-    			<a4j:support event="onchange" reRender="tab"/>				
+    			<a4j:support event="onchange" reRender="tab,char"/>				
   			</h:selectOneMenu> 
 			
 			<h:outputText value="LISTE DES CHARGES :" />
@@ -109,7 +109,7 @@
 			
 			</h:panelGrid>
 			
- <a4j:commandButton value="AJOUTER" action="#{commandeBine.ajouterChargesSurProduit}"  data="#{commandeBine.message}" oncomplete="alert(data)" reRender="pro,tab"/>
+ <a4j:commandButton value="AJOUTER" action="#{commandeBine.ajouterChargesSurProduit}"  data="#{commandeBine.message}" oncomplete="alert(data)" reRender="pro,tab,char"/>
 
  <a4j:commandButton value="FINIR AJOUT DES CHARGES" action="#{commandeBine.finirAjoutDesCharges}"  data="#{commandeBine.message}" oncomplete="alert(data)" reRender="tab,typPro,nomPr,nbrEx,maqPre,chem,pro,char,qtteChar"/>
 
