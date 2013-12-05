@@ -82,9 +82,10 @@
 		
 		</h:panelGrid>
 
-   	 <a4j:commandButton value="AJOUTER" action="#{commandeBine.ajouterProdSurCmd}"  data="#{commandeBine.message}" oncomplete="alert(data)" reRender="pro,char,qtteChar,typPro,nomPr,nbrEx,maqPre,chem"/>
-   	 <a4j:commandButton value="FINIR" action="#{commandeBine.finirAjoutDesProdSurCmd}"  data="#{commandeBine.message}" oncomplete="alert(data)" reRender="msgCmd,cli,ni,so,pro,char,qtteChar,typPro,nomPr,nbrEx,maqPre,chem"/>
-	
+   	 <a4j:commandButton value="AJOUTER LE PRODUIT" action="#{commandeBine.ajouterProdSurCmd}"  data="#{commandeBine.message}" oncomplete="alert(data)" reRender="pro,char,qtteChar,typPro,nomPr,nbrEx,maqPre,chem"/>
+   	 <a4j:commandButton value="QUITTER" action="#{commandeBine.finirAjoutDesProdSurCmd}"  data="#{commandeBine.message}" oncomplete="alert(data)" reRender="msgCmd,cli,ni,so,pro,char,qtteChar,typPro,nomPr,nbrEx,maqPre,chem"/>   	 
+   	 <a4j:commandButton value="RETOUR DANS AJOUT DES CHARGES" action="#{commandeBine.OrienteDansAjoutDesCharges}"  data="#{commandeBine.message}" oncomplete="alert(data)" reRender="cli,ni,so,typPro,nomPr,nbrEx,maqPre,chem,pro,char,qtteChar"/>   	 
+
 		
 		</rich:panel>
 		
@@ -118,9 +119,11 @@
 		
 		<rich:panel style ="background-color:#00BFFF;">
 		
+		<h:panelGrid columns="2">
+		
 		<rich:dataTable id="tab" value="#{commandeBine.listDesChargePr1Prod}" var="c">
 		
-  		<f:facet name="header">LISTE DES CHARGES</f:facet>
+  		<f:facet name="header">LISTE DES CHARGES POUR LE PRODUIT [ #{commandeBine.partieDuTitreSurTableau} ]</f:facet>
   		
   		<rich:column>
   		<f:facet name="header">CHARGE</f:facet>
@@ -135,6 +138,17 @@
   		
   		</rich:dataTable>
   		
+  		<h:panelGrid columns="2">
+  		
+  			<h:outputText value="MONTANT POUR LE PRODUIT SELECTIONNE :" />
+  			<h:inputText value="#{commandeBine.montantPourLeProdSelectionne}" />
+  			
+  			<h:outputText value="MONTANT TOTAL :" />
+  			<h:inputText value="#{commandeBine.montantTotalDeLaCmd}" />
+  			
+  		</h:panelGrid>
+  		
+  		</h:panelGrid>
 		</rich:panel>
 	
 	</h:form>

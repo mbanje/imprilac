@@ -341,7 +341,7 @@ return;
 
 
 
-if((this.activenif==true)||(this.activesociete==true))
+if((this.activenif==true)||(this.activesociete==true)||(this.showMessageCmd==true))
 {message="VOUS VOULER CREER UNE AUTRE COMMANDE ALORS QU'IL Y A UNE AUTRE EN COURT!";
 return;
 }
@@ -572,7 +572,8 @@ if(this.com.getListProd()!=null)//LA LISTE DES PRODUITS EXISTE
 		System.out.println("FIN AFFICHAGE, J'AJOUTE UN PRODUIT SUR UNE COMMANDE");
 		System.out.println("FIN AFFICHAGE, J'AJOUTE UN PRODUIT SUR UNE COMMANDE");
 		//while((j<this.com.getListProd().size())&&!((this.com.getListProd().get(j).getIdProduit()==this.idProd)&&(this.com.getListProd().get(j).getTitre()==this.titreProd)))
-		while((j<this.com.getListProd().size())&&!((this.com.getListProd().get(j).getIdProduit()==this.idProd)&&(this.com.getListProd().get(j).getTitre().equalsIgnoreCase(this.titreProd))))		
+		//while((j<this.com.getListProd().size())&&!((this.com.getListProd().get(j).getIdProduit()==this.idProd)&&(this.com.getListProd().get(j).getTitre().equalsIgnoreCase(this.titreProd))))		
+		while((j<this.com.getListProd().size())&&!(this.com.getListProd().get(j).getTitre().equalsIgnoreCase(this.titreProd)))
 		{System.out.println("''''''''");
 		System.out.println(" sans !"+((this.com.getListProd().get(j).getIdProduit()==this.idProd)&&(this.com.getListProd().get(j).getTitre()==this.titreProd)));
 		System.out.println(" avec !"+!((this.com.getListProd().get(j).getIdProduit()==this.idProd)&&(this.com.getListProd().get(j).getTitre()==this.titreProd)));
@@ -824,9 +825,15 @@ public void setDesactiveQuantiteCharges(boolean desactiveQuantiteCharges) {
 public void ajouterChargesSurProduit()
 {
 System.out.println("DEBUT DE public void ajouterChargesSurProduit()");
-System.out.println("this.titreProduit "+this.titreProduit);
-System.out.println("this.titreProduit.length() "+this.titreProduit.length());
 
+if(this.com==null)
+{message="VOUS DEVEZ D'ABORD CREER UNE COMMANDE!!";
+return;
+	}
+if((this.com.getListProd()==null)||(this.com.getListProd().size()<1))
+{message="VOUS N'AVEZ AUCUN PRODUIT SUR UNE COMANDE!!";
+return;
+	}
 
 if(this.titreProduit.length()==0)
 {message="SELECTIONNER UN TITRE DU PRODUIT S'IL VOUS PLAIT!!";
@@ -845,10 +852,7 @@ if((this.desactiveListProSurDmd)||(this.desactiveListCharges)||(this.desactiveQu
 return;
 	}
 
-if(this.com==null)
-{message="VOUS DEVEZ D'ABORD CREER UNE COMMANDE!!";
-return;
-	}
+
 
 if((this.com.getListProd()==null)||(this.com.getListProd().size()==0))
 {message="VOUS DEVEZ D'ABORD METTRE UN PRODUIT SUR UNE COMMANDE";
@@ -886,10 +890,11 @@ while((i<this.com.getListProd().size())&&!(this.titreProduit.equalsIgnoreCase(th
 
 
 if(i<this.com.getListProd().size())
-{
+{   
+	//LE IF CI-DESSOUS N'EST PLUS NECESSAIRE(CETTE LISTE EST ABANDONNEE)
 	if(this.com.getListProd().get(i).getListCharges()==null)
 		{this.com.getListProd().get(i).setListCharges(new ArrayList<Charge>());
-		System.out.println("--------JE CREE UNE NOUVELLE LISTE DES DES CHARGES------");
+		System.out.println("--------JE CREE UNE NOUVELLE LISTE DES CHARGES------");
 		}
 	
 	//------------------------AUTRE MOYEN-------------------------
@@ -898,13 +903,26 @@ if(i<this.com.getListProd().size())
 	
 	else//IL Y A UN OU PLUSIEURS CHARGES
 	{Charge j=null;
+	boolean inseree=false;
 		j=this.com.getListProd().get(i).getCharge();
 		while(j.getCharge()!=null)
-		{j=j.getCharge();	
+		{
+			if(j.getIdCharge()==c.getIdCharge())
+			{	j.setQuantiteCharge(j.getQuantiteCharge()+c.getQuantiteCharge());
+				inseree=true;
+			}
+			
+			j=j.getCharge();
+			
 		}
 		
-		if(j.getCharge()==null)
+		
+		if((j.getCharge()==null)&&(inseree==false))
+		{if(j.getIdCharge()==c.getIdCharge())
+			j.setQuantiteCharge(j.getQuantiteCharge()+c.getQuantiteCharge());
+		else
 			j.setCharge(c);
+		}
 		else
 			System.out.println("JE PASSE DANS LE ELSE DANS LA FONCTION D'AJOUT DES CHARGES!!");
 		
@@ -943,6 +961,8 @@ public List<Charge> getListDesChargePr1Prod() {
 	System.out.println("this.com.getListProd().get(0).getTitre()"+this.com.getListProd().get(0).getTitre());
 		
 		int i=0;
+		
+		//FAISONS i POINTER SUR LE PRODUIT VOULU.
 		while((i<this.com.getListProd().size())&&!(this.titreProduit.equalsIgnoreCase(this.com.getListProd().get(i).getTitre())))
 		{System.out.println("JE PASSE DANS LA BOUCLE i= "+i);
 			i++;
@@ -960,14 +980,29 @@ public List<Charge> getListDesChargePr1Prod() {
 		}*/
 	
 //=======DANS LA ZONE DE LA LISTE DE RECOURS========
+		
+	//RECUPERONS LE NOM DU PRODUIT(ON A SON id)
+	int idPro=this.com.getListProd().get(i).getIdProduit();
+	ResultSet res=Connecteur.Extrairedonnees("select * from produits where Idprod="+idPro+"");
+	String typ=null;
+	
+	try {
+		res.next();
+		typ=res.getString("Type");
+		this.partieDuTitreSurTableau=typ+" :"+this.titreProduit;
+	} catch (SQLException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}
+	
+	
 	if(this.com.getListProd().get(i).getCharge()!=null)
 	{Charge c;
 		this.listDesChargePr1Prod.add(this.com.getListProd().get(i).getCharge());
 		c=this.com.getListProd().get(i).getCharge();
-		
 		while(c.getCharge()!=null)
-		{this.listDesChargePr1Prod.add(c);
-		c=c.getCharge();
+		{c=c.getCharge();
+		this.listDesChargePr1Prod.add(c);
 		}
 		
 	}
@@ -975,6 +1010,9 @@ public List<Charge> getListDesChargePr1Prod() {
 	
 }
 	//}
+	if((this.titreProduit==null)||(this.titreProduit.length()<1))
+		this.partieDuTitreSurTableau="";
+	
 	return listDesChargePr1Prod;
 }
 
@@ -1038,4 +1076,66 @@ public void finirAjoutDesProdSurCmd()
 	message="OK";
 	}
 
+
+private String partieDuTitreSurTableau="";
+public String getPartieDuTitreSurTableau() {
+	return partieDuTitreSurTableau;
 }
+
+public void setPartieDuTitreSurTableau(String partieDuTitreSurTableau) {
+	this.partieDuTitreSurTableau = partieDuTitreSurTableau;
+}
+
+public void OrienteDansAjoutDesCharges()
+{if(this.com==null)
+{message="IL N'Y A PAS DE COMMANDE EN COUR DE CREATION!!";
+return;
+	}
+
+if((this.com.getListProd()==null)||(this.com.getListProd().size()<1))
+{message="IL N'Y A AUCUN PRODUIT SUR CETTE COMMANDE!!";
+return;
+	}
+
+this.desactiveNomClient=true;
+this.activenif=true;
+this.activesociete=true;
+
+
+this.desactiveProd=true;
+this.desactiveTitre=true;
+this.desactiveNbreEx=true;
+this.desactiveMaqPres=true;
+this.desactiveChemin=true;
+
+
+//ON ACTIVE LES CHAMPS D'AJOUT DES CHARGES
+
+this.desactiveListProSurDmd=false;
+this.desactiveListCharges=false;
+this.desactiveQuantiteCharges=false;
+	
+	}
+//==============================MONTANTS==========================
+private float montantPourLeProdSelectionne=0;
+private float montantTotalDeLaCmd=0;
+public float getMontantPourLeProdSelectionne() {
+	return montantPourLeProdSelectionne;
+}
+
+public void setMontantPourLeProdSelectionne(float montantPourLeProdSelectionne) {
+	this.montantPourLeProdSelectionne = montantPourLeProdSelectionne;
+}
+
+public float getMontantTotalDeLaCmd() {
+	return montantTotalDeLaCmd;
+}
+
+public void setMontantTotalDeLaCmd(float montantTotalDeLaCmd) {
+	this.montantTotalDeLaCmd = montantTotalDeLaCmd;
+}
+
+
+}
+
+
