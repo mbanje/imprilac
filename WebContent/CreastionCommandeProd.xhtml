@@ -40,9 +40,10 @@
 
  			   	
     	</h:panelGrid>
-   	 <a4j:commandButton value="VALIDER" action="#{commandeBine.instancierCmd}"  data="#{commandeBine.message}" oncomplete="alert(data)" reRender="ni,so,msgCmd,cli,typPro,nomPr,nbrEx,maqPre,chem,pro"/>
+   	 <a4j:commandButton value="CREER" action="#{commandeBine.instancierCmd}"  data="#{commandeBine.message}" oncomplete="alert(data)" reRender="ni,so,msgCmd,cli,typPro,nomPr,nbrEx,maqPre,chem,pro"/>
    	 <a4j:commandButton value="SUPRIMER" action="#{commandeBine.supprimerCmd}"  data="#{commandeBine.message}" oncomplete="alert(data)" reRender="ni,so,msgCmd,cli,typPro,nomPr,nbrEx,maqPre,chem,pro,char,qtteChar"/>
-		
+	 <a4j:commandButton value="ENREGISTRER" action="#{commandeBine.saveCmd}"  data="#{commandeBine.message}" oncomplete="alert(data)" />
+	 
 		</rich:panel>
 		
 		
@@ -82,7 +83,7 @@
 		
 		</h:panelGrid>
 
-   	 <a4j:commandButton value="AJOUTER LE PRODUIT" action="#{commandeBine.ajouterProdSurCmd}"  data="#{commandeBine.message}" oncomplete="alert(data)" reRender="pro,char,qtteChar,typPro,nomPr,nbrEx,maqPre,chem"/>
+   	 <a4j:commandButton value="AJOUTER LE PRODUIT" action="#{commandeBine.ajouterProdSurCmd}"  data="#{commandeBine.message}" oncomplete="alert(data)" reRender="pro,char,qtteChar,typPro,nomPr,nbrEx,maqPre,chem,mont2"/>
    	 <a4j:commandButton value="QUITTER" action="#{commandeBine.finirAjoutDesProdSurCmd}"  data="#{commandeBine.message}" oncomplete="alert(data)" reRender="msgCmd,cli,ni,so,pro,char,qtteChar,typPro,nomPr,nbrEx,maqPre,chem"/>   	 
    	 <a4j:commandButton value="RETOUR DANS AJOUT DES CHARGES" action="#{commandeBine.OrienteDansAjoutDesCharges}"  data="#{commandeBine.message}" oncomplete="alert(data)" reRender="cli,ni,so,typPro,nomPr,nbrEx,maqPre,chem,pro,char,qtteChar"/>   	 
 
@@ -96,7 +97,7 @@
 			<h:outputText value="PRODUITS SUR COMMANDE :" />
   			<h:selectOneMenu value="#{commandeBine.titreProduit}" id="pro" disabled="#{commandeBine.desactiveListProSurDmd}">
   				<f:selectItems value="#{commandeBine.listDeroulanteDesProd}"/>
-    			<a4j:support event="onchange" reRender="tab,char"/>				
+    			<a4j:support event="onchange" actionListener="#{commandeBine.calculMontantPrUnProd}" reRender="tab,char,mont1,mont2"/>				
   			</h:selectOneMenu> 
 			
 			<h:outputText value="LISTE DES CHARGES :" />
@@ -110,7 +111,7 @@
 			
 			</h:panelGrid>
 			
- <a4j:commandButton value="AJOUTER" action="#{commandeBine.ajouterChargesSurProduit}"  data="#{commandeBine.message}" oncomplete="alert(data)" reRender="pro,tab,char"/>
+ <a4j:commandButton value="AJOUTER" action="#{commandeBine.ajouterChargesSurProduit}"  data="#{commandeBine.message}" oncomplete="alert(data)" reRender="pro,tab,char,mont1,mont2"/>
 
  <a4j:commandButton value="FINIR AJOUT DES CHARGES" action="#{commandeBine.finirAjoutDesCharges}"  data="#{commandeBine.message}" oncomplete="alert(data)" reRender="tab,typPro,nomPr,nbrEx,maqPre,chem,pro,char,qtteChar"/>
 
@@ -141,10 +142,10 @@
   		<h:panelGrid columns="2">
   		
   			<h:outputText value="MONTANT POUR LE PRODUIT SELECTIONNE :" />
-  			<h:inputText value="#{commandeBine.montantPourLeProdSelectionne}" />
+  			<h:outputText value="#{commandeBine.montantPourLeProdSelectionne}" id="mont1"/>
   			
   			<h:outputText value="MONTANT TOTAL :" />
-  			<h:inputText value="#{commandeBine.montantTotalDeLaCmd}" />
+  			<h:outputText value="#{commandeBine.montantTotalDeLaCmd}" id="mont2"/>
   			
   		</h:panelGrid>
   		
