@@ -1368,6 +1368,11 @@ public void saveCmd()
 			if(m!=-1)
 				message="INSERTION REUSSIE!!";	
 			
+			//IL FAUT ENSUITE METTRE SON ETAT A "NON ENTAMME"
+			idFig=recupereIdDuDernierP();
+			m=-1;
+			m=Connecteur.Insererdonnees("insert into historique_etapes (Idfigure,Date,Designation) values ("+idFig+",now(),'NON ENTAMME')");
+			
 			if(p.getCharge()!=null)
 			{
 			idFig=recupereIdDuDernierP();
@@ -1394,6 +1399,148 @@ public void saveCmd()
 	
 	this.com=null;
 	this.titreProduit=null;
+}
+
+
+
+private List<SelectItem> listDesCliAyaDesCmdAvcDesProdEnCour;
+private int idCli=0;
+public int getIdCli() {
+	return idCli;
+}
+
+public void setIdCli(int idCli) {
+	this.idCli = idCli;
+}
+
+public List<SelectItem> getListDesCliAyaDesCmdAvcDesProdEnCour() {
+	
+	ResultSet res=null;
+	
+	if(listDesCliAyaDesCmdAvcDesProdEnCour==null)
+		listDesCliAyaDesCmdAvcDesProdEnCour=new ArrayList<SelectItem>();
+	else
+		listDesCliAyaDesCmdAvcDesProdEnCour.clear();
+	
+	listDesCliAyaDesCmdAvcDesProdEnCour.add(new SelectItem(0,""));
+	
+	res=Connecteur.Extrairedonnees("select p.Idpersonne,p.Nompersonne,p.Prenompersonne from personne p where p.Idpersonne in (select cli.Idclient from client cli,commande com,figurer fig,historique_etapes histo where cli.Idclient=com.Idclient and com.Idcmd=fig.Idcmd and fig.Idfigurer=histo.Idfigure and histo.Designation !='TERMINEE')");
+
+	try {
+		while(res.next())
+		{listDesCliAyaDesCmdAvcDesProdEnCour.add(new SelectItem(res.getInt("Idpersonne"),res.getString("Nompersonne")+" "+res.getString("Prenompersonne")));
+
+		}
+	} catch (SQLException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}
+	
+	return listDesCliAyaDesCmdAvcDesProdEnCour;
+}
+
+public void setListDesCliAyaDesCmdAvcDesProdEnCour(
+		List<SelectItem> listDesCliAyaDesCmdAvcDesProdEnCour) {
+	this.listDesCliAyaDesCmdAvcDesProdEnCour = listDesCliAyaDesCmdAvcDesProdEnCour;
+}
+
+
+
+private List<SelectItem> listDesCmdAvcDesProdEnCour;
+private int idComd=0;
+
+public int getIdComd() {
+	return idComd;
+}
+
+public void setIdComd(int idComd) {
+	this.idComd = idComd;
+}
+
+public List<SelectItem> getListDesCmdAvcDesProdEnCour() {
+	
+	ResultSet res=null;
+	
+	if(listDesCmdAvcDesProdEnCour==null)
+		listDesCmdAvcDesProdEnCour=new ArrayList<SelectItem>();
+	else
+		listDesCmdAvcDesProdEnCour.clear();
+	
+	listDesCmdAvcDesProdEnCour.add(new SelectItem(0,""));
+	System.out.println("00");
+	System.out.println("00");	
+	
+	if(this.idCli!=0)//SI ON A SELECTIONNE UN CLIENT
+	{
+	System.out.println("11");
+	System.out.println("11");
+	res=Connecteur.Extrairedonnees("select Idcmd from commande where Idclient="+this.idCli+" and Idcmd in (select com.Idcmd from commande com,figurer fig,historique_etapes histo where com.Idcmd=fig.Idcmd and fig.Idfigurer=histo.Idfigure and histo.Designation !='TERMINEE')");
+
+	try {
+		while(res.next())
+		{listDesCmdAvcDesProdEnCour.add(new SelectItem(res.getInt("Idcmd"),""+res.getInt("Idcmd")+""));
+
+		}
+	} catch (SQLException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}
+	}
+	return listDesCmdAvcDesProdEnCour;
+}
+
+public void setListDesCmdAvcDesProdEnCour(
+		List<SelectItem> listDesCmdAvcDesProdEnCour) {
+	this.listDesCmdAvcDesProdEnCour = listDesCmdAvcDesProdEnCour;
+}
+
+
+private List<SelectItem> listDesProdDuneCmdNonEncorTermns; 
+private int idP;
+public int getIdP() {
+	return idP;
+}
+
+public void setIdP(int idP) {
+	this.idP = idP;
+}
+
+public List<SelectItem> getListDesProdDuneCmdNonEncorTermns() {
+	
+	ResultSet res=null;
+	
+	if(listDesProdDuneCmdNonEncorTermns==null)
+		listDesProdDuneCmdNonEncorTermns=new ArrayList<SelectItem>();
+	else
+		listDesProdDuneCmdNonEncorTermns.clear();
+	
+	listDesProdDuneCmdNonEncorTermns.add(new SelectItem(0,""));
+	System.out.println("00");
+	System.out.println("00");	
+	
+	if((this.idComd!=0)&&(this.idCli!=0))//SI ON A SELECTIONNE UN CLIENT
+	{
+	System.out.println("11");
+	System.out.println("11");
+	res=Connecteur.Extrairedonnees("select pro.Idprod,pro.Type,fig.Titre from commande com,figurer fig,produits pro,historique_etapes hist where com.Idcmd="+this.idComd+" and com.Idcmd=fig.Idcmd and fig.Idprod=pro.Idprod and fig.Idfigurer=hist.Idfigure and hist.Designation !='TERMINEE'");
+
+	try {
+		while(res.next())
+		{listDesProdDuneCmdNonEncorTermns.add(new SelectItem(res.getInt("Idprod"),res.getString("Type")+" : "+res.getString("Titre")));
+
+		}
+	} catch (SQLException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}
+	}
+	
+	return listDesProdDuneCmdNonEncorTermns;
+}
+
+public void setListDesProdDuneCmdNonEncorTermns(
+		List<SelectItem> listDesProdDuneCmdNonEncorTermns) {
+	this.listDesProdDuneCmdNonEncorTermns = listDesProdDuneCmdNonEncorTermns;
 }
 
 }
