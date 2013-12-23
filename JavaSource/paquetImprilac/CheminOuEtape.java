@@ -12,6 +12,33 @@ public class CheminOuEtape {
 	private float cout;
 	
 	
+	
+	private String designationP;
+	private String date;
+	private String etap;
+	
+	
+	
+	
+
+	public String getDesignationP() {
+		return designationP;
+	}
+	public void setDesignationP(String designationP) {
+		this.designationP = designationP;
+	}
+	public String getDate() {
+		return date;
+	}
+	public void setDate(String date) {
+		this.date = date;
+	}
+	public String getEtap() {
+		return etap;
+	}
+	public void setEtap(String etap) {
+		this.etap = etap;
+	}
 	public float getCout() {
 		return cout;
 	}

@@ -1,0 +1,26 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:a4j="http://richfaces.org/a4j"
+      xmlns:rich="http://richfaces.org/rich"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:ui="http://java.sun.com/jsf/facelets">
+
+  <head></head>
+
+  <body>
+  	<h:form>
+  	
+  	  		<rich:fileUpload fileUploadListener="#{fileUploadbine.}"  maxFilesQuantity="999999999" immediateUpload="true" noDuplicate="true" acceptedTypes="jpg, gif, png" ontyperejected="alert('LES TYPES DE FICHIER PERMIS SONT jpg, gif, png')">
+  			
+  			<f:facet name="label">
+  				<h:outputText value="{_KB}KB from {KB}KB uploaded --- {mm}:{ss}" />
+  			</f:facet>
+  			
+  			<a4j:support event="onuploadcomplete"/>
+  			
+  			</rich:fileUpload>
+  	
+  	</h:form>
+  </body>
+</html>
