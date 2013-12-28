@@ -2242,10 +2242,10 @@ public void enregistrerChemEtap()
 		   message="TAPEZ LE NOM DU CHEMIN S'IL VOUS PLAIT!";
 		   return; 
 	      } 
-		if(this.cout==0)
+/*		if(this.cout==0)
 			{message="INDIQUER LE COUT DE CHEMIN S'IL VOUS PLAIT!!";
 			return;
-			}
+			}*/
 	      this.designa=this.designa.toUpperCase();
 	      res=Connecteur.Extrairedonnees("select * from chemin where Designation='"+this.designa+"'");
 	      try {

@@ -27,7 +27,7 @@
   				<h:outputText value="NOM DU CLIENT  :"/>
   				<h:selectOneMenu value="#{commandeBine.idCli}" id="l1">
   			 		<f:selectItems value="#{commandeBine.listDesCliAyaDesCmdAvcDesProdEnCour}"/>
-  			 		<a4j:support event="onchange" reRender="l2,l3,l4"/>
+  			 		<a4j:support event="onchange" reRender="l2,l3,l4,tab"/>
   				</h:selectOneMenu>
   			</h:panelGrid>
   			
@@ -35,7 +35,7 @@
   				<h:outputText value="NUMERO DE LA COMMANDE :"/>
   				<h:selectOneMenu value="#{commandeBine.idComd}" id="l2">
   			 		<f:selectItems value="#{commandeBine.listDesCmdAvcDesProdEnCour}"/>
-  			 		<a4j:support event="onchange" reRender="l3,l4"/>
+  			 		<a4j:support event="onchange" reRender="l3,l4,tab"/>
   				</h:selectOneMenu>
   			</h:panelGrid>
   			

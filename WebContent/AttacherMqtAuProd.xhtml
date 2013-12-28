@@ -46,7 +46,7 @@
   				</h:selectOneMenu>
   			</h:panelGrid>
   			
-  			<rich:fileUpload maxFilesQuantity="999999999" immediateUpload="true" noDuplicate="true" acceptedTypes="jpg, gif, png" ontyperejected="alert('LES TYPES DE FICHIER PERMIS SONT jpg, gif, png')" fileUploadListener="#{commandeBine.listener}">
+  			<rich:fileUpload fileUploadListener="#{commandeBine.listener}" maxFilesQuantity="999999999"  immediateUpload="true" noDuplicate="true" acceptedTypes="jpg, gif, png, docx, ppt" ontyperejected="alert('LES TYPES DE FICHIER PERMIS SONT jpg, gif, png et UN FICHIER NE PEUT ETRE SUR CETTE LISTE QUE UNE SEULE FOIS!!')" >
   			
   			<f:facet name="label">
   				<h:outputText value="{_KB}KB from {KB}KB uploaded --- {mm}:{ss}" />
@@ -54,8 +54,14 @@
   			
   			</rich:fileUpload>
   			
+  			
+
+  			
+  			
   		</h:panelGrid>
-  
+ 
+ <a4j:commandButton value="ENREGISTRER" action="#{commandeBine.saveMaquette}"  data="#{commandeBine.message}" oncomplete="alert(data)" reRender="l4,tab"/>
+
  	
   </h:form>		
  </rich:panel>

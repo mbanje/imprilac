@@ -11,6 +11,7 @@ import javax.faces.model.SelectItem;
 import org.richfaces.event.UploadEvent;
 import org.richfaces.model.UploadItem;
 
+import java.awt.event.ItemEvent;
 import java.io.IOException;
 import java.io.OutputStream;
 
@@ -1529,11 +1530,16 @@ public List<SelectItem> getListDesProdDuneCmdNonEncorTermns() {
 	{
 	System.out.println("11");
 	System.out.println("11");
-	res=Connecteur.Extrairedonnees("select pro.Idprod,pro.Type,fig.Titre from commande com,figurer fig,produits pro,historique_etapes hist where com.Idcmd="+this.idComd+" and com.Idcmd=fig.Idcmd and fig.Idprod=pro.Idprod and fig.Idfigurer=hist.Idfigure and hist.Designation !='TERMINEE'");
-
+	//res=Connecteur.Extrairedonnees("select fig.Idfigurer,pro.Type,fig.Titre from commande com,figurer fig,produits pro,historique_etapes hist where com.Idcmd="+this.idComd+" and com.Idcmd=fig.Idcmd and fig.Idprod=pro.Idprod and fig.Idfigurer=hist.Idfigure and hist.Designation !='TERMINEE'");
+	res=Connecteur.Extrairedonnees("select figu.Idfigurer,prod.Type,figu.Titre from commande coma,figurer figu,produits prod where coma.Idcmd="+this.idComd+" and coma.Idcmd=figu.Idcmd and figu.Idprod=prod.Idprod and figu.Idfigurer in(select fig.Idfigurer from commande com,figurer fig,produits pro,historique_etapes hist where com.Idcmd="+this.idComd+" and com.Idcmd=fig.Idcmd and fig.Idprod=pro.Idprod and fig.Idfigurer=hist.Idfigure and hist.Designation !='TERMINEE')");
+	
+	
+	
 	try {
 		while(res.next())
-		{listDesProdDuneCmdNonEncorTermns.add(new SelectItem(res.getInt("Idprod"),res.getString("Type")+" : "+res.getString("Titre")));
+		{	
+				
+			listDesProdDuneCmdNonEncorTermns.add(new SelectItem(res.getInt("Idfigurer"),res.getString("Type")+" : "+res.getString("Titre")));
 
 		}
 	} catch (SQLException e) {
@@ -1549,6 +1555,28 @@ public void setListDesProdDuneCmdNonEncorTermns(
 		List<SelectItem> listDesProdDuneCmdNonEncorTermns) {
 	this.listDesProdDuneCmdNonEncorTermns = listDesProdDuneCmdNonEncorTermns;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 //DEBUT DE LA PARTIE DE MANIPULATION DE <rich:fileUpload>
@@ -1576,22 +1604,98 @@ public void paint(OutputStream stream, Object object) throws IOException {
     stream.write(getFiles().get((Integer)object).getData());
 }
 
-public void listener(UploadEvent event) throws Exception
-{
 
+private boolean showMessageMaquette=false;
+public boolean isShowMessageMaquette() {
+	return showMessageMaquette;
+}
+
+public void setShowMessageMaquette(boolean showMessageMaquette) {
+	this.showMessageMaquette = showMessageMaquette;
+}
+
+public void listener(UploadEvent event) throws Exception{
+
+System.out.println("debut ecouteur");
+
+
+
+UploadItem item = event.getUploadItem();
+File file = new File();
+file.setLength(item.getData().length);
+file.setName(item.getFileName());
+file.setData(item.getData());
+
+if((file.getName()==null)||(file.getName().length()<1))
+	{this.showMessageMaquette=true;
+	return;
 	}
-/*public void listener(UploadEvent event) throws Exception{
+
+files.add(file);
+this.showMessageMaquette=false;
+System.out.println("LE NOM DU FICHIER QUI VIENT D'ETRE CHARGE EST "+file.getName());
+
+
+}
+
+
+public void saveMaquette()
+{
+if(this.idCli==0)
+{	message="VOUS N'AVEZ PAS SELECTONNER UN CLIENT!!";
+	return;
+	}
+
+if(this.idComd==0)
+{message="VOUS N'AVEZ PAS SELECTIONNE DE COMMANDE!!";
+return;
+	}
+
+if(this.idP==0)
+{message="VOUS N'AVEZ PAS SELECTIONNE UN PRODUIT!!";
+return;
+	}
+
+if(this.files.size()<1)
+	{message="LA LISTE DES MAQUETTES EST VIDE!!";
+	return;
+	}
+int n=-1;
+for(int j=0;j<this.files.size();j++)
+{System.out.println("+this.files.get(j).getName()"+this.files.get(j).getName());
+String s=this.files.get(j).getName();
+System.out.println("s"+s);
+n=Connecteur.Insererdonnees("insert into maquette (Idfigurer,Nomphoto,Dtecreation) values ("+this.idP+",'"+s+"',now())");
+}
+if(n!=-1)
+	message="OPERATION REUSSIE!!";
+else
+	message="OPERATION ECHOUEE!!";
 	
-    UploadItem item = event.getUploadItem();
-    File file = new File();
-    file.setLength(item.getData().length);
-    file.setName(item.getFileName());
-    file.setData(item.getData());
-    files.add(file);
-    
-System.out.println("Les fichiers sur files sont au nombre de "+this.getSize());
-} */
+	}
 //FIN DE LA PARTIE DE MANIPULATION DE <rich:fileUpload>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 //DEBUT DE LA PARTIE POUR MARQUER A QUELLE ETAPE SE TROUVE UN PRODUIT
@@ -1638,23 +1742,25 @@ public List<SelectItem> getListDesEtapNonEncorMarqPrUnProd() {
 	System.out.println("00");
 	System.out.println("00");	
 	
-	if((this.idComd!=0)&&(this.idCli!=0))//SI ON A SELECTIONNE UN CLIENT
+	if((this.idComd!=0)&&(this.idCli!=0)&&(this.idP!=0))//SI ON A SELECTIONNE UN CLIENT,
+		//UNE COMMANDE ET UN PRODUIT
 	{
 	System.out.println("11");
 	System.out.println("11");
-	res=Connecteur.Extrairedonnees("select et.Designation from figurer fig,chemin che,chemin_etapes c_e,etapes et where fig.Idcmd="+this.idComd+" and fig.Idprod="+this.idP+" and fig.Idchemin=che.Idchemin and che.Idchemin=c_e.idchemin and c_e.Idetape=et.Idetape");
-
+	//res=Connecteur.Extrairedonnees("select et.Designation from figurer fig,chemin che,chemin_etapes c_e,etapes et where fig.Idcmd="+this.idComd+" and fig.Idprod="+this.idP+" and fig.Idchemin=che.Idchemin and che.Idchemin=c_e.idchemin and c_e.Idetape=et.Idetape");
+	System.out.println("LE ID DESIGNANT UN PRODUIT D'UNE COMMANDE EST-> "+this.idP);
+	res=Connecteur.Extrairedonnees("select et.Designation from figurer fig,chemin che,chemin_etapes c_e,etapes et where fig.Idfigurer="+this.idP+" and fig.Idchemin=che.Idchemin and che.Idchemin=c_e.idchemin and c_e.Idetape=et.Idetape");	
 	try {
 	System.out.println("@0");
 		while(res.next())
 		{
-		int idf=0;
+		int idf=this.idP;
 		
-		idf=recupereIdfigure(this.idComd,this.idP);
-		if(idf==0)
-			break;
-		else
-		{
+		//idf=recupereIdfigure(this.idComd,this.idP);
+		//if(idf==0)
+			//break;
+		//else
+		//{
 		r0=Connecteur.Extrairedonnees("select * from historique_etapes where Idfigure="+idf+" and Designation='"+res.getString("Designation")+"'");
 		if(!r0.next())
 		{
@@ -1662,7 +1768,7 @@ public List<SelectItem> getListDesEtapNonEncorMarqPrUnProd() {
 		System.out.println("@1");
 		}
 		
-		}
+		//}
 		
 		}
 	} catch (SQLException e) {
@@ -1710,7 +1816,7 @@ if(this.idP==0)
 return;
 	}
 
-if(this.etap.length()<1)
+if((this.etap.length()<1)||(this.etap.equalsIgnoreCase("0")||(this.etap==null)))
 {message="SELECTIONNER UNE ETAPE S'IL VOUS PLAIT!!";
 return;
 	}
@@ -1718,13 +1824,14 @@ return;
 System.out.println("this.etap "+this.etap);
 System.out.println("this.etap "+this.etap);
 
-r=Connecteur.Extrairedonnees("select Idfigurer from figurer where Idcmd="+this.idComd+" and Idprod="+this.idP+"");
+//r=Connecteur.Extrairedonnees("select Idfigurer from figurer where Idcmd="+this.idComd+" and Idprod="+this.idP+"");
 
 try {
-	r.next();
-	idFig=r.getInt("Idfigurer");
-	if(idFig==0)
-		return;
+	//r.next();
+	//idFig=r.getInt("Idfigurer");
+	idFig=this.idP;
+	//if(idFig==0)
+		//return;
 	
 	int n=-1;
 	
@@ -1767,7 +1874,8 @@ public List<CheminOuEtape> getListHistorique() {
 	
 	
 	System.out.println("!!!!!!!!!");
-	res=Connecteur.Extrairedonnees("select p.Type,h.Date,h.Designation from produits p,figurer f,historique_etapes h where f.Idcmd="+this.idComd+" and f.Idprod="+this.idP+" and p.Idprod=f.Idprod and f.Idfigurer=h.Idfigure");
+	//res=Connecteur.Extrairedonnees("select p.Type,h.Date,h.Designation from produits p,figurer f,historique_etapes h where f.Idcmd="+this.idComd+" and f.Idprod="+this.idP+" and p.Idprod=f.Idprod and f.Idfigurer=h.Idfigure");
+	res=Connecteur.Extrairedonnees("select p.Type,h.Date,h.Designation from produits p,figurer f,historique_etapes h where f.Idfigurer="+this.idP+" and p.Idprod=f.Idprod and f.Idfigurer=h.Idfigure");
 	int num=1;
 	try {
 		while(res.next())
