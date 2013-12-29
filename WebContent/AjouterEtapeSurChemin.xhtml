@@ -45,7 +45,7 @@
   		
   		<rich:panel>
   		<rich:dataTable id="tab" value="#{commandeBine.listCheEta}" var="c">
-  		<f:facet name="header">#{commandeBine.titre}</f:facet>
+  		<f:facet name="header"><h1>#{commandeBine.titre}</h1></f:facet>
   		
   		<rich:column>
   		<f:facet name="header">NUMERO</f:facet>
@@ -57,6 +57,16 @@
   		#{c.designationEta}
   		</rich:column>
   		
+  		
+  		<rich:column>
+    		<f:facet name="header">SUPPRIMER</f:facet>
+     			
+      				<a4j:commandLink actionListener="#{commandeBine.enleverEtapeSurChem}" value="supprimer" reRender="tab,etap">
+      				
+      				<f:setPropertyActionListener value="#{c}" target="#{commandeBine.cheOuEta}" />
+	  				
+	  				</a4j:commandLink>	
+   		</rich:column>  
 
   		</rich:dataTable>
   		</rich:panel>

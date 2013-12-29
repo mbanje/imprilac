@@ -1,8 +1,10 @@
 package paquetImprilac;
 
+import java.nio.channels.FileChannel;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import javax.faces.event.ActionEvent;
@@ -12,8 +14,14 @@ import org.richfaces.event.UploadEvent;
 import org.richfaces.model.UploadItem;
 
 import java.awt.event.ItemEvent;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.PrintWriter;
 
 public class CommandeBean {
 	
@@ -223,7 +231,7 @@ public List<CheminOuEtape> getListCheEta() {
 		p.setNum(num);
 		listCheEta.add(p);
 		if(no==0)
-			titre="LISTE DES ETAPES SE TROUVANT SUR LE CHEMIN "+res.getString("c.Designation").toUpperCase()+"";
+			titre="LISTE DES ETAPES SE TROUVANT SUR LE CHEMIN : '"+res.getString("c.Designation").toUpperCase()+"'";
 		
 		no++;
 		num++;
@@ -1600,12 +1608,12 @@ public int getSize() {
     }
 }
 
-public void paint(OutputStream stream, Object object) throws IOException {
+/*public void paint(OutputStream stream, Object object) throws IOException {
     stream.write(getFiles().get((Integer)object).getData());
-}
+}*/
 
 
-private boolean showMessageMaquette=false;
+/*private boolean showMessageMaquette=false;
 public boolean isShowMessageMaquette() {
 	return showMessageMaquette;
 }
@@ -1613,30 +1621,44 @@ public boolean isShowMessageMaquette() {
 public void setShowMessageMaquette(boolean showMessageMaquette) {
 	this.showMessageMaquette = showMessageMaquette;
 }
-
+*/
 public void listener(UploadEvent event) throws Exception{
 
 System.out.println("debut ecouteur");
-
-
-
 UploadItem item = event.getUploadItem();
-File file = new File();
-file.setLength(item.getData().length);
-file.setName(item.getFileName());
-file.setData(item.getData());
+String nomDuFic=null,nomDuFic0=null;
 
-if((file.getName()==null)||(file.getName().length()<1))
-	{this.showMessageMaquette=true;
-	return;
-	}
-
+Date d=new Date();
+System.out.println("1");
+nomDuFic0=item.getFileName();
+System.out.println("2");
+nomDuFic=""+d.getYear()+"_"+d.getMonth()+"_"+d.getDate()+"_"+d.getDay()+"_"+d.getHours()+"_"+d.getMinutes()+"_"+d.getSeconds()+"_"+item.getFileName();
+System.out.println("3");
+File file = new File(nomDuFic);
+//file.setLength(item.getData().length);
+//file.setName(nomDuFic);
+//file.setData(item.getData());
 files.add(file);
-this.showMessageMaquette=false;
-System.out.println("LE NOM DU FICHIER QUI VIENT D'ETRE CHARGE EST "+file.getName());
 
 
+//============================================
+//FAUT COPIER LE FICHIER CHARGE DANS LE REPERT
+//============================================
+
+FileOutputStream fos=null;
+
+try{
+	
+fos = new FileOutputStream(new File("C:\\Documents and Settings\\S\\Mes documents\\memoire\\maquettes\\"+nomDuFic));
+fos.write(item.getData());
+fos.close();
+
+} catch (IOException e) {
+e.printStackTrace();
 }
+}
+
+
 
 
 public void saveMaquette()
@@ -1672,6 +1694,7 @@ if(n!=-1)
 else
 	message="OPERATION ECHOUEE!!";
 	
+this.files.clear();
 	}
 //FIN DE LA PARTIE DE MANIPULATION DE <rich:fileUpload>
 
@@ -1920,6 +1943,101 @@ try {
 
 return id;
 }
+
+
+
+
+
+//DEBUT DE LA FONCTION QUI PERMET D'ENLEVER UNE ETAPE SUR UN CHEMIN
+private CheminOuEtape cheOuEta=null;
+public CheminOuEtape getCheOuEta() {
+	return cheOuEta;
+}
+
+public void setCheOuEta(CheminOuEtape cheOuEta) {
+	this.cheOuEta = cheOuEta;
+}
+
+public void enleverEtapeSurChem(ActionEvent e)
+{
+if(this.cheOuEta==null)//CAS IMPOSSIBLE
+{message="AUCUNE ETAPE N'A ETE SUPPRIMEE!!";
+return;
+	}
+
+if(this.idChemin==0)
+{message="AUCUN CHEMIN N'A ETE SELECTIONNE!!";
+return;
+	}
+
+ResultSet re=null;
+re=Connecteur.Extrairedonnees("select * from etapes where Designation='"+this.cheOuEta.getDesignationEta()+"'");
+int idE=0;
+
+try {
+	re.next();
+	idE=re.getInt("Idetape");
+
+int n=-1;
+n=Connecteur.Insererdonnees("delete from chemin_etapes where idchemin="+this.idChemin+" and Idetape="+idE+"");
+
+if(n==-1)
+	message="SUPPRESSION DE L'ETAPE ECHOUEE!!";
+else
+	message="SUPPRESSION DE L'ETAPE REUSSIE!!";
+
+this.cheOuEta=null;
+//this.idChemin=0;
+} catch (SQLException e1) {
+	// TODO Auto-generated catch block
+	e1.printStackTrace();
+}
+
+	}
+//FIN DE LA FONCTION QUI PERMET D'ENLEVER UNE ETAPE SUR UN CHEMIN
+
+private List<CheminOuEtape> listDesEtapDuChem;
+public List<CheminOuEtape> getListDesEtapDuChem() {
+	
+	ResultSet res=null;
+	
+	if(listDesEtapDuChem==null)
+		listDesEtapDuChem=new ArrayList<CheminOuEtape>();
+	else
+		listDesEtapDuChem.clear();
+	
+	
+	
+	res=Connecteur.Extrairedonnees("select c.Designation,e.Designation from chemin as c,chemin_etapes as c_e,etapes as e where e.Idetape=c_e.Idetape and c_e.idchemin=c.Idchemin and c.Idchemin="+this.idChemin+"");
+	int no=0,num=1;
+	try {
+		while(res.next())
+		{CheminOuEtape p=new CheminOuEtape();
+		p.setDesignationChe(res.getString("c.Designation"));
+		p.setDesignationEta(res.getString("e.Designation"));
+		p.setNum(num);
+		listDesEtapDuChem.add(p);
+		if(no==0)
+			titre="LISTE DES ETAPES SE TROUVANT SUR LE CHEMIN : '"+res.getString("c.Designation").toUpperCase()+"'";
+		
+		no++;
+		num++;
+		}
+	} catch (SQLException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}
+	
+	if(no==0)
+		titre="LA SELECTION D'UN CHEMIN VISUALISE SES ETAPES";
+	
+	return listDesEtapDuChem;
+}
+
+public void setListDesEtapDuChem(List<CheminOuEtape> listDesEtapDuChem) {
+	this.listDesEtapDuChem = listDesEtapDuChem;
+}
+
 
 }
 

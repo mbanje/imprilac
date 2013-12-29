@@ -18,9 +18,17 @@ public class CheminOuEtape {
 	private String etap;
 	
 	
+	//private String nomEtape;
+	
 	
 	
 
+/*	public String getNomEtape() {
+		return nomEtape;
+	}
+	public void setNomEtape(String nomEtape) {
+		this.nomEtape = nomEtape;
+	}*/
 	public String getDesignationP() {
 		return designationP;
 	}
