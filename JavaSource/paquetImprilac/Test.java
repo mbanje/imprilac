@@ -2,6 +2,7 @@ package paquetImprilac;
 
 
 //Packages à importer afin d'utiliser l'objet File
+import java.awt.Desktop;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -15,7 +16,7 @@ public class Test {
 	/**
 	 * @param args
 	 */
-	public static void main(String[] args) {
+	public static void main(String[] args) {/*
 		// TODO Auto-generated method stub
 
 		//Nous déclarons nos objets en dehors du bloc try/catch
@@ -62,6 +63,14 @@ public class Test {
 		e.printStackTrace();
 		}
 		
+	*/
+		Desktop desk = Desktop.getDesktop();
+		try {
+			desk.open(new File("C:\\Documents and Settings\\S\\Mes documents\\memoire\\maquettes\\113_11_28_6_17_29_11_Dice.jpg"));
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 }

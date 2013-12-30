@@ -13,10 +13,20 @@ private Produit produit;
 private List<Charge> listCharges;
 private float montantTotalProd;
 
+
 private Charge charge=null;
 
+//===
+
+private int num=0;
 
 
+public int getNum() {
+	return num;
+}
+public void setNum(int num) {
+	this.num = num;
+}
 public Charge getCharge() {
 	return charge;
 }

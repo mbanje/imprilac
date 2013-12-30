@@ -13,6 +13,7 @@ import javax.faces.model.SelectItem;
 import org.richfaces.event.UploadEvent;
 import org.richfaces.model.UploadItem;
 
+import java.awt.Desktop;
 import java.awt.event.ItemEvent;
 import java.io.File;
 import java.io.FileInputStream;
@@ -348,6 +349,8 @@ public void setActivesociete(boolean activesociete) {
 	this.activesociete = activesociete;
 }
 
+
+
 public void instancierCmd()
 {System.out.println("!!!!!!");
 if(this.idClient==0)
@@ -614,12 +617,18 @@ if(this.com.getListProd()!=null)//LA LISTE DES PRODUITS EXISTE
 			message="DONNER UN AUTRE TITRE A CE PRODUIT!!";
 			return;
 		}
-	}
+		else
+		{	j++;
+			p.setNum(j);
+		}
+	}else
+		p.setNum(1);
 
  }
 else//LA LISTE DES PRODUITS N'EXISTE PAS
 {this.com.setListProd(new ArrayList<Produit>());
 System.out.println("fff");
+p.setNum(1);
 }
 System.out.println("this.com.getListProd().size() AVANT AJOUT DU PRODUIT SUR UNE COMMANDE "+this.com.getListProd().size());
 this.com.getListProd().add(p);
@@ -991,55 +1000,67 @@ public List<Charge> getListDesChargePr1Prod() {
 	
 	//if(this.titreProd!=null)
 	//{	
+	
+	System.out.println("1");
 	if((this.com!=null)&&(this.com.getListProd()!=null)&&(this.com.getListProd().size()>0)&&(this.titreProduit!=null)&&(this.titreProduit.length()>0))
-	{
+	{System.out.println("2");
 	System.out.println("this.com.getListProd().get(0).getTitre()"+this.com.getListProd().get(0).getTitre());
-		
+	System.out.println("3");
 		int i=0;
 		
 		//FAISONS i POINTER SUR LE PRODUIT VOULU.
 		while((i<this.com.getListProd().size())&&!(this.titreProduit.equalsIgnoreCase(this.com.getListProd().get(i).getTitre())))
 		{System.out.println("JE PASSE DANS LA BOUCLE i= "+i);
 			i++;
+			System.out.println("4");
 			}
+		System.out.println("5");
 	//	System.out.println("this.com.getListProd().get(i).getListCharges().size() "+this.com.getListProd().get(i).getListCharges().size());
 		if(this.com.getListProd().get(i).getListCharges()==null)
 		{System.out.println(",,,,,,,,,,");
+		System.out.println("6");
 			this.com.getListProd().get(i).setListCharges(new ArrayList<Charge>());
 		}
+		System.out.println("7");
 		//if((this.com.getListProd().get(i).getListCharges()!=null)&&(this.com.getListProd().get(i).getListCharges().size()>0))
 	if(this.com.getListProd().get(i).getListCharges()!=null)
-		{System.out.println("this.com.getListProd().get(i).getListCharges().size() avant prise de la liste "+this.com.getListProd().get(i).getListCharges().size());
+		{System.out.println("8");
+		System.out.println("this.com.getListProd().get(i).getListCharges().size() avant prise de la liste "+this.com.getListProd().get(i).getListCharges().size());
 			listDesChargePr1Prod=this.com.getListProd().get(i).getListCharges();
 		System.out.println("this.com.getListProd().get(i).getListCharges().size() apres prise de la liste "+this.com.getListProd().get(i).getListCharges().size());
+		System.out.println("9");
 		}
 	
 //=======DANS LA ZONE DE LA LISTE DE RECOURS========
-		
+	System.out.println("10");
 	//RECUPERONS LE NOM DU PRODUIT(ON A SON id)
 	int idPro=this.com.getListProd().get(i).getIdProduit();
 	ResultSet res=Connecteur.Extrairedonnees("select * from produits where Idprod="+idPro+"");
 	String typ=null;
-	
-	try {
+	System.out.println("11");
+	try {System.out.println("12");
 		res.next();
 		typ=res.getString("Type");
 		this.partieDuTitreSurTableau=typ+" :"+this.titreProduit;
+		System.out.println("13");
 	} catch (SQLException e) {
 		// TODO Auto-generated catch block
 		e.printStackTrace();
 	}
 	
-	
+	System.out.println("14");
 	if(this.com.getListProd().get(i).getCharge()!=null)
 	{Charge c;
+	System.out.println("15");
 		this.listDesChargePr1Prod.add(this.com.getListProd().get(i).getCharge());
 		c=this.com.getListProd().get(i).getCharge();
+		System.out.println("16");
 		while(c.getCharge()!=null)
 		{c=c.getCharge();
+		System.out.println("17");
 		this.listDesChargePr1Prod.add(c);
 		}
-		
+		System.out.println("18");
 	}
 
 	
@@ -1083,6 +1104,7 @@ this.desactiveNbreEx=false;
 this.desactiveMaqPres=false;
 this.desactiveChemin=false;
 
+this.idCharge=0;
 message="OK";
 
 	}
@@ -1120,6 +1142,40 @@ public String getPartieDuTitreSurTableau() {
 public void setPartieDuTitreSurTableau(String partieDuTitreSurTableau) {
 	this.partieDuTitreSurTableau = partieDuTitreSurTableau;
 }
+
+public void OrienteDansAjoutDesProd()
+{if(this.com==null)
+{message="IL N'Y A PAS DE COMMANDE EN COUR DE CREATION!!";
+return;
+	}
+
+/*if((this.com.getListProd()==null)||(this.com.getListProd().size()<1))
+{message="IL N'Y A AUCUN PRODUIT SUR CETTE COMMANDE!!";
+return;
+	}*/
+
+this.desactiveNomClient=true;
+this.activenif=true;
+this.activesociete=true;
+
+
+//ON ACTIVE LES CHAMPS D'AJOUT DES PRODUITS
+this.desactiveProd=false;
+this.desactiveTitre=false;
+this.desactiveNbreEx=false;
+this.desactiveMaqPres=false;
+this.desactiveChemin=false;
+
+
+
+
+this.desactiveListProSurDmd=true;
+this.desactiveListCharges=true;
+this.desactiveQuantiteCharges=true;
+
+	}
+
+
 
 public void OrienteDansAjoutDesCharges()
 {if(this.com==null)
@@ -1288,6 +1344,7 @@ return m;
 	}
 
 
+
 public void calculMontantCmd()
 {
 if((this.com==null)||(this.com.getListProd()==null)||(this.com.getListProd().size()<1))
@@ -1303,7 +1360,39 @@ while(i<this.com.getListProd().size())
 this.montantTotalDeLaCmd+=calculMontantPrUnProd3(this.com.getListProd().get(i).getTitre());
 	i++;
 	}
+}
+
+private Produit p=null;
+public Produit getP() {
+	return p;
+}
+public void setP(Produit p) {
+	this.p = p;
+}
+
+//DEBUT DE LA FONCTION QUI ENLEVE UN PRODUIT SUR UNE COMMANDE
+public void deleteProd(ActionEvent ev)
+{
+	if(p==null)//CAS IMPOSSIBLE
+	{message="PAS DE PRODUIT INDIQUE POUR LA SUPPRESSION!!";
+	return;
+		}
+	
+	if(this.com.getListProd().size()<1)//CAS IMPOSSIBLE
+	{message="PAS DE PRODUIT INDIQUE POUR LA SUPPRESSION!!";
+	return;
 	}
+	
+	int j=0;
+	while((j<this.com.getListProd().size())&&!(this.com.getListProd().get(j).getTitre().equalsIgnoreCase(p.getTitre())))
+	{
+		j++;
+	}
+	
+	this.com.getListProd().remove(j);
+	calculMontantCmd();
+	}
+//FIN DE LA FONCTION QUI ENLEVE UN PRODUIT SUR UNE COMMANDE
 
 public int recupereIdDuDernierCmd()
 {int i=-1;
@@ -2039,6 +2128,99 @@ public void setListDesEtapDuChem(List<CheminOuEtape> listDesEtapDuChem) {
 }
 
 
+
+private List<Maquette> listDesMaqD1ProdDonne;
+public List<Maquette> getListDesMaqD1ProdDonne() {
+	
+ResultSet res=null;
+	
+	if(listDesMaqD1ProdDonne==null)
+		listDesMaqD1ProdDonne=new ArrayList<Maquette>();
+	else
+		listDesMaqD1ProdDonne.clear();
+	
+	
+	System.out.println("!!!!!!!!!");
+	//res=Connecteur.Extrairedonnees("select p.Type,h.Date,h.Designation from produits p,figurer f,historique_etapes h where f.Idcmd="+this.idComd+" and f.Idprod="+this.idP+" and p.Idprod=f.Idprod and f.Idfigurer=h.Idfigure");
+	res=Connecteur.Extrairedonnees("select * from maquette where Idfigurer="+this.idP+"");
+	int num=1;
+	try {
+		while(res.next())
+		{
+		Maquette m=new Maquette();
+		m.setNum(num);
+		m.setIdMaql(res.getInt("Idmaquette"));
+		m.setNomMaq(res.getString("Nomphoto"));
+		
+		listDesMaqD1ProdDonne.add(m);
+		
+	System.out.println("////////2");	
+		num++;
+		}
+	} catch (SQLException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}
+	
+	return listDesMaqD1ProdDonne;
+}
+
+public void setListDesMaqD1ProdDonne(List<Maquette> listDesMaqD1ProdDonne) {
+	this.listDesMaqD1ProdDonne = listDesMaqD1ProdDonne;
+}
+
+private Maquette m=null;
+public Maquette getM() {
+	return m;
+}
+
+public void setM(Maquette m) {
+	this.m = m;
+}
+
+//DEBUT DE LA FONCTION QUI EST UTILISEE POUR SUPPRIMER UNE MAQUETTE
+public void deleteMaquette(ActionEvent e)
+{if(m==null)//CAS IMPOSSIBLE
+{message="PAS DE MAQUETTE INDIQUE POUR LA SUPPRESSION!!";
+return;
+	}
+
+int idm=0;
+idm=m.getIdMaql();
+int n=-1;
+n=Connecteur.Insererdonnees("delete from maquette where Idmaquette="+idm+"");
+if(n==-1)
+	message="OPERATION ECHOUEE!!";
+else
+	message="OPERATION REUSSIE!!";
+
+m=null;
+	}
+//FIN DE LA FONCTION QUI EST UTILISEE POUR SUPPRIMER UNE MAQUETTE
+
+//DEBUT DE LA FONCTION QUI EST UTILISEE POUR VISUALISER UNE MAQUETTE
+public void visualiseMaquette(ActionEvent ev)
+{if(m==null)//CAS IMPOSSIBLE
+{message="PAS DE MAQUETTE INDIQUE POUR LA SUPPRESSION!!";
+return;
+	}
+
+int idm=0;
+idm=m.getIdMaql();
+
+String nomMaq=null;
+nomMaq=m.getNomMaq();
+
+Desktop desk = Desktop.getDesktop();
+try {
+	desk.open(new File("C:\\Documents and Settings\\S\\Mes documents\\memoire\\maquettes\\"+nomMaq));
+} catch (IOException e) {
+	// TODO Auto-generated catch block
+	e.printStackTrace();
+}
+
+	}
+//FIN DE LA FONCTION QUI EST UTILISEE POUR VISUALISER UNE MAQUETTE
 }
 
 
