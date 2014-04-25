@@ -8,7 +8,23 @@ public class Charge {
 	private String designation;
 	private Charge charge=null;
 	
+	private int idMateriel;
+	private int num;
 	
+	
+	
+	public int getNum() {
+		return num;
+	}
+	public void setNum(int num) {
+		this.num = num;
+	}
+	public int getIdMateriel() {
+		return idMateriel;
+	}
+	public void setIdMateriel(int idMateriel) {
+		this.idMateriel = idMateriel;
+	}
 	public String getDesignation() {
 		return designation;
 	}

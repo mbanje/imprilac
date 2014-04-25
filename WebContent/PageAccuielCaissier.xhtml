@@ -12,7 +12,7 @@
   
   
     <a4j:keepAlive beanName="bine" />
-    <rich:panel style ="width:500px;font-size:35px;margin-left:250px;" >
+    <rich:panel style ="width:500px;font-size:35px;margin-left:250px;background-color:#00BFFF;" >
   	<f:facet name="header">PAGE D'ACCUIEL DU GESTIONNAIRE</f:facet>
   	
   	<h:form>
@@ -22,6 +22,10 @@
   		<h:selectOneMenu value="#{demandeBine.idPersonneConnecte}" style ="visibility: hidden;">
   			<f:selectItems value="#{bine.listPersonneConnecte}"/>
   		</h:selectOneMenu>
+  		
+  		
+		<a4j:commandButton value="deconnexion" action="#{bine.deconnection}"/>
+  		
   		
   		
 		<rich:toolBar>
@@ -38,7 +42,7 @@
 			<f:facet name="label">
 				<h:outputText value="OPERATION" />
 			</f:facet>
-				<rich:menuItem submitMode="ajax" value="MARQUER UNE SORTIE" action="marquerSortieMat"/>
+				<rich:menuItem submitMode="ajax" value="MARQUER UN PAYEMENT" action="Payer"/>
 			</rich:dropDownMenu>
 				
 				

@@ -1,0 +1,53 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:a4j="http://richfaces.org/a4j"
+      xmlns:rich="http://richfaces.org/rich"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:ui="http://java.sun.com/jsf/facelets">
+
+  <head></head>
+
+  <body>
+  
+        <a4j:keepAlive beanName="afficherbine" />
+  
+  <rich:panel style ="width:850px;font-size:35px;margin-left:120px;background-color:#00BFFF;" >
+  <f:facet name="header">PAGE POUR LA VISUALISATION DES DIFFERENTS MATERIAUX ET LEURS QUANTITES</f:facet>
+  
+  	
+  	  	<h:selectOneMenu value="#{afficherbine.idPersonneConnecte}" style ="visibility: hidden;">
+  		<f:selectItems value="#{bine.listPersonneConnecte}"/>
+  		</h:selectOneMenu>
+  		
+  		<h:selectOneMenu value="#{commandeBine.idPersonneConnecte}" style ="visibility: hidden;">
+  		<f:selectItems value="#{bine.listPersonneConnecte}"/>
+  		</h:selectOneMenu>
+  		
+  		
+  	<rich:dataTable id="tab" value="#{afficherbine.listDesMatAuChef}" var="mat">
+  		<f:facet name="header">LISTE DES MATERIAUX DANS LES MAINS DU CHEF DE PRODUCTION ET LEUR QUANTITE</f:facet>
+  		
+  		<rich:column>
+  		<f:facet name="header">NUMERO</f:facet>
+  		#{mat.num}
+  		</rich:column>
+  		
+ 
+    	<rich:column>
+  		<f:facet name="header">DESIGNATION</f:facet>
+  		#{mat.designation}
+  		</rich:column>
+  		
+     	<rich:column>
+  		<f:facet name="header">QUANTITE</f:facet>
+  		#{mat.qteAuChef}
+  		</rich:column>
+     
+  		</rich:dataTable>
+  		
+  		
+  	</rich:panel>
+  
+  </body>
+</html>

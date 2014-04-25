@@ -1,0 +1,197 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:a4j="http://richfaces.org/a4j"
+      xmlns:rich="http://richfaces.org/rich"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:ui="http://java.sun.com/jsf/facelets">
+
+  <head>
+    <meta http-equiv="Content-type" content="text/xhtml;charset=utf-8" />
+  	<title> Enregistrement des charges</title>
+  </head>
+
+  <body>
+  
+    <a4j:keepAlive beanName="bine" />
+    <rich:panel style ="width:500px;font-size:35px;margin-left:250px;background-color:#00BFFF;" >
+    <f:facet name="header">PAGE DE CREATION DES CHARGES</f:facet>
+    <h:form>
+    
+      	<h:selectOneMenu value="#{bine.idPersonneConnecte}" style ="visibility: hidden;">
+  		<f:selectItems value="#{bine.listPersonneConnecte}"/>
+  		</h:selectOneMenu>
+  	
+  		<h:panelGrid columns="4">
+  		
+  		<h:outputText value="TYPE DE LA CARGE" />
+  		<h:selectOneMenu value="#{bine.idTypeCharge}" id="t">
+  			<f:selectItems value="#{bine.listDesTypeDeCharges}" />
+  			<a4j:support event="onchange" actionListener="#{bine.ecouteChangeTypeCharge}" reRender="nomC1,nomC2,desi"/>
+  		</h:selectOneMenu>
+  		
+  		<a4j:outputPanel ajaxRendered="true" >
+  		<h:outputText value="DESIGNATION" rendered="#{bine.showLabelDesi}" id="desi"/>
+  		</a4j:outputPanel>
+  		<h:panelGrid columns="2">
+  		
+  			<a4j:outputPanel ajaxRendered="true" id="nomC1">
+  				<h:inputText value="#{bine.nomCharg}" rendered="#{bine.showZoneSaisie}"/>
+  			</a4j:outputPanel>
+  			
+  			<a4j:outputPanel ajaxRendered="true" id="nomC2">
+  				<h:selectOneMenu value="#{bine.idCharg}" rendered="#{bine.showSelect}">
+  			 		<f:selectItems value="#{bine.listDesMateriaux}" />
+  				</h:selectOneMenu>
+  			</a4j:outputPanel>
+  			
+  		</h:panelGrid>
+  		
+  		
+
+  			<h:outputText value="PRIX UNITAIRE  :" />
+  			<h:inputText value="#{bine.prixUnit}" id="pu"/>
+
+  		
+  		</h:panelGrid>
+  	
+  	   	 <a4j:commandButton value="ENVOYER" action="#{bine.saveCharges}"  data="#{bine.message}" oncomplete="alert(data)" reRender="t,desi,nomC1,nomC2,pu,tab"/>
+  	
+  	</h:form>
+  	
+  	<h:form >
+  	
+  	  <rich:panel style ="background-color:#00BFFF;">
+  		<rich:dataTable id="tab" value="#{bine.listDesCharges}" var="c" rows="7">
+  		<f:facet name="header">LISTE DES CHARGES</f:facet>
+  		
+  		<rich:column>
+  		<f:facet name="header">NUMERO</f:facet>
+  		#{c.num}
+  		</rich:column>
+  		
+ 
+    	<rich:column>
+  		<f:facet name="header">DESIGNATION</f:facet>
+  		#{c.designation}
+  		</rich:column>
+  		
+  		
+  		<rich:column>
+  		<f:facet name="header">PRIX UNITAIRE</f:facet>
+  		#{c.prixUni}
+  		</rich:column> 	
+  		
+  		<rich:column>
+    		<f:facet name="header">ACTION</f:facet>
+     			
+      				<a4j:commandLink onclick="#{rich:component('formp')}.show()" value="modifier" reRender="m">
+      				
+      				<f:setPropertyActionListener value="#{c}" target="#{bine.selec}" />
+	  				
+	  				</a4j:commandLink>	
+   		</rich:column> 	
+   		
+   		<rich:column>
+    		<f:facet name="header">SUPPRIMER</f:facet>
+     			
+      				<a4j:commandLink actionListener="#{bine.supprimerCharge}" value="supprimer" reRender="tab">
+      				
+      				<f:setPropertyActionListener value="#{c}" target="#{bine.c1}" />
+	  				
+	  				</a4j:commandLink>	
+   		</rich:column> 
+   		
+   		
+   		
+   		  		   <f:facet name="footer">
+  			
+  			<rich:datascroller>
+  			
+  				<f:facet name="first">
+  					<h:outputText value="Premier" />
+  				</f:facet>
+  				
+  				<f:facet name="first-disabled">
+  					<h:outputText value="Premier" />
+  				</f:facet>
+  				
+  				<f:facet name="last">
+  					<h:outputText value="Dernier" />
+  				</f:facet>
+  				
+  				<f:facet name="last-disabled">
+  					<h:outputText value="Dernier" />
+  				</f:facet>
+  				
+  				<f:facet name="next">
+  					<h:outputText value="Suivant" />
+  				</f:facet>
+  				
+  				<f:facet name="next-disabled">
+  					<h:outputText value="Suivant" />
+  				</f:facet>
+  				
+  				<f:facet name="previous">
+  					<h:outputText value="Precedent" />
+  				</f:facet>
+  				
+  				<f:facet name="previous-disabled">
+  					<h:outputText value="Précédent" />
+  				</f:facet>
+  				
+  			</rich:datascroller>
+  			
+  		</f:facet>
+   		
+  		
+  	</rich:dataTable>
+  
+  	</rich:panel>
+  	
+  	</h:form>
+  	
+  	</rich:panel>
+
+  
+  
+  
+  
+  
+  
+    	<rich:modalPanel id='formp' width="700" height="300" style ="background-color:#00BFFF;">
+  	
+ 		<f:facet name="header">FORMULAIRE DE MODIFICATION</f:facet>
+  		<f:facet name="controls">
+ 			<h:graphicImage value="/image/close.png" onclick="#{rich:component('formp')}.hide();"/>
+  		</f:facet>
+  		
+  		
+  		
+  	
+  		<h:panelGroup>
+  			<h:form id="m">
+  			
+  			
+  			 <a4j:outputPanel ajaxRendered="true" id="prix">	
+  				<h:panelGrid columns="2">
+  				<h:outputText value="PRIX UNITAIRE  :" />
+  				<h:inputText value="#{bine.selec.prixUni}" />
+  				</h:panelGrid>
+  			</a4j:outputPanel>
+  			
+
+  	
+<a4j:commandButton action="#{bine.modifierCoutCharge}" value="MODIFIER" data="#{bine.message}" oncomplete="alert(data)" reRender="tab" />
+		</h:form>
+	</h:panelGroup>
+  </rich:modalPanel> 
+  
+  
+  
+  
+  
+  
+  
+  </body>
+</html>

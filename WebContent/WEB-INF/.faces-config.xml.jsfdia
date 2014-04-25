@@ -33,16 +33,55 @@
     NAME="output1" PATH="/HistoriseMatRecu.xhtml"
     TARGET="rules:#HistoriseMatRecu.xhtml" TITLE="historiserMat" model-entity="JSFProcessItemOutput"/>
    <PROCESS-ITEM-OUTPUT
-    ID="savePersonne::#EnregistrementPersonnes.xhtml" NAME="output2"
-    PATH="/EnregistrementPersonnes.xhtml"
-    TARGET="rules:#EnregistrementPersonnes.xhtml" TITLE="savePersonne" model-entity="JSFProcessItemOutput"/>
-   <PROCESS-ITEM-OUTPUT
     ID="saveMatOuProd::#CreationMateriel_Produit.xhtml" NAME="output3"
     PATH="/CreationMateriel_Produit.xhtml"
     TARGET="rules:#CreationMateriel_Produit.xhtml" TITLE="saveMatOuProd" model-entity="JSFProcessItemOutput"/>
-   <PROCESS-ITEM-OUTPUT ID="donneCompte::#CreationComptes.xhtml"
-    NAME="output4" PATH="/CreationComptes.xhtml"
-    TARGET="rules:#CreationComptes.xhtml" TITLE="donneCompte" model-entity="JSFProcessItemOutput"/>
+   <PROCESS-ITEM-OUTPUT ID="saveChEtCh::#CreationCheminEtapes.xhtml"
+    NAME="output5" PATH="/CreationCheminEtapes.xhtml"
+    TARGET="rules:#CreationCheminEtapes.xhtml" TITLE="saveChEtCh" model-entity="JSFProcessItemOutput"/>
+   <PROCESS-ITEM-OUTPUT ID="mettreEtSurCh::#AjouterEtapeSurChemin.xhtml"
+    NAME="output6" PATH="/AjouterEtapeSurChemin.xhtml"
+    TARGET="rules:#AjouterEtapeSurChemin.xhtml" TITLE="mettreEtSurCh" model-entity="JSFProcessItemOutput"/>
+   <PROCESS-ITEM-OUTPUT ID="creerCmd::#CreationCommandeProduit.xhtml"
+    NAME="output2" PATH="/CreationCommandeProduit.xhtml"
+    TARGET="rules:#CreationCommandeProduit.xhtml" TITLE="creerCmd" model-entity="JSFProcessItemOutput"/>
+   <PROCESS-ITEM-OUTPUT ID="maquette::#AttacherMqtAuProd.xhtml"
+    NAME="output4" PATH="/AttacherMqtAuProd.xhtml"
+    TARGET="rules:#AttacherMqtAuProd.xhtml" TITLE="maquette" model-entity="JSFProcessItemOutput"/>
+   <PROCESS-ITEM-OUTPUT ID="CreerGroupe::#Creation_groupes.xhtml"
+    NAME="output7" PATH="/Creation_groupes.xhtml"
+    TARGET="rules:#Creation_groupes.xhtml" TITLE="CreerGroupe" model-entity="JSFProcessItemOutput"/>
+   <PROCESS-ITEM-OUTPUT ID="deconnection::#Identification.xhtml"
+    NAME="output8" PATH="/Identification.xhtml"
+    TARGET="rules:#Identification.xhtml" TITLE="deconnection" model-entity="JSFProcessItemOutput"/>
+   <PROCESS-ITEM-OUTPUT ID="saveCharge::#CreationCharges.xhtml"
+    NAME="output9" PATH="/CreationCharges.xhtml"
+    TARGET="rules:#CreationCharges.xhtml" TITLE="saveCharge" model-entity="JSFProcessItemOutput"/>
+   <PROCESS-ITEM-OUTPUT
+    ID="marquerEtap::#Marquer_Etape_Pr_Un_Prod1.xhtml" NAME="output10"
+    PATH="/Marquer_Etape_Pr_Un_Prod1.xhtml"
+    TARGET="rules:#Marquer_Etape_Pr_Un_Prod1.xhtml" TITLE="marquerEtap" model-entity="JSFProcessItemOutput"/>
+   <PROCESS-ITEM-OUTPUT ID="voirProdPaye::#LivrerProduitPaye.xhtml"
+    NAME="output11" PATH="/LivrerProduitPaye.xhtml"
+    TARGET="rules:#LivrerProduitPaye.xhtml" TITLE="voirProdPaye" model-entity="JSFProcessItemOutput"/>
+   <PROCESS-ITEM-OUTPUT ID="voirMatEQtite::#AFFICHER_MATERIEL_Qte.xhtml"
+    NAME="output12" PATH="/AFFICHER_MATERIEL_Qte.xhtml"
+    TARGET="rules:#AFFICHER_MATERIEL_Qte.xhtml" TITLE="voirMatEQtite" model-entity="JSFProcessItemOutput"/>
+   <PROCESS-ITEM-OUTPUT
+    ID="voirProdctDispo::#AFFICHER_PRODUCTEURS_DISPO.xhtml"
+    NAME="output13" PATH="/AFFICHER_PRODUCTEURS_DISPO.xhtml"
+    TARGET="rules:#AFFICHER_PRODUCTEURS_DISPO.xhtml"
+    TITLE="voirProdctDispo" model-entity="JSFProcessItemOutput"/>
+   <PROCESS-ITEM-OUTPUT
+    ID="modifierEtatDesProduct::#MODIFIER_ETAT_PRODUCTEUR.xhtml"
+    NAME="output14" PATH="/MODIFIER_ETAT_PRODUCTEUR.xhtml"
+    TARGET="rules:#MODIFIER_ETAT_PRODUCTEUR.xhtml"
+    TITLE="modifierEtatDesProduct" model-entity="JSFProcessItemOutput"/>
+   <PROCESS-ITEM-OUTPUT ID="saveCli::#EnregistrentClient.xhtml"
+    NAME="output15" PATH="/EnregistrentClient.xhtml"
+    TARGET="rules:#EnregistrentClient.xhtml" TITLE="saveCli" model-entity="JSFProcessItemOutput"/>
+   <PROCESS-ITEM-OUTPUT ID="bon::#SaveBon.xhtml" NAME="output16"
+    PATH="/SaveBon.xhtml" TARGET="rules:#SaveBon.xhtml" TITLE="bon" model-entity="JSFProcessItemOutput"/>
   </PROCESS-ITEM>
  </PROCESS-ITEM>
  <PROCESS-ITEM NAME="rules:#PageAccuielGerant.xhtml"
@@ -52,6 +91,19 @@
    <PROCESS-ITEM-OUTPUT ID="analyseDmd::#AnalyseDmdMat.xhtml"
     NAME="output" PATH="/AnalyseDmdMat.xhtml"
     TARGET="rules:#AnalyseDmdMat.xhtml" TITLE="analyseDmd" model-entity="JSFProcessItemOutput"/>
+   <PROCESS-ITEM-OUTPUT
+    ID="savePersonne::#EnregistrementPersonnes.xhtml" NAME="output1"
+    PATH="/EnregistrementPersonnes.xhtml"
+    TARGET="rules:#EnregistrementPersonnes.xhtml" TITLE="savePersonne" model-entity="JSFProcessItemOutput"/>
+   <PROCESS-ITEM-OUTPUT ID="donneCompte::#CreationComptes.xhtml"
+    NAME="output2" PATH="/CreationComptes.xhtml"
+    TARGET="rules:#CreationComptes.xhtml" TITLE="donneCompte" model-entity="JSFProcessItemOutput"/>
+   <PROCESS-ITEM-OUTPUT ID="deconnection::#Identification.xhtml"
+    NAME="output3" PATH="/Identification.xhtml"
+    TARGET="rules:#Identification.xhtml" TITLE="deconnection" model-entity="JSFProcessItemOutput"/>
+   <PROCESS-ITEM-OUTPUT ID="ajouteProf::#AJOUTER_PROFIL.xhtml"
+    NAME="output4" PATH="/AJOUTER_PROFIL.xhtml"
+    TARGET="rules:#AJOUTER_PROFIL.xhtml" TITLE="ajouteProf" model-entity="JSFProcessItemOutput"/>
   </PROCESS-ITEM>
  </PROCESS-ITEM>
  <PROCESS-ITEM NAME="rules:#PageAccuielGestionr.xhtml"
@@ -61,24 +113,82 @@
    <PROCESS-ITEM-OUTPUT ID="marquerSortieMat::#SortirMateriel.xhtml"
     NAME="output" PATH="/SortirMateriel.xhtml"
     TARGET="rules:#SortirMateriel.xhtml" TITLE="marquerSortieMat" model-entity="JSFProcessItemOutput"/>
+   <PROCESS-ITEM-OUTPUT ID="ajoute::#AjouteQteMatDansStock.xhtml"
+    NAME="output1" PATH="/AjouteQteMatDansStock.xhtml"
+    TARGET="rules:#AjouteQteMatDansStock.xhtml" TITLE="ajoute" model-entity="JSFProcessItemOutput"/>
+   <PROCESS-ITEM-OUTPUT ID="deconnection::#Identification.xhtml"
+    NAME="output2" PATH="/Identification.xhtml"
+    TARGET="rules:#Identification.xhtml" TITLE="deconnection" model-entity="JSFProcessItemOutput"/>
   </PROCESS-ITEM>
  </PROCESS-ITEM>
  <PROCESS-ITEM NAME="rules:#PageAccuielEmploye.xhtml"
-  PATH="/PageAccuielEmploye.xhtml" SHAPE="288,465,0,0" model-entity="JSFProcessGroup"/>
+  PATH="/PageAccuielEmploye.xhtml" SHAPE="288,465,0,0" model-entity="JSFProcessGroup">
+  <PROCESS-ITEM ID="rules:#PageAccuielEmploye.xhtml:0" NAME="item"
+   PATH="/PageAccuielEmploye.xhtml" model-entity="JSFProcessItem">
+   <PROCESS-ITEM-OUTPUT ID="deconnection::#Identification.xhtml"
+    NAME="output1" PATH="/Identification.xhtml"
+    TARGET="rules:#Identification.xhtml" TITLE="deconnection" model-entity="JSFProcessItemOutput"/>
+   <PROCESS-ITEM-OUTPUT
+    ID="marquerEtap::#Marquer_Etape_Pr_Un_Prod1.xhtml" NAME="output2"
+    PATH="/Marquer_Etape_Pr_Un_Prod1.xhtml"
+    TARGET="rules:#Marquer_Etape_Pr_Un_Prod1.xhtml" TITLE="marquerEtap" model-entity="JSFProcessItemOutput"/>
+  </PROCESS-ITEM>
+ </PROCESS-ITEM>
  <PROCESS-ITEM NAME="rules:#PageAccuielCaissier.xhtml"
-  PATH="/PageAccuielCaissier.xhtml" SHAPE="304,497,0,0" model-entity="JSFProcessGroup"/>
+  PATH="/PageAccuielCaissier.xhtml" SHAPE="304,497,0,0" model-entity="JSFProcessGroup">
+  <PROCESS-ITEM ID="rules:#PageAccuielCaissier.xhtml:0" NAME="item"
+   PATH="/PageAccuielCaissier.xhtml" model-entity="JSFProcessItem">
+   <PROCESS-ITEM-OUTPUT ID="Payer::#Payement.xhtml" NAME="output"
+    PATH="/Payement.xhtml" TARGET="rules:#Payement.xhtml" TITLE="Payer" model-entity="JSFProcessItemOutput"/>
+   <PROCESS-ITEM-OUTPUT ID="deconnection::#Identification.xhtml"
+    NAME="output1" PATH="/Identification.xhtml"
+    TARGET="rules:#Identification.xhtml" TITLE="deconnection" model-entity="JSFProcessItemOutput"/>
+  </PROCESS-ITEM>
+ </PROCESS-ITEM>
  <PROCESS-ITEM NAME="rules:#CreastionDemandeMateriel.xhtml"
   PATH="/CreastionDemandeMateriel.xhtml" SHAPE="512,17,0,0" model-entity="JSFProcessGroup"/>
  <PROCESS-ITEM NAME="rules:#HistoriseMatRecu.xhtml"
   PATH="/HistoriseMatRecu.xhtml" SHAPE="528,257,0,0" model-entity="JSFProcessGroup"/>
- <PROCESS-ITEM NAME="rules:#EnregistrementPersonnes.xhtml"
-  PATH="/EnregistrementPersonnes.xhtml" SHAPE="544,257,0,0" model-entity="JSFProcessGroup"/>
  <PROCESS-ITEM NAME="rules:#CreationMateriel_Produit.xhtml"
   PATH="/CreationMateriel_Produit.xhtml" SHAPE="560,257,0,0" model-entity="JSFProcessGroup"/>
- <PROCESS-ITEM NAME="rules:#CreationComptes.xhtml"
-  PATH="/CreationComptes.xhtml" SHAPE="576,257,0,0" model-entity="JSFProcessGroup"/>
  <PROCESS-ITEM NAME="rules:#AnalyseDmdMat.xhtml"
   PATH="/AnalyseDmdMat.xhtml" SHAPE="576,257,0,0" model-entity="JSFProcessGroup"/>
  <PROCESS-ITEM NAME="rules:#SortirMateriel.xhtml"
   PATH="/SortirMateriel.xhtml" SHAPE="576,481,0,0" model-entity="JSFProcessGroup"/>
+ <PROCESS-ITEM NAME="rules:#CreationCheminEtapes.xhtml"
+  PATH="/CreationCheminEtapes.xhtml" SHAPE="576,289,0,0" model-entity="JSFProcessGroup"/>
+ <PROCESS-ITEM NAME="rules:#AjouterEtapeSurChemin.xhtml"
+  PATH="/AjouterEtapeSurChemin.xhtml" SHAPE="576,321,0,0" model-entity="JSFProcessGroup"/>
+ <PROCESS-ITEM NAME="rules:#CreationCommandeProduit.xhtml"
+  PATH="/CreationCommandeProduit.xhtml" SHAPE="576,289,0,0" model-entity="JSFProcessGroup"/>
+ <PROCESS-ITEM NAME="rules:#AttacherMqtAuProd.xhtml"
+  PATH="/AttacherMqtAuProd.xhtml" SHAPE="576,321,0,0" model-entity="JSFProcessGroup"/>
+ <PROCESS-ITEM NAME="rules:#Creation_groupes.xhtml"
+  PATH="/Creation_groupes.xhtml" SHAPE="576,353,0,0" model-entity="JSFProcessGroup"/>
+ <PROCESS-ITEM NAME="rules:#EnregistrementPersonnes.xhtml"
+  PATH="/EnregistrementPersonnes.xhtml" SHAPE="576,353,0,0" model-entity="JSFProcessGroup"/>
+ <PROCESS-ITEM NAME="rules:#CreationComptes.xhtml"
+  PATH="/CreationComptes.xhtml" SHAPE="576,353,0,0" model-entity="JSFProcessGroup"/>
+ <PROCESS-ITEM NAME="rules:#AjouteQteMatDansStock.xhtml"
+  PATH="/AjouteQteMatDansStock.xhtml" SHAPE="576,353,0,0" model-entity="JSFProcessGroup"/>
+ <PROCESS-ITEM NAME="rules:#Payement.xhtml" PATH="/Payement.xhtml"
+  SHAPE="576,897,0,0" model-entity="JSFProcessGroup"/>
+ <PROCESS-ITEM NAME="rules:#CreationCharges.xhtml"
+  PATH="/CreationCharges.xhtml" SHAPE="640,417,0,0" model-entity="JSFProcessGroup"/>
+ <PROCESS-ITEM NAME="rules:#Marquer_Etape_Pr_Un_Prod1.xhtml"
+  PATH="/Marquer_Etape_Pr_Un_Prod1.xhtml" SHAPE="640,1089,0,0" model-entity="JSFProcessGroup"/>
+ <PROCESS-ITEM NAME="rules:#LivrerProduitPaye.xhtml"
+  PATH="/LivrerProduitPaye.xhtml" SHAPE="640,481,0,0" model-entity="JSFProcessGroup"/>
+ <PROCESS-ITEM NAME="rules:#AJOUTER_PROFIL.xhtml"
+  PATH="/AJOUTER_PROFIL.xhtml" SHAPE="640,481,0,0" model-entity="JSFProcessGroup"/>
+ <PROCESS-ITEM NAME="rules:#AFFICHER_MATERIEL_Qte.xhtml"
+  PATH="/AFFICHER_MATERIEL_Qte.xhtml" SHAPE="640,513,0,0" model-entity="JSFProcessGroup"/>
+ <PROCESS-ITEM NAME="rules:#AFFICHER_PRODUCTEURS_DISPO.xhtml"
+  PATH="/AFFICHER_PRODUCTEURS_DISPO.xhtml" SHAPE="640,545,0,0" model-entity="JSFProcessGroup"/>
+ <PROCESS-ITEM NAME="rules:#MODIFIER_ETAT_PRODUCTEUR.xhtml"
+  PATH="/MODIFIER_ETAT_PRODUCTEUR.xhtml" SHAPE="640,577,0,0" model-entity="JSFProcessGroup"/>
+ <PROCESS-ITEM NAME="rules:#EnregistrentClient.xhtml"
+  PATH="/EnregistrentClient.xhtml" SHAPE="640,609,0,0" model-entity="JSFProcessGroup"/>
+ <PROCESS-ITEM NAME="rules:#SaveBon.xhtml" PATH="/SaveBon.xhtml"
+  SHAPE="640,641,0,0" model-entity="JSFProcessGroup"/>
 </PROCESS>

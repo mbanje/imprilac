@@ -6,12 +6,13 @@
       xmlns:f="http://java.sun.com/jsf/core"
       xmlns:ui="http://java.sun.com/jsf/facelets">
 
-  <head></head>
+  <head>
+  </head>
 
   <body>
     <a4j:keepAlive beanName="demandeBine" />
      
-<rich:panel style ="width:700px;font-size:35px;margin-left:250px;background-color:#00BFFF;" >
+<rich:panel style ="width:600px;font-size:35px;margin-left:250px;background-color:#00BFFF;" >
     
 <h:form>
 
@@ -26,7 +27,7 @@
   			
   			<h:panelGrid columns="1">
   			<a4j:outputPanel id="messageNomMat">
-			<h:outputText value="SELECTIONNER LE NOM DU MATERIEL!!" rendered="#{demandeBine.showMessageAboutNomMat}"/> 
+			<h:outputText value="SELECTIONNER LE NOM DU MATERIEL!!" rendered="#{demandeBine.showMessageAboutNomMat}" style ="color:yellow;"/> 
 			</a4j:outputPanel>
   			
   			<h:selectOneMenu value="#{demandeBine.idMateriel}">
@@ -40,7 +41,7 @@
     		<h:outputText value="QUANTITE :" />
 			<h:panelGrid columns="1">
   				<a4j:outputPanel id="messageQuanti">
-					<h:outputText value="LA QUANTITE DOIT ETRE UN NOMBRE SUPERIEURE A ZERO!!" rendered="#{demandeBine.showMessageAboutQuantite}"/> 
+					<h:outputText value="LA QUANTITE DOIT ETRE UN NOMBRE SUPERIEURE A ZERO!!" rendered="#{demandeBine.showMessageAboutQuantite}" style ="color:yellow;"/> 
 				</a4j:outputPanel>
 			   	
     		<h:inputText value="#{demandeBine.quantiteMateriel}" >
@@ -54,7 +55,7 @@
   	  <a4j:commandButton value="VALIDER" reRender="tab" action="#{demandeBine.creerDmdMateriel}" data="#{demandeBine.message}" oncomplete="alert(data)"/> 	
  
  </h:panelGrid>
-    </h:form>  
+     
     
     
      <rich:panel style="background-color:#00BFFF;">
@@ -76,10 +77,20 @@
   		<f:facet name="header">QUANTITE</f:facet>
   		#{per.quantiteMateriel}
   		</rich:column>
+  		
+  		<rich:column>
+    		<f:facet name="header">SUPPRIMER</f:facet>
+     			
+      				<a4j:commandLink actionListener="#{demandeBine.enleverProdSurDmd}" value="supprimer" reRender="tab">
+      				
+      				<f:setPropertyActionListener value="#{per}" target="#{demandeBine.selectedDmd}" />
+	  				
+	  				</a4j:commandLink>	
+   		</rich:column>
 
   		</rich:dataTable>
   	</rich:panel>
-
+</h:form>
   </rich:panel>	
   </body>
 </html>

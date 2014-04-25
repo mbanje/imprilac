@@ -23,6 +23,9 @@
   		</h:selectOneMenu>
   		
   		
+  		<a4j:commandButton value="deconnexion" action="#{bine.deconnection}"/>
+  		
+  		
 		<rich:toolBar>
 			<rich:dropDownMenu>
 			<f:facet name="label">
@@ -38,6 +41,7 @@
 				<h:outputText value="OPERATION" />
 			</f:facet>
 				<rich:menuItem submitMode="ajax" value="MARQUER UNE SORTIE" action="marquerSortieMat"/>
+				<rich:menuItem submitMode="ajax" value="SIGNALER AUGMENTATIOM DU MATERIEL" action="ajoute"/>
 			</rich:dropDownMenu>
 				
 				

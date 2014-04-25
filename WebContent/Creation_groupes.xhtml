@@ -1,0 +1,164 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:a4j="http://richfaces.org/a4j"
+      xmlns:rich="http://richfaces.org/rich"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:ui="http://java.sun.com/jsf/facelets">
+
+  <head></head>
+
+  <body>
+  
+        <a4j:keepAlive beanName="commandeBine" />
+  
+  <rich:panel style ="width:750px;font-size:35px;margin-left:200px;background-color:#00BFFF;" >
+  <f:facet name="header">PAGE DE CREATION DES GROUPES D'EMPLOYES</f:facet>
+  	<h:form id="fo">
+  	
+  	  	<h:selectOneMenu value="#{bine.idPersonneConnecte}" style ="visibility: hidden;">
+  		<f:selectItems value="#{bine.listPersonneConnecte}"/>
+  		</h:selectOneMenu>
+  		
+  		<h:selectOneMenu value="#{commandeBine.idPersonneConnecte}" style ="visibility: hidden;">
+  		<f:selectItems value="#{bine.listPersonneConnecte}"/>
+  		</h:selectOneMenu>
+  
+  <h:panelGrid columns="2">
+  	
+  	<h:panelGrid columns="2">
+  		  		<h:outputText value="NOM DU CLIENT  :"/>
+  		  		
+  		  		<h:panelGrid columns="1">
+  		  		
+  		  		<a4j:outputPanel id="messageClient">
+					<h:outputText value="SELECTIONNER LE CLIENT S'IL VOUS PLAIT!!" rendered="#{commandeBine.showMessageClient}" style ="color:yellow;"/> 
+				</a4j:outputPanel>
+  		  		
+  				<h:selectOneMenu value="#{commandeBine.idCli1}" id="l1" disabled="#{commandeBine.desactiveClient1}">
+  			 		<f:selectItems value="#{commandeBine.listDesCliAyaDesCmdAvcDesProdEnCour1}"/>
+  			 		<a4j:support event="onchange" actionListener="#{commandeBine.listernInPutClient}" reRender="l2,l3,l4,messageClient"/>
+  				</h:selectOneMenu>		
+  				</h:panelGrid>
+  	</h:panelGrid>
+  	
+  	<h:panelGrid columns="2">
+  				<h:outputText value="NUMERO DE LA COMMANDE :"/>
+  				
+  				<h:panelGrid columns="1">
+  				
+  				<a4j:outputPanel id="messageCommande">
+					<h:outputText value="SELECTIONNER UNE COMMANDE S'IL VOUS PLAIT!!" rendered="#{commandeBine.showMessageComd}" style ="color:yellow;"/> 
+				</a4j:outputPanel>
+  				
+  				<h:selectOneMenu value="#{commandeBine.idComd1}" id="l2" disabled="#{commandeBine.desactiveCmd1}">
+  			 		<f:selectItems value="#{commandeBine.listDesCmdAvcDesProdEnCour1}"/>
+  			 		<a4j:support event="onchange" actionListener="#{commandeBine.listernInPutCommande}" reRender="l3,l4,messageCommande"/>
+  				</h:selectOneMenu>
+  				</h:panelGrid>
+  	</h:panelGrid>
+  	
+  	<h:panelGrid columns="2">
+  				<h:outputText value="NOM DU PRODUIT :"/>
+  				
+  				<h:panelGrid columns="1">
+  				
+  				<a4j:outputPanel id="messageProduit">
+					<h:outputText value="SELECTIONNER UN PRODUIT S'IL VOUS PLAIT!!" rendered="#{commandeBine.showMessageProd}" style ="color:yellow;"/> 
+				</a4j:outputPanel>
+  				
+  				<h:selectOneMenu value="#{commandeBine.idP1}" id="l3" disabled="#{commandeBine.desactivePro1}">
+  			 		<f:selectItems value="#{commandeBine.listDesProdDuneCmdNonEncorTermns1}"/>
+  				<a4j:support event="onchange" actionListener="#{commandeBine.listernInPutProduit}" reRender="l4,messageProduit"/>
+  				</h:selectOneMenu>
+  				</h:panelGrid>
+  	</h:panelGrid>
+  	
+  </h:panelGrid>
+  
+ 
+
+  	
+  	<h:panelGrid columns="6">
+  	
+  		<h:outputText value="DATE PROVISOIRE DEBUT :"/>
+  		<rich:calendar value="#{commandeBine.dteProvDeb}" datePattern="dd/MM/yyyy HH:mm:a" reRender="l4" eventsQueue="onchange"/>
+  		<h:commandButton value="OK"/>
+		
+  		<h:outputText value="DATE PROVISOIRE FIN :"/>
+  		<rich:calendar value="#{commandeBine.dteProvFin}" datePattern="dd/MM/yyyy HH:mm:a" reRender="l4"/>
+		<h:commandButton value="OK"/>
+  		 	
+  	</h:panelGrid>
+  	
+  	
+  	
+  	<h:panelGrid columns="2">
+  				<h:outputText value="PRODUCTEURS :"/>
+  				
+  				<h:panelGrid columns="1">
+  				
+  				<a4j:outputPanel id="messageProducteur">
+					<h:outputText value="SELECTIONNER UN PRODUCTEUR S'IL VOUS PLAIT!!" rendered="#{commandeBine.showMessageProducteur}" style ="color:yellow;"/> 
+				</a4j:outputPanel>
+  				
+  				<h:selectOneMenu value="#{commandeBine.idProducteur}" id="l4">
+  			 		<f:selectItems value="#{commandeBine.listDesProducteursLibres}"/>
+  				<a4j:support event="onchange" actionListener="#{commandeBine.listernInPutProducteur}" reRender="messageProducteur"/>
+  				</h:selectOneMenu>
+  				</h:panelGrid>
+  	</h:panelGrid>
+  	
+  	
+  	
+  	
+  
+   <a4j:commandButton value="AJOUTER" action="#{commandeBine.ajouteProducteurDsGroup}" reRender="messageClient,messageCommande,messageProduit,messageProducteur,tab,l1,l2,l3,l4"/>
+   <a4j:commandButton value="ANNULER" action="#{commandeBine.annulerGroupe}"  reRender="tab,l1,l2,l3,l4" data="#{commandeBine.message}" oncomplete="alert(data)"/>
+   <a4j:commandButton value="ENREGISTRER" action="#{commandeBine.createGroup}"  reRender="tab,l1,l2,l3,l4" data="#{commandeBine.message}" oncomplete="alert(data)"/>
+  
+  
+  
+  
+  <rich:panel style ="background-color:#00BFFF;">
+  		<rich:dataTable id="tab" value="#{commandeBine.listDesProducteursD1Group}" var="c">
+  		<f:facet name="header">LISTE DES PRODUCTEURS D'UN GROUPE</f:facet>
+
+  		<rich:column>
+  		<f:facet name="header">NUMERO</f:facet>
+  		#{c.numPersonne}
+  		</rich:column>  	
+  	
+	
+  		<rich:column>
+  		<f:facet name="header">NOM</f:facet>
+  		#{c.nomPersonne}
+  		</rich:column>
+  	
+  		
+  		<rich:column>
+  		<f:facet name="header">PRENOM PERSONNE</f:facet>
+  		#{c.prenomPersonne}
+  		</rich:column>
+  		
+  		<rich:column>
+  		<f:facet name="header">NUMERO UNIQUE</f:facet>
+  		#{c.idPersonne}
+  		</rich:column>
+
+		<rich:column>
+    		<f:facet name="header">SUPPRIMER</f:facet>
+     			
+      				<a4j:commandLink actionListener="#{commandeBine.enleverPersonne}" value="supprimer" reRender="tab,l4">
+      				
+      				<f:setPropertyActionListener value="#{c}" target="#{commandeBine.pe}" />
+	  				
+	  				</a4j:commandLink>	
+   		</rich:column> 
+   			
+  		</rich:dataTable>
+  		</rich:panel>
+  </h:form>
+  </rich:panel>
+  </body>
+</html>

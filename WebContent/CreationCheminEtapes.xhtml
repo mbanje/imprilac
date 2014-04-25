@@ -6,13 +6,16 @@
       xmlns:f="http://java.sun.com/jsf/core"
       xmlns:ui="http://java.sun.com/jsf/facelets">
 
-  <head></head>
+  <head>
+    <meta http-equiv="Content-type" content="text/xhtml;charset=utf-8" />
+  	<title> Enregistrement des chemins et des etapes</title>
+  </head>
 
   <body>
   <a4j:keepAlive beanName="bine" />
-     <rich:panel style ="width:500px;font-size:35px;margin-left:250px;background-color:#00BFFF;" >
+    <rich:panel style ="width:500px;font-size:35px;margin-left:250px;background-color:#00BFFF;" >
     <f:facet name="header">PAGE D'ENREGISTREMENT DES CHEMINS ET DES ETAPES</f:facet>
-    <h:form> 
+    <h:form>
     
       	<h:selectOneMenu value="#{bine.idPersonneConnecte}" style ="visibility: hidden;">
   		<f:selectItems value="#{bine.listPersonneConnecte}"/>
@@ -54,8 +57,8 @@
    </h:form>
    
    <h:form>
-  <rich:panel>
-  		<rich:dataTable id="tab" value="#{bine.listCheminEtape}" var="c">
+  <rich:panel style ="background-color:#00BFFF;">
+  		<rich:dataTable id="tab" value="#{bine.listCheminEtape}" var="c" rows="7">
   		<f:facet name="header">LISTE DES #{bine.types}</f:facet>
   		
   		<rich:column>
@@ -90,7 +93,58 @@
 	  				
 	  				</a4j:commandLink>	
    		</rich:column> 
+   		
+   		
+   		<rich:column>
+    		<f:facet name="header">SUPPRIMER</f:facet>
+     			
+      				<a4j:commandLink actionListener="#{bine.supprimerCheEta}" value="supprimer" reRender="tab" data="#{bine.message}" oncomplete="alert(data)">
+      				
+      				<f:setPropertyActionListener value="#{c}" target="#{bine.sele}" />
+	  				
+	  				</a4j:commandLink>	
+   		</rich:column>
   		
+  		
+  		   <f:facet name="footer">
+  			
+  			<rich:datascroller>
+  			
+  				<f:facet name="first">
+  					<h:outputText value="Premier" />
+  				</f:facet>
+  				
+  				<f:facet name="first-disabled">
+  					<h:outputText value="Premier" />
+  				</f:facet>
+  				
+  				<f:facet name="last">
+  					<h:outputText value="Dernier" />
+  				</f:facet>
+  				
+  				<f:facet name="last-disabled">
+  					<h:outputText value="Dernier" />
+  				</f:facet>
+  				
+  				<f:facet name="next">
+  					<h:outputText value="Suivant" />
+  				</f:facet>
+  				
+  				<f:facet name="next-disabled">
+  					<h:outputText value="Suivant" />
+  				</f:facet>
+  				
+  				<f:facet name="previous">
+  					<h:outputText value="Precedent" />
+  				</f:facet>
+  				
+  				<f:facet name="previous-disabled">
+  					<h:outputText value="Précédent" />
+  				</f:facet>
+  				
+  			</rich:datascroller>
+  			
+  		</f:facet>
   		
   	</rich:dataTable>
   
@@ -141,7 +195,7 @@
   			
   </h:panelGrid>
   	
-<a4j:commandButton action="#{bine.modifierCheEtaCharge}" value="MODIFIER" data="#{bine.message}" oncomplete="alert(data)" reRender="tab" />
+<a4j:commandButton action="#{bine.modifierCheEta}" value="MODIFIER" data="#{bine.message}" oncomplete="alert(data)" reRender="tab" />
 		</h:form>
 	</h:panelGroup>
   </rich:modalPanel> 

@@ -9,6 +9,24 @@ public class Commande {
 	private int nbreDeProd;
 	private List<Produit> listProd;
 	private float montantTotal;
+	private String bon;
+	private int idcmd;
+	
+	
+	
+	
+	public int getIdcmd() {
+		return idcmd;
+	}
+	public void setIdcmd(int idcmd) {
+		this.idcmd = idcmd;
+	}
+	public String getBon() {
+		return bon;
+	}
+	public void setBon(String bon) {
+		this.bon = bon;
+	}
 	public int getIdClient() {
 		return idClient;
 	}

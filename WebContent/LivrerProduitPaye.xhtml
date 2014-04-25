@@ -1,0 +1,169 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:a4j="http://richfaces.org/a4j"
+      xmlns:rich="http://richfaces.org/rich"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:ui="http://java.sun.com/jsf/facelets">
+
+  <head></head>
+
+  <body>
+  
+    
+  	        <a4j:keepAlive beanName="commandeBine" />
+  
+  <rich:panel style ="width:850px;font-size:35px;margin-left:120px;background-color:#00BFFF;" >
+  <f:facet name="header">PAGE POUR LE PAYEMENT</f:facet>
+  	<h:form id="fo">
+  	
+  	  	<h:selectOneMenu value="#{bine.idPersonneConnecte}" style ="visibility: hidden;">
+  		<f:selectItems value="#{bine.listPersonneConnecte}"/>
+  		</h:selectOneMenu>
+  		
+  		<h:selectOneMenu value="#{commandeBine.idPersonneConnecte}" style ="visibility: hidden;">
+  		<f:selectItems value="#{bine.listPersonneConnecte}"/>
+  		</h:selectOneMenu>
+  		
+  		
+  		
+  		
+  		
+  		  	<h:panelGrid columns="3">
+  	
+  			 <h:panelGrid columns="2">
+  		  		<h:outputText value="NOM ET PRENOM DU CLIENT  :"/>
+  		  		
+  		  
+  				<h:selectOneMenu value="#{commandeBine.idCli3}" id="l1">
+  			 		<f:selectItems value="#{commandeBine.listDesCliAyantDesProdPayeMNoLivre}"/>
+  			 		<a4j:support event="onchange" reRender="l2,tab1,l3"/>
+  				</h:selectOneMenu>		
+  			</h:panelGrid>
+  			
+  			
+  			<h:panelGrid columns="2">
+  				<h:outputText value="NUMERO DE LA COMMANDE :"/>
+ 
+  				
+  				<h:selectOneMenu value="#{commandeBine.idCmd3}" id="l2">
+  			 		<f:selectItems value="#{commandeBine.listDesCmdAvecDesProdPayeMNoLivre}"/>
+  					<a4j:support event="onchange" reRender="l3,tab1"/>
+  				</h:selectOneMenu>
+  			</h:panelGrid>
+  			
+  			
+  			<h:panelGrid columns="2">
+  				<h:outputText value="NUMERO DU PAYEMENT :"/>
+  				<h:selectOneMenu value="#{commandeBine.idPayet}" id="l3">
+  			 		<f:selectItems value="#{commandeBine.listDesPayetNoLivres}"/>
+  			 		<a4j:support event="onchange" actionListener="#{commandeBine.ecouteChangePayement}" reRender="nEp,tab,tab1"/>
+  				</h:selectOneMenu>
+  			</h:panelGrid>
+  			
+  			<h:panelGrid columns="1">
+  			
+  			</h:panelGrid>
+  			
+  			<h:panelGrid columns="2">
+  					<h:outputText value="CAISSIER IMPLIQUE :" />
+  					<h:outputText value="#{commandeBine.nomEtPrenomCaissier}" id="nEp"/>
+  			</h:panelGrid>
+  			
+  			
+  			</h:panelGrid>
+  			
+  			
+  <a4j:commandButton value="MARQUER LIVRAISON" action="#{commandeBine.marquerLivraison}"  reRender="l1,l2,l3,nEp,tab" data="#{commandeBine.message}" oncomplete="alert(data)"/>
+
+  			
+  	<rich:panel style ="background-color:#00BFFF;">
+  		<rich:dataTable id="tab" value="#{commandeBine.listDesProdPayeMNonLivrePr1Payet}" var="c">
+  		<f:facet name="header">PRODUITS PAYES POUR LE PAYEMENT SELECTIONNE</f:facet>
+
+  		<rich:column>
+  		<f:facet name="header">NUMERO</f:facet>
+  		#{c.num}
+  		</rich:column>  
+  		
+  		<rich:column>
+  		<f:facet name="header">TYPE DU PRODUIT</f:facet>
+  		#{c.nomProduit}
+  		</rich:column>	
+
+  		<rich:column>
+  		<f:facet name="header">TITRE</f:facet>
+  		#{c.titre}
+  		</rich:column>
+  				<rich:column>
+  		<f:facet name="header">QUANTITE COMMANDE</f:facet>
+  		#{c.nbr_ex_dmd}
+  		</rich:column>  
+  				<rich:column>
+  		<f:facet name="header">QUANTITE DEJA PAYES</f:facet>
+  		#{c.nbr_ex_djaPaye}
+  		</rich:column>  
+
+ 
+  		<rich:column>
+  		<f:facet name="header">QUANTITE A LIVRER</f:facet>
+  		#{c.nbr_ex_paye}
+  		</rich:column>  
+  		
+  		<rich:column>
+    		<f:facet name="header">AFFICHER MAQUETTE</f:facet>
+     			
+      				<a4j:commandLink value="lister maquettes" reRender="tab1">
+      				
+      				<f:setPropertyActionListener value="#{c}" target="#{commandeBine.pt}" />
+	  				
+	  				</a4j:commandLink>	
+   		</rich:column>	
+  		
+  		
+  		</rich:dataTable>
+  		</rich:panel>
+  		
+  		
+  		
+  		
+  		
+  		
+  		
+  		<rich:panel style ="background-color:#00BFFF;">
+  		
+  	<rich:dataTable id="tab1" value="#{commandeBine.listDesMaqtD1ProdSelectionne}" var="c1">
+  		<f:facet name="header">LISTE DES MAQUETTES DU PRODUIT SELECTIONNE</f:facet>
+
+  		<rich:column>
+  		<f:facet name="header">NUMERO</f:facet>
+  		#{c1.num}
+  		</rich:column>  
+  		
+  		<rich:column>
+  		<f:facet name="header">NOM DE LA MAQUETTE</f:facet>
+  		#{c1.nomMaq}
+  		</rich:column>	
+  		
+  		<rich:column>
+    		<f:facet name="header">VISUALISER</f:facet>
+     			
+      				<a4j:commandLink actionListener="#{commandeBine.visualiseMaquette}" value="voir" reRender="tab1">
+      				
+      				<f:setPropertyActionListener value="#{c1}" target="#{commandeBine.m}" />
+	  				
+	  				</a4j:commandLink>	
+   		</rich:column>
+  		
+  	</rich:dataTable>
+  
+  		
+  		</rich:panel>
+  			
+  			
+  	</h:form>
+  	</rich:panel>
+  	
+  
+  </body>
+</html>

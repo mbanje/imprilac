@@ -1,0 +1,58 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:a4j="http://richfaces.org/a4j"
+      xmlns:rich="http://richfaces.org/rich"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:ui="http://java.sun.com/jsf/facelets">
+
+  <head></head>
+
+  <body>
+  
+  
+  <a4j:keepAlive beanName="bine" />
+  
+  <rich:panel style ="width:700px;font-size:35px;margin-left:250px;background-color:#00BFFF;" >
+  <f:facet name="header">PAGE D'AJOUT DES PROFILS A QUELCUN</f:facet>
+  	<h:form id="fo">
+  	
+  	  	<h:selectOneMenu value="#{demandeBine.idPersonneConnecte}" style ="visibility: hidden;">
+  		<f:selectItems value="#{bine.listPersonneConnecte}"/>
+  		</h:selectOneMenu>
+  	
+  	
+  	<h:panelGrid columns="2">
+  		
+  		 <h:panelGrid columns="2">
+  			<h:outputText value="CATEGORIE    :"/>
+  			<h:selectOneMenu value="#{bine.idCat1}" id="l">
+  			 <f:selectItems value="#{bine.listcategoriespersonnes1}"/>
+  			 <a4j:support event="onchange" reRender="lp,lc"/>
+  			</h:selectOneMenu>
+  		</h:panelGrid>
+  		
+  		
+  		<h:panelGrid columns="2">
+  			<h:outputText value="PERSONNE  :"/>
+  			<h:selectOneMenu value="#{bine.idP}" id="lp">
+  			 <f:selectItems value="#{bine.listDesPersonnes1}"/>
+  			</h:selectOneMenu>
+  		</h:panelGrid>
+  		
+  		 <h:panelGrid columns="2">
+  			<h:outputText value="NOUVELLE CATEGORIE  :"/>
+  			<h:selectOneMenu value="#{bine.idCat2}" id="lc">
+  			 <f:selectItems value="#{bine.listcategoriespersonnes2}"/>
+  			</h:selectOneMenu>
+  		</h:panelGrid>
+  	
+  	</h:panelGrid>
+    <a4j:commandButton value="ENREGISTRER" action="#{bine.ajouterProfil}"  data="#{bine.message}" oncomplete="alert(data)" reRender="l,lp,lc"/> 		
+ 	
+  	</h:form>
+  	</rich:panel>
+  	
+  
+  </body>
+</html>

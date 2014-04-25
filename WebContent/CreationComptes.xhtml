@@ -6,12 +6,15 @@
       xmlns:f="http://java.sun.com/jsf/core"
       xmlns:ui="http://java.sun.com/jsf/facelets">
 
-  <head></head>
+  <head>
+     <meta http-equiv="Content-type" content="text/xhtml;charset=utf-8" />
+  	<title>CREATION DES COMPTES</title>
+  </head>
 
   <body>
   <a4j:keepAlive beanName="bine" />
   
-  <rich:panel style ="width:750px;font-size:35px;margin-left:200px;background-color:#00BFFF;" >
+  <rich:panel style ="width:850px;font-size:35px;margin-left:100px;background-color:#00BFFF;" >
   <f:facet name="header">PAGE DE CREATION DES COMPTES</f:facet>
   	<h:form id="fo">
   	
@@ -26,7 +29,7 @@
   				<h:panelGrid columns="1">
   				
   				<a4j:outputPanel id="messageLog1">
-					<h:outputText value="LE LOGIN DOIT ETRE COMPOSE DE LETTRES ET/OU CHIFFRES ET/OU '_' UNIQUEMENT!!" rendered="#{bine.showmessage1}"/> 
+					<h:outputText value="LE LOGIN DOIT ETRE COMPOSE DE LETTRES ET/OU CHIFFRES ET/OU '_' UNIQUEMENT!!" rendered="#{bine.showmessage1}" style ="color:yellow;"/> 
 				</a4j:outputPanel>
 
   				
@@ -83,8 +86,8 @@
   	
   	
   	<h:form>
-  	<rich:panel style ="width:750px;font-size:35px;margin-left:200px;background-color:#00BFFF;" >
-  		<rich:dataTable id="tab" value="#{bine.listDesPersoAyantLogEtPw}" var="per">
+  	<rich:panel style ="width:850px;font-size:35px;margin-left:100px;background-color:#00BFFF;" >
+  		<rich:dataTable id="tab" value="#{bine.listDesPersoAyantLogEtPw}" var="per" rows="5">
   		<f:facet name="header">LISTE DES #{bine.profil}</f:facet>
   		
   		<rich:column>
@@ -100,6 +103,11 @@
    		<rich:column>
   		<f:facet name="header">PRENOM</f:facet>
   		#{per.prenomPersonne}
+  		</rich:column>
+  		
+  		<rich:column>
+  		<f:facet name="header">NUMERO UNIQUE</f:facet>
+  		#{per.idPersonne}
   		</rich:column>
   		
     	<rich:column>
@@ -145,6 +153,58 @@
 	  				
 	  				</a4j:commandLink>	
    		</rich:column>  
+   		
+   		<rich:column>
+    		<f:facet name="header">SUPPRIMER</f:facet>
+     			
+      				<a4j:commandLink actionListener="#{bine.supprimerCompte}" value="supprimer" reRender="tab">
+      				
+      				<f:setPropertyActionListener value="#{per}" target="#{bine.selected}" />
+	  				
+	  				</a4j:commandLink>	
+   		</rich:column> 
+   		
+   		
+   		  		   		<f:facet name="footer">
+  			
+  			<rich:datascroller>
+  			
+  				<f:facet name="first">
+  					<h:outputText value="Premier" />
+  				</f:facet>
+  				
+  				<f:facet name="first-disabled">
+  					<h:outputText value="Premier" />
+  				</f:facet>
+  				
+  				<f:facet name="last">
+  					<h:outputText value="Dernier" />
+  				</f:facet>
+  				
+  				<f:facet name="last-disabled">
+  					<h:outputText value="Dernier" />
+  				</f:facet>
+  				
+  				<f:facet name="next">
+  					<h:outputText value="Suivant" />
+  				</f:facet>
+  				
+  				<f:facet name="next-disabled">
+  					<h:outputText value="Suivant" />
+  				</f:facet>
+  				
+  				<f:facet name="previous">
+  					<h:outputText value="Precedent" />
+  				</f:facet>
+  				
+  				<f:facet name="previous-disabled">
+  					<h:outputText value="Précédent" />
+  				</f:facet>
+  				
+  			</rich:datascroller>
+  			
+  		</f:facet>
+   		
   		
   		</rich:dataTable>
   		

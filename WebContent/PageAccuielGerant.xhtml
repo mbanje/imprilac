@@ -23,12 +23,15 @@
   		</h:selectOneMenu>
   		
   		
+  		<a4j:commandButton value="deconnexion" action="#{bine.deconnection}"/>
+  		
+  		
 		<rich:toolBar>
 			<rich:dropDownMenu>
 			<f:facet name="label">
 				<h:outputText value="FICHIER" />
 			</f:facet>
-			
+			<rich:menuItem submitMode="ajax" value="ENREGISTRER UNE PERSONNE" action="savePersonne"/>
 			
 			</rich:dropDownMenu>
 
@@ -37,7 +40,9 @@
 			<f:facet name="label">
 				<h:outputText value="OPERATION" />
 			</f:facet>
+				<rich:menuItem submitMode="ajax" value="DONNER COMPTE" action="donneCompte"/>
 				<rich:menuItem submitMode="ajax" value="ANALISER DEMANDE" action="analyseDmd"/>
+				<rich:menuItem submitMode="ajax" value="AJOUTER PROFIL" action="ajouteProf"/>
 			</rich:dropDownMenu>
 				
 				

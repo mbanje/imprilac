@@ -6,7 +6,10 @@
       xmlns:f="http://java.sun.com/jsf/core"
       xmlns:ui="http://java.sun.com/jsf/facelets">
 
-  <head></head>
+  <head>
+    <meta http-equiv="Content-type" content="text/xhtml;charset=utf-8" />
+  	<title> Ajout des étapes sur des chemins</title>
+  </head>
 <a4j:keepAlive beanName="commandeBine" />
   <body>
   <rich:panel style ="width:600px;font-size:35px;margin-left:250px;background-color:#00BFFF;">
@@ -43,8 +46,8 @@
   		
   		
   		
-  		<rich:panel>
-  		<rich:dataTable id="tab" value="#{commandeBine.listCheEta}" var="c">
+  		<rich:panel style ="background-color:#00BFFF;">
+  		<rich:dataTable id="tab" value="#{commandeBine.listCheEta}" var="c" rows="6">
   		<f:facet name="header"><h1>#{commandeBine.titre}</h1></f:facet>
   		
   		<rich:column>
@@ -66,7 +69,49 @@
       				<f:setPropertyActionListener value="#{c}" target="#{commandeBine.cheOuEta}" />
 	  				
 	  				</a4j:commandLink>	
-   		</rich:column>  
+   		</rich:column> 
+   		
+   		
+   		   		  		   <f:facet name="footer">
+  			
+  			<rich:datascroller>
+  			
+  				<f:facet name="first">
+  					<h:outputText value="Premier" />
+  				</f:facet>
+  				
+  				<f:facet name="first-disabled">
+  					<h:outputText value="Premier" />
+  				</f:facet>
+  				
+  				<f:facet name="last">
+  					<h:outputText value="Dernier" />
+  				</f:facet>
+  				
+  				<f:facet name="last-disabled">
+  					<h:outputText value="Dernier" />
+  				</f:facet>
+  				
+  				<f:facet name="next">
+  					<h:outputText value="Suivant" />
+  				</f:facet>
+  				
+  				<f:facet name="next-disabled">
+  					<h:outputText value="Suivant" />
+  				</f:facet>
+  				
+  				<f:facet name="previous">
+  					<h:outputText value="Precedent" />
+  				</f:facet>
+  				
+  				<f:facet name="previous-disabled">
+  					<h:outputText value="Précédent" />
+  				</f:facet>
+  				
+  			</rich:datascroller>
+  			
+  		</f:facet>
+   		 
 
   		</rich:dataTable>
   		</rich:panel>

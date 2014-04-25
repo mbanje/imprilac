@@ -22,6 +22,11 @@
   <managed-bean-class>paquetImprilac.FileUploadbean</managed-bean-class>
   <managed-bean-scope>request</managed-bean-scope>
  </managed-bean>
+ <managed-bean>
+  <managed-bean-name>afficherbine</managed-bean-name>
+  <managed-bean-class>paquetImprilac.Afficherbean</managed-bean-class>
+  <managed-bean-scope>session</managed-bean-scope>
+ </managed-bean>
  <navigation-rule>
   <display-name>identif</display-name>
   <from-view-id>/Identification.xhtml</from-view-id>
@@ -64,18 +69,78 @@
    <redirect/>
   </navigation-case>
   <navigation-case>
-   <from-outcome>savePersonne</from-outcome>
-   <to-view-id>/EnregistrementPersonnes.xhtml</to-view-id>
-   <redirect/>
-  </navigation-case>
-  <navigation-case>
    <from-outcome>saveMatOuProd</from-outcome>
    <to-view-id>/CreationMateriel_Produit.xhtml</to-view-id>
    <redirect/>
   </navigation-case>
   <navigation-case>
-   <from-outcome>donneCompte</from-outcome>
-   <to-view-id>/CreationComptes.xhtml</to-view-id>
+   <from-outcome>saveChEtCh</from-outcome>
+   <to-view-id>/CreationCheminEtapes.xhtml</to-view-id>
+   <redirect/>
+  </navigation-case>
+  <navigation-case>
+   <from-outcome>mettreEtSurCh</from-outcome>
+   <to-view-id>/AjouterEtapeSurChemin.xhtml</to-view-id>
+   <redirect/>
+  </navigation-case>
+  <navigation-case>
+   <from-outcome>creerCmd</from-outcome>
+   <to-view-id>/CreationCommandeProduit.xhtml</to-view-id>
+   <redirect/>
+  </navigation-case>
+  <navigation-case>
+   <from-outcome>maquette</from-outcome>
+   <to-view-id>/AttacherMqtAuProd.xhtml</to-view-id>
+   <redirect/>
+  </navigation-case>
+  <navigation-case>
+   <from-outcome>CreerGroupe</from-outcome>
+   <to-view-id>/Creation_groupes.xhtml</to-view-id>
+   <redirect/>
+  </navigation-case>
+  <navigation-case>
+   <from-outcome>deconnection</from-outcome>
+   <to-view-id>/Identification.xhtml</to-view-id>
+   <redirect/>
+  </navigation-case>
+  <navigation-case>
+   <from-outcome>saveCharge</from-outcome>
+   <to-view-id>/CreationCharges.xhtml</to-view-id>
+   <redirect/>
+  </navigation-case>
+  <navigation-case>
+   <from-outcome>marquerEtap</from-outcome>
+   <to-view-id>/Marquer_Etape_Pr_Un_Prod1.xhtml</to-view-id>
+   <redirect/>
+  </navigation-case>
+  <navigation-case>
+   <from-outcome>voirProdPaye</from-outcome>
+   <to-view-id>/LivrerProduitPaye.xhtml</to-view-id>
+   <redirect/>
+  </navigation-case>
+  <navigation-case>
+   <from-outcome>voirMatEQtite</from-outcome>
+   <to-view-id>/AFFICHER_MATERIEL_Qte.xhtml</to-view-id>
+   <redirect/>
+  </navigation-case>
+  <navigation-case>
+   <from-outcome>voirProdctDispo</from-outcome>
+   <to-view-id>/AFFICHER_PRODUCTEURS_DISPO.xhtml</to-view-id>
+   <redirect/>
+  </navigation-case>
+  <navigation-case>
+   <from-outcome>modifierEtatDesProduct</from-outcome>
+   <to-view-id>/MODIFIER_ETAT_PRODUCTEUR.xhtml</to-view-id>
+   <redirect/>
+  </navigation-case>
+  <navigation-case>
+   <from-outcome>saveCli</from-outcome>
+   <to-view-id>/EnregistrentClient.xhtml</to-view-id>
+   <redirect/>
+  </navigation-case>
+  <navigation-case>
+   <from-outcome>bon</from-outcome>
+   <to-view-id>/SaveBon.xhtml</to-view-id>
    <redirect/>
   </navigation-case>
  </navigation-rule>
@@ -86,12 +151,68 @@
    <to-view-id>/AnalyseDmdMat.xhtml</to-view-id>
    <redirect/>
   </navigation-case>
+  <navigation-case>
+   <from-outcome>savePersonne</from-outcome>
+   <to-view-id>/EnregistrementPersonnes.xhtml</to-view-id>
+   <redirect/>
+  </navigation-case>
+  <navigation-case>
+   <from-outcome>donneCompte</from-outcome>
+   <to-view-id>/CreationComptes.xhtml</to-view-id>
+   <redirect/>
+  </navigation-case>
+  <navigation-case>
+   <from-outcome>deconnection</from-outcome>
+   <to-view-id>/Identification.xhtml</to-view-id>
+   <redirect/>
+  </navigation-case>
+  <navigation-case>
+   <from-outcome>ajouteProf</from-outcome>
+   <to-view-id>/AJOUTER_PROFIL.xhtml</to-view-id>
+   <redirect/>
+  </navigation-case>
  </navigation-rule>
  <navigation-rule>
   <from-view-id>/PageAccuielGestionr.xhtml</from-view-id>
   <navigation-case>
    <from-outcome>marquerSortieMat</from-outcome>
    <to-view-id>/SortirMateriel.xhtml</to-view-id>
+   <redirect/>
+  </navigation-case>
+  <navigation-case>
+   <from-outcome>ajoute</from-outcome>
+   <to-view-id>/AjouteQteMatDansStock.xhtml</to-view-id>
+   <redirect/>
+  </navigation-case>
+  <navigation-case>
+   <from-outcome>deconnection</from-outcome>
+   <to-view-id>/Identification.xhtml</to-view-id>
+   <redirect/>
+  </navigation-case>
+ </navigation-rule>
+ <navigation-rule>
+  <from-view-id>/PageAccuielEmploye.xhtml</from-view-id>
+  <navigation-case>
+   <from-outcome>deconnection</from-outcome>
+   <to-view-id>/Identification.xhtml</to-view-id>
+   <redirect/>
+  </navigation-case>
+  <navigation-case>
+   <from-outcome>marquerEtap</from-outcome>
+   <to-view-id>/Marquer_Etape_Pr_Un_Prod1.xhtml</to-view-id>
+   <redirect/>
+  </navigation-case>
+ </navigation-rule>
+ <navigation-rule>
+  <from-view-id>/PageAccuielCaissier.xhtml</from-view-id>
+  <navigation-case>
+   <from-outcome>Payer</from-outcome>
+   <to-view-id>/Payement.xhtml</to-view-id>
+   <redirect/>
+  </navigation-case>
+  <navigation-case>
+   <from-outcome>deconnection</from-outcome>
+   <to-view-id>/Identification.xhtml</to-view-id>
    <redirect/>
   </navigation-case>
  </navigation-rule>

@@ -12,10 +12,12 @@
   </head>
 
   <body>
+  
+  
   <a4j:keepAlive beanName="bine" />
   
   <rich:panel style ="width:700px;font-size:35px;margin-left:250px;background-color:#00BFFF;" >
-  <f:facet name="header">PAGE D'ENREGISTREMENT DE PERSONNES</f:facet>
+  <f:facet name="header">PAGE D'ENREGISTREMENT DES CLIENTS</f:facet>
   	<h:form id="fo">
   	
   	  	<h:selectOneMenu value="#{demandeBine.idPersonneConnecte}" style ="visibility: hidden;">
@@ -53,57 +55,19 @@
   			<h:outputText value="DATE DE NAISSANCE :" />
   			<rich:calendar value="#{bine.dateNaissance}" datePattern="dd/MM/yyyy"/>
   		</h:panelGrid>
-  			
-  		<h:panelGrid columns="2">
-  			<h:outputText value="CATEGORIE    :"/>
-  			<h:selectOneMenu value="#{bine.idcategoriePersonne}">
-  			 <f:selectItems value="#{bine.listcategoriespersonnes0}"/>
-  			 <a4j:support event="onchange" actionListener="#{bine.displayFields}" reRender="tab"/>
-  			</h:selectOneMenu>
-  		</h:panelGrid>
-  		
-  		<a4j:outputPanel ajaxRendered="true">	
-  	
-  		<h:panelGrid columns="2" rendered="#{bine.showDiplome}" >
-  			<h:outputText value="DIPLOME   :" />
-  			<h:panelGrid columns="1">
-  			<a4j:outputPanel id="messageAboutDiplo">
-					<h:outputText value="LE NOM DU DIPLOME PEUT ETRE COMPOSE DE LETTRES ET/OU CHIFFRES ET/OU '_' UNIQUEMENT!!" rendered="#{bine.showMessageErrorForDiplo}" /> 
-			</a4j:outputPanel>
-  			<h:inputText value="#{bine.diplome}" id="diplo">
-  			
-  			</h:inputText>
-  			</h:panelGrid>
-  		</h:panelGrid>
-  		 </a4j:outputPanel>
+
+
   		 
-  		 <a4j:outputPanel ajaxRendered="true">
-  		<h:panelGrid columns="2" rendered="#{bine.showBureau}" >	
-  			<h:outputText value="BUREAU    :" />
-  			<h:inputText value="#{bine.bureau}" />
-  		</h:panelGrid>
-  		</a4j:outputPanel>
   		
-  		<a4j:outputPanel ajaxRendered="true">
-  		<h:panelGrid columns="2" rendered="#{bine.showTel}" >
+  		<h:panelGrid columns="2" >
   			<h:outputText value="TELEPHONE  :" />
   			<h:inputText value="#{bine.tel}" />
   		</h:panelGrid>
-  		</a4j:outputPanel>
-  		
-  		<a4j:outputPanel ajaxRendered="true" id="mo">
-  		<h:panelGrid columns="2" rendered="#{bine.modifier}">
-  			<h:outputText value="QUI A MODIFIER? :"/>
-  			<h:selectOneMenu value="#{bine.idPerso}">
-  			 <f:selectItems value="#{bine.listper}"/>
-  			 
-  			</h:selectOneMenu>
-  		</h:panelGrid>
-  		</a4j:outputPanel>
+
   		
   	</h:panelGrid>
   		
-  <a4j:commandButton value="INSERRER" action="#{bine.insertPersonne}"  data="#{bine.message}" oncomplete="alert(data)" reRender="tab,fo"/> 		
+  <a4j:commandButton value="INSERRER" action="#{bine.insertClient}"  data="#{bine.message}" oncomplete="alert(data)" reRender="tab,fo"/> 		
  	</h:form>	
  </rich:panel>
   	
@@ -113,7 +77,7 @@
   	
   	<h:form>
   	<rich:panel style ="width:700px;font-size:35px;margin-left:250px;background-color:#00BFFF;">
-  		<rich:dataTable id="tab" value="#{bine.listPesonnes}" var="per" rows="7">
+  		<rich:dataTable id="tab" value="#{bine.listPesonnesClient}" var="per" rows="5">
   		<f:facet name="header">LISTE DES #{bine.profil}</f:facet>
  
    		<rich:column>
@@ -141,17 +105,7 @@
   		#{per.dateNaissance}
   		</rich:column>
   		
-    	<rich:column rendered="#{bine.showDiplome}">
-  		<f:facet name="header">DIPLOME</f:facet>
-  		#{per.diplome}
-  		</rich:column>
-  		
-     	<rich:column rendered="#{bine.showBureau}">
-  		<f:facet name="header">BUREAU</f:facet>
-  		#{per.bureau}
-  		</rich:column>
-  		
-     	<rich:column rendered="#{bine.showTel}">
+     	<rich:column >
   		<f:facet name="header">TELEPHONE</f:facet>
   		#{per.tel}
   		</rich:column>
@@ -172,15 +126,15 @@
    		<rich:column>
     		<f:facet name="header">SUPPRIMER</f:facet>
      			
-      				<a4j:commandLink actionListener="#{bine.retirerProfilAKelk1}" value="supprimer" reRender="tab" data="#{bine.message}" oncomplete="alert(data)">
+      				<a4j:commandLink actionListener="#{bine.supprimerClient}" value="supprimer" reRender="tab" data="#{bine.message}" oncomplete="alert(data)">
       				
       				<f:setPropertyActionListener value="#{per}" target="#{bine.selected}" />
 	  				
 	  				</a4j:commandLink>	
    		</rich:column>
-  		
-  		
-  		   		<f:facet name="footer">
+   		
+   		
+   		   		  		   		<f:facet name="footer">
   			
   			<rich:datascroller>
   			
@@ -219,7 +173,7 @@
   			</rich:datascroller>
   			
   		</f:facet>
-  		
+   		
   		
   		</rich:dataTable>
   	</rich:panel>
@@ -257,39 +211,23 @@
   					</h:panelGrid>
   			
   		
-  		 			<a4j:outputPanel ajaxRendered="true">	
-  					<h:panelGrid columns="2" rendered="#{bine.showDiplome}">
-  					<h:outputText value="DIPLOME   :" />
-  					<h:inputText value="#{bine.selected.diplome}" />
-  					</h:panelGrid>
-  		 			</a4j:outputPanel>
-  		 
-  		 			<a4j:outputPanel ajaxRendered="true">
-  					<h:panelGrid columns="2" rendered="#{bine.showBureau}" >	
-  					<h:outputText value="BUREAU    :" />
-  					<h:inputText value="#{bine.selected.bureau}" />
-  					</h:panelGrid>
-  					</a4j:outputPanel>
-  		
-  					<a4j:outputPanel ajaxRendered="true">
-  					<h:panelGrid columns="2" rendered="#{bine.showTel}" >
+  					<h:panelGrid columns="2"  >
   					<h:outputText value="TELEPHONE  :" />
   					<h:inputText value="#{bine.selected.tel}" />
   					</h:panelGrid>
-  					</a4j:outputPanel>
+  					
   		
   				
   				</h:panelGrid>
   	
-<a4j:commandButton action="#{bine.modifierPersonne}" value="MODIFIER" data="#{bine.message}" oncomplete="alert(data)" reRender="tab" />
+<a4j:commandButton action="#{bine.modifierClient}" value="MODIFIER" data="#{bine.message}" oncomplete="alert(data)" reRender="tab" />
 		</h:form>
 	</h:panelGroup>
 	
 	
   </rich:modalPanel> 
-  	
-  	
-  	
-  	
+  
+  
+  
   </body>
 </html>

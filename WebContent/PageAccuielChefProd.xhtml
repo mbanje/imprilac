@@ -22,13 +22,21 @@
   		</h:selectOneMenu>
   		
   		
+  	 <a4j:commandButton value="deconnexion" action="#{bine.deconnection}"/>
+
+  		
 		<rich:toolBar>
 			<rich:dropDownMenu>
 			<f:facet name="label">
 				<h:outputText value="FICHIER" />
 			</f:facet>
-				<rich:menuItem submitMode="ajax" value="ENREGISTRER UNE PERSONNE" action="savePersonne"/>
-				<rich:menuItem submitMode="ajax" value="ENREGISTRER UN MATERIEL OU UN PRODUIT" action="saveMatOuProd"/>
+				<rich:menuItem submitMode="ajax" value="ENREGISTRER DES CLIENTS" action="saveCli"/>
+				<rich:menuItem submitMode="ajax" value="ENREGISTRER UN MATERIEL" action="saveMatOuProd"/>
+				<rich:menuItem submitMode="ajax" value="ENREGISTRER UN PRODUIT" action="saveMatOuProd"/>
+				<rich:menuItem submitMode="ajax" value="ENREGISTRER UN CHEMIN" action="saveChEtCh"/>
+				<rich:menuItem submitMode="ajax" value="ENREGISTRER UNE ETAPE" action="saveChEtCh"/>
+				<rich:menuItem submitMode="ajax" value="ENREGISTRER UNE CHARGE" action="saveCharge"/>
+				<rich:menuItem submitMode="ajax" value="AFFECTER ETAPES AU CHEMINS" action="mettreEtSurCh"/>
 			</rich:dropDownMenu>
 
 
@@ -36,17 +44,24 @@
 			<f:facet name="label">
 				<h:outputText value="OPERATION" />
 			</f:facet>
-				<rich:menuItem submitMode="ajax" value="DONNER COMPTE" action="donneCompte"/>
 				<rich:menuItem submitMode="ajax" value="DEMANDE MATERIEL" action="dmdMateriel"/>
 				<rich:menuItem submitMode="ajax" value="HISTORISER MATERIEL" action="historiserMat"/>
+				<rich:menuItem submitMode="ajax" value="CREER UNE COMMANDE" action="creerCmd"/>
+				<rich:menuItem submitMode="ajax" value="ENREGISTRER UN BON" action="bon"/>				
+				<rich:menuItem submitMode="ajax" value="ENREGISTRER DES MAQUETTES" action="maquette"/>
+				<rich:menuItem submitMode="ajax" value="CREER UN GROUPE D'EMPLOYES" action="CreerGroupe"/>
+				<rich:menuItem submitMode="ajax" value="MARQUER ETAPE" action="marquerEtap"/>
+				<rich:menuItem submitMode="ajax" value="VOIR PRODUITS PAYES" action="voirProdPaye"/>
+				<rich:menuItem submitMode="ajax" value="MODIFIER ETAT DES PRODUCTEURS" action="modifierEtatDesProduct"/>			
 			</rich:dropDownMenu>
 				
 				
 			<rich:dropDownMenu>
 			<f:facet name="label">
-				<h:outputText value="AIDE" />
+				<h:outputText value="AFFICHER" />
 			</f:facet>
-				<rich:menuItem submitMode="ajax" value="About"/>
+				<rich:menuItem submitMode="ajax" value="VOIR QUANTITE DES MATERIAUX" action="voirMatEQtite"/>
+				<rich:menuItem submitMode="ajax" value="VOIR PRODUCTEURS DISPONNIBLES" action="voirProdctDispo"/>
 			</rich:dropDownMenu>
 		</rich:toolBar>
   		

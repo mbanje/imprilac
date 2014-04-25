@@ -1,0 +1,118 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:a4j="http://richfaces.org/a4j"
+      xmlns:rich="http://richfaces.org/rich"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:ui="http://java.sun.com/jsf/facelets">
+
+  <head></head>
+
+  <body>
+  
+  <h:form>
+           <a4j:keepAlive beanName="afficherbine" />
+  
+  <rich:panel style ="width:850px;font-size:35px;margin-left:120px;background-color:#00BFFF;" >
+  <f:facet name="header">PAGE POUR LA MODIFICATION DES ETATS DES PRODUCTEURS</f:facet>
+  
+  	
+  	  	<h:selectOneMenu value="#{afficherbine.idPersonneConnecte}" style ="visibility: hidden;">
+  		<f:selectItems value="#{bine.listPersonneConnecte}"/>
+  		</h:selectOneMenu>
+  		
+  		<h:selectOneMenu value="#{commandeBine.idPersonneConnecte}" style ="visibility: hidden;">
+  		<f:selectItems value="#{bine.listPersonneConnecte}"/>
+  		</h:selectOneMenu>
+  		
+  		
+  	<rich:dataTable id="tab" value="#{afficherbine.listDeTousLesProducteurs}" var="p">
+  		<f:facet name="header">LISTE DE TOUS LES PRODUCTEURS</f:facet>
+  		
+  		<rich:column>
+  		<f:facet name="header">NUMERO</f:facet>
+  		#{p.numPersonne}
+  		</rich:column>
+  		
+ 
+    	<rich:column>
+  		<f:facet name="header">NOM PERSONNE</f:facet>
+  		#{p.nomPersonne}
+  		</rich:column>
+  		
+     	<rich:column>
+  		<f:facet name="header">PRENOM</f:facet>
+  		#{p.prenomPersonne}
+  		</rich:column>
+  		
+  	  	<rich:column>
+  		<f:facet name="header">NUMERO UNIQUE</f:facet>
+  		#{p.idPersonne}
+  		</rich:column>
+  		
+  		<rich:column>
+  		<f:facet name="header">DIPLOME</f:facet>
+  		#{p.diplome}
+  		</rich:column>
+  		
+  		<rich:column>
+  		<f:facet name="header">ETAT</f:facet>
+  		#{p.etat}
+  		</rich:column>
+  		
+  		
+  		<rich:column>
+    		<f:facet name="header">MODIFIER ETAT</f:facet>
+     			
+      				<a4j:commandLink onclick="#{rich:component('formp')}.show()" value="modifier" reRender="m">
+      				
+      				<f:setPropertyActionListener value="#{p}" target="#{afficherbine.psele}" />
+	  				
+	  				</a4j:commandLink>	
+   		</rich:column> 
+     
+  		</rich:dataTable>
+  	
+    	</rich:panel>
+ </h:form>
+  		
+  		
+  		
+  		
+  		
+  		
+<rich:modalPanel id='formp' width="700" height="300" style="background-color:#00BFFF;">
+
+
+  	
+ 		<f:facet name="header">FORMULAIRE DE MODIFICATION DE L'ETAT DES PRODUCTEURS</f:facet>
+  		<f:facet name="controls">
+ 			<h:graphicImage value="/image/close.png" onclick="#{rich:component('formp')}.hide();"/>
+  		</f:facet>
+  		
+  		
+  		
+  	
+  		<h:panelGroup>
+  			<h:form id="m" >
+  			  	<h:panelGrid columns="2" >
+  					
+  				<h:outputText value="NOUVEL ETAT :     " />
+  				<h:selectOneMenu value="#{afficherbine.idEtat}" id="l1">
+  			 		<f:selectItems value="#{afficherbine.listDesEtatsDesEmploy}"/>
+  				</h:selectOneMenu>
+
+  				</h:panelGrid>
+  	
+<a4j:commandButton action="#{afficherbine.changeEtatProduct}" value="ENREGISTRER" data="#{afficherbine.message}" oncomplete="alert(data)" reRender="tab,m" />
+			
+			</h:form>
+		</h:panelGroup>
+	
+	
+</rich:modalPanel> 
+  		
+ 
+  
+  </body>
+</html>

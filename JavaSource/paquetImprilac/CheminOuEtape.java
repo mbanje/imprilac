@@ -12,10 +12,12 @@ public class CheminOuEtape {
 	private float cout;
 	
 	
-	
+	private int idHisto;
 	private String designationP;
 	private String date;
 	private String etap;
+	
+	
 	
 	
 	//private String nomEtape;
@@ -23,7 +25,13 @@ public class CheminOuEtape {
 	
 	
 
-/*	public String getNomEtape() {
+public int getIdHisto() {
+		return idHisto;
+	}
+	public void setIdHisto(int idHisto) {
+		this.idHisto = idHisto;
+	}
+	/*	public String getNomEtape() {
 		return nomEtape;
 	}
 	public void setNomEtape(String nomEtape) {

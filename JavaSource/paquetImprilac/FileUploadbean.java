@@ -4,6 +4,9 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
 
+import javax.faces.context.FacesContext;
+import javax.servlet.http.HttpSession;
+
 import org.richfaces.event.UploadEvent;
 import org.richfaces.model.UploadItem;
 
@@ -29,6 +32,24 @@ public class FileUploadbean {
 
 	public void paint(OutputStream stream, Object object) throws IOException {
 	    stream.write(getFiles().get((Integer)object).getData());
+	}
+	
+	public FileUploadbean()
+	{
+		FacesContext context = FacesContext.getCurrentInstance();
+		 HttpSession session =(HttpSession)context.getExternalContext().getSession(true);  
+		 
+		 String dataConnect=(String)session.getAttribute("legal");
+		 //String dataConnect=(String)session.getAttribute("idPersonneConnectee");
+		 
+		 if(dataConnect==null){
+			 try {
+				context.getExternalContext().redirect("/imprilac/Identification.jsf");
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		 }
 	}
 	
 public void act()

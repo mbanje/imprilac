@@ -6,17 +6,20 @@
       xmlns:f="http://java.sun.com/jsf/core"
       xmlns:ui="http://java.sun.com/jsf/facelets">
 
-  <head></head>
+  <head>
+    <meta http-equiv="Content-type" content="text/xhtml;charset=utf-8" />
+  	<title> Historisation des materiaux</title>
+  </head>
 
   <body>
      <a4j:keepAlive beanName="demandeBine" />
      
-
+	<h:form>
      
   	<rich:panel style ="width:650px;font-size:35px;margin-left:250px;background-color:#00BFFF;">
   	<f:facet name="header">HISTORISATION DES MATERIAUX</f:facet>
   		
-  		<h:form>
+  		
   		
    		<h:selectOneMenu value="#{demandeBine.idPersonneConnecte}" style ="visibility: hidden;">
   			<f:selectItems value="#{bine.listPersonneConnecte}"/>
@@ -49,16 +52,17 @@
   			
   			</h:panelGrid>
   			<a4j:commandButton value="AJOUTER" action="#{demandeBine.ecouteAjouteHisto}"  data="#{demandeBine.message}" oncomplete="alert(data)" reRender="mat,dmd,qmatacco,tab"/> 
+  			<a4j:commandButton value="ANNULER" action="#{demandeBine.annulerListDesMatAHisto}"  data="#{demandeBine.message}" oncomplete="alert(data)" reRender="tab"/> 
   			<a4j:commandButton value="VALIDER" action="#{demandeBine.updateUnite}"  data="#{demandeBine.message}" oncomplete="alert(data)" reRender="mat,dmd,qmatacco,tab,tab1,etatMat,form,m"/> 
+  			
   		
-  		</h:form>
   		
   	</rich:panel>
   	
   	
   	
   <rich:panel style ="width:650px;font-size:35px;margin-left:250px;background-color:#00BFFF;" id="richpa" rendered="true">
-  		<rich:dataTable id="tab" value="#{demandeBine.listAHistoriser}" var="mate">
+  		<rich:dataTable id="tab" value="#{demandeBine.listAHistoriser}" var="mate" rows="4">
   		<f:facet name="header">LISTE POUR HISTORISATION</f:facet>
   		
   		<rich:column>
@@ -70,6 +74,48 @@
   		<f:facet name="header">ETAT DU MATERIEL</f:facet>
   		#{mate.etatMatString}
   		</rich:column>
+  		
+  		
+  		  		   <f:facet name="footer">
+  			
+  			<rich:datascroller>
+  			
+  				<f:facet name="first">
+  					<h:outputText value="Premier" />
+  				</f:facet>
+  				
+  				<f:facet name="first-disabled">
+  					<h:outputText value="Premier" />
+  				</f:facet>
+  				
+  				<f:facet name="last">
+  					<h:outputText value="Dernier" />
+  				</f:facet>
+  				
+  				<f:facet name="last-disabled">
+  					<h:outputText value="Dernier" />
+  				</f:facet>
+  				
+  				<f:facet name="next">
+  					<h:outputText value="Suivant" />
+  				</f:facet>
+  				
+  				<f:facet name="next-disabled">
+  					<h:outputText value="Suivant" />
+  				</f:facet>
+  				
+  				<f:facet name="previous">
+  					<h:outputText value="Precedent" />
+  				</f:facet>
+  				
+  				<f:facet name="previous-disabled">
+  					<h:outputText value="Précédent" />
+  				</f:facet>
+  				
+  			</rich:datascroller>
+  			
+  		</f:facet>
+  		
 
   		</rich:dataTable>
   	</rich:panel>
@@ -83,7 +129,7 @@
   			<h:form>
   	 <a4j:keepAlive beanName="demandeBine" />
   	<rich:panel style ="width:650px;font-size:35px;margin-left:250px;background-color:#00BFFF;">
-  		<rich:dataTable id="tab1" value="#{demandeBine.listMatHistoriser}" var="per">
+  		<rich:dataTable id="tab1" value="#{demandeBine.listMatHistoriser}" var="per" rows="7">
   		<f:facet name="header">LISTE DES MATERIEL POUR HISTORISATION</f:facet>
   		
   		<rich:column>
@@ -115,6 +161,49 @@
       				<f:setPropertyActionListener value="#{per}" target="#{demandeBine.selected}" />
 	  				</a4j:commandLink>	
    		</rich:column>  
+  		
+  		
+  		   <f:facet name="footer">
+  			
+  			<rich:datascroller>
+  			
+  				<f:facet name="first">
+  					<h:outputText value="Premier" />
+  				</f:facet>
+  				
+  				<f:facet name="first-disabled">
+  					<h:outputText value="Premier" />
+  				</f:facet>
+  				
+  				<f:facet name="last">
+  					<h:outputText value="Dernier" />
+  				</f:facet>
+  				
+  				<f:facet name="last-disabled">
+  					<h:outputText value="Dernier" />
+  				</f:facet>
+  				
+  				<f:facet name="next">
+  					<h:outputText value="Suivant" />
+  				</f:facet>
+  				
+  				<f:facet name="next-disabled">
+  					<h:outputText value="Suivant" />
+  				</f:facet>
+  				
+  				<f:facet name="previous">
+  					<h:outputText value="Precedent" />
+  				</f:facet>
+  				
+  				<f:facet name="previous-disabled">
+  					<h:outputText value="Précédent" />
+  				</f:facet>
+  				
+  			</rich:datascroller>
+  			
+  		</f:facet>
+  		
+  		
   		
   		</rich:dataTable>
   		
@@ -162,6 +251,6 @@
 	</h:panelGroup>
   </rich:modalPanel> 
   
-  	
+  	</h:form>
   </body>
 </html>

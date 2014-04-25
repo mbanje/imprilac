@@ -3,12 +3,16 @@ package paquetImprilac;
 import java.nio.channels.FileChannel;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.text.Format;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import javax.faces.context.FacesContext;
 import javax.faces.event.ActionEvent;
 import javax.faces.model.SelectItem;
+import javax.servlet.http.HttpSession;
 
 import org.richfaces.event.UploadEvent;
 import org.richfaces.model.UploadItem;
@@ -26,7 +30,27 @@ import java.io.PrintWriter;
 
 public class CommandeBean {
 	
+	
 	private String message;
+	
+	public CommandeBean()
+	{
+		FacesContext context = FacesContext.getCurrentInstance();
+		 HttpSession session =(HttpSession)context.getExternalContext().getSession(true);  
+		 
+		 String dataConnect=(String)session.getAttribute("legal");
+		 //String dataConnect=(String)session.getAttribute("idPersonneConnectee");
+		 
+		 if(dataConnect==null){
+			 try {
+				context.getExternalContext().redirect("/imprilac/Identification.jsf");
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		 }
+	}
+	
 	public String getMessage() {
 		return message;
 	}
@@ -78,7 +102,7 @@ public class CommandeBean {
 			listDesChemin.clear();
 		
 		listDesChemin.add(new SelectItem(0,""));
-		res=Connecteur.Extrairedonnees("select * from chemin");
+		res=Connecteur.Extrairedonnees("select * from chemin where supprime=0");
 
 		try {
 			while(res.next())
@@ -141,7 +165,7 @@ public List<SelectItem> getListDesEtapesNonSurCheminDonn() {
 	
 	listDesEtapesNonSurCheminDonn.add(new SelectItem(0,""));
 	//ON SELECTIONNE LES ETAPES NON ENCORE SUR LE CHEMIN DONNE
-	res=Connecteur.Extrairedonnees("select * from etapes as eta where eta.Idetape not in (select che_eta.Idetape from chemin_etapes as che_eta where che_eta.idchemin="+this.idChemin+")");
+	res=Connecteur.Extrairedonnees("select * from etapes as eta where eta.Idetape not in (select che_eta.Idetape from chemin_etapes as che_eta where che_eta.idchemin="+this.idChemin+") and eta.supprime=0");
 
 	try {
 		while(res.next())
@@ -265,11 +289,11 @@ public List<SelectItem> getListDesClients() {
 	
 	listDesClients.add(new SelectItem(0,""));
 	
-	res=Connecteur.Extrairedonnees("select * from personne p,client c where p.Idpersonne=c.Idclient");
+	res=Connecteur.Extrairedonnees("select * from personne p,client c where p.Idpersonne=c.Idclient and c.supprimee=0 order by Nompersonne");
 
 	try {
 		while(res.next())
-		{listDesClients.add(new SelectItem(res.getInt("Idpersonne"),res.getString("Nompersonne")+" "+res.getString("Prenompersonne")));
+		{listDesClients.add(new SelectItem(res.getInt("Idpersonne"),res.getString("Nompersonne")+"    "+res.getString("Prenompersonne")+"        "+res.getString("Idpersonne")));
 
 		}
 	} catch (SQLException e) {
@@ -493,6 +517,14 @@ public void setMaqPresente(String maqPresente) {
 	this.maqPresente = maqPresente;
 }
 //========================================================================
+private float coutMaqt=0;
+public float getCoutMaqt() {
+	return coutMaqt;
+}
+public void setCoutMaqt(float coutMaqt) {
+	this.coutMaqt = coutMaqt;
+}
+
 public void ajouterProdSurCmd()
 {
 System.out.println("000");
@@ -538,6 +570,13 @@ if(this.idChemin==0)
 	{message="INDIQUER LE CHEMIN QUE VA PRENDRE LE PRODUIT S'IL VOUS PLAIT!!";
 	return;
 	}
+
+if((this.coutMaqt==0)&&(this.maqPresente.equalsIgnoreCase("NON")))
+		{
+	message="SAISISSER LE COUT DE LA MAQUETTE S'IL VOUS PLAIT!!";
+	return;
+		}
+
 System.out.println("999");
 
 //============FIN DE CONTROLE DES CHAMPS DE SAISI==================
@@ -550,10 +589,23 @@ p.setIdProduit(this.idProd);
 p.setTitre(this.titreProd);
 p.setNbre_exemplaire_prod(this.nbrExemplaires);
 System.out.println("ccc");
-if(this.maqPresente=="OUI")
-	p.setMaq_presentee(true);
+/*if(this.maqPresente=="OUI")
+	p.setMaq_presentee(this.maqPresente);
 else
+{
 	p.setMaq_presentee(false);
+	p.setCout_maqt(this.coutMaqt);
+}*/
+
+
+	p.setMaq_presentee(this.maqPresente);
+	if(this.maqPresente.equalsIgnoreCase("NON"))
+	p.setCout_maqt(this.coutMaqt);
+	else
+	p.setCout_maqt(0);
+
+
+
 p.setIdChemin(this.idChemin);
 
 System.out.println("ddd");
@@ -562,6 +614,7 @@ try {
 	if(res.next())
 	{
 p.setMontantTotalProd(res.getFloat("cout"));
+p.setCoutChemin(res.getFloat("cout"));
 	}
 } catch (SQLException e) {
 	// TODO Auto-generated catch block
@@ -801,7 +854,20 @@ if((this.com!=null)&&(this.com.getListProd()!=null)&&(this.com.getListProd().siz
 		try {
 			while(res.next())
 			{
-listDesChargesNonEncoreAjouter.add(new SelectItem(res.getInt("Idcharge"),res.getString("Designation")+" "+res.getFloat("PU")));
+				//
+if(res.getString("Designation")!=null)
+listDesChargesNonEncoreAjouter.add(new SelectItem(res.getInt("Idcharge"),res.getString("Designation")+"   "+res.getFloat("PU")));
+else
+{ResultSet r=null;
+System.out.println("bbbbbb---------------bbbbbbb");
+r=Connecteur.Extrairedonnees("select * from materiel where Idmateriel="+res.getInt("Idmat")+"");
+if(r.next())
+{System.out.println("ccccccccc-----------cccccccc");
+listDesChargesNonEncoreAjouter.add(new SelectItem(res.getInt("Idcharge"),r.getString("Designation")+"   "+res.getFloat("PU")));
+
+	}
+	}
+//
 			}
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
@@ -882,7 +948,7 @@ if(this.quantiteCharge==0)
 return;
 	}
 if((this.desactiveListProSurDmd)||(this.desactiveListCharges)||(this.desactiveQuantiteCharges))
-{message="VOUS DEVEZ D'ABORD AJOUTER LE PREDUIT SUR UNE COMMANDE!!";
+{message="VOUS DEVEZ D'ABORD AJOUTER LE PRODUIT SUR UNE COMMANDE!!";
 return;
 	}
 
@@ -908,6 +974,17 @@ try {
 	if(res.next())
 	{c.setPrixUni(res.getFloat("PU"));
 	c.setDesignation(res.getString("Designation"));
+	
+	if(res.getInt("Idmat")!=0)
+	{
+		ResultSet r=null;
+		r=Connecteur.Extrairedonnees("select * from materiel where Idmateriel="+res.getInt("Idmat")+"");
+	
+		if(r.next())
+	c.setDesignation(r.getString("Designation"));
+		
+	}
+	
 		}
 } catch (SQLException e) {
 	// TODO Auto-generated catch block
@@ -983,6 +1060,85 @@ System.out.println("FIN DE public void ajouterChargesSurProduit()");
 }
 
 
+private Charge selectedCharge;
+
+public Charge getSelectedCharge() {
+	return selectedCharge;
+}
+
+public void setSelectedCharge(Charge selectedCharge) {
+	this.selectedCharge = selectedCharge;
+}
+
+
+public void enleverChargeSurProd(ActionEvent e)
+{
+
+	if(this.com==null)//CAS IMPOSSIBLE
+	{message="VOUS DEVEZ D'ABORD CREER UNE COMMANDE!!";
+	return;
+		}
+	if((this.com.getListProd()==null)||(this.com.getListProd().size()<1))//CAS IMPOSSIBLE
+	{message="VOUS N'AVEZ AUCUN PRODUIT SUR UNE COMANDE!!";
+	return;
+		}
+	if((this.desactiveListProSurDmd)||(this.desactiveListCharges)||(this.desactiveQuantiteCharges))
+	{message="ACTIVER D'ABORD LA PARTIE D'AJOUT DES CHARGES!!";
+	return;
+		}
+	if((this.com.getListProd()==null)||(this.com.getListProd().size()==0))//CAS IMPOSSIBLE
+	{message="VOUS DEVEZ D'ABORD METTRE UN PRODUIT SUR UNE COMMANDE";
+	return;
+		}
+	int i=0;
+	while((i<this.com.getListProd().size())&&!(this.titreProduit.equalsIgnoreCase(this.com.getListProd().get(i).getTitre())))
+	{
+		i++;
+		}
+
+	if(i<this.com.getListProd().size())
+	{   
+		
+		Charge j1,j2=null;
+		//boolean inseree=false;
+		if(this.com.getListProd().get(i).getCharge()!=null)//TOUJOURS LE CAS
+		{
+			j1=this.com.getListProd().get(i).getCharge();
+			if(j1.getIdCharge()==this.selectedCharge.getIdCharge())//IL Y AVAIS UNE SEULE CHARGE SUR CE PRODUIT
+			{	
+				this.com.getListProd().get(i).setCharge(j1.getCharge());	
+			}
+			else//IL Y AVAIS PLUS D'UNE SEULE CHARGE
+			{while((j1.getCharge()!=null)&&(j1.getIdCharge()!=this.selectedCharge.getIdCharge()))
+			{
+				j2=j1;
+				j1=j1.getCharge();
+			}
+			j2.setCharge(j1.getCharge());
+			j1.setCharge(null);	
+			}
+			
+			
+			
+		}
+		else
+			message="CAS BIZARRE!!";
+		
+		
+		
+
+
+
+	calculMontantPrUnProd2();
+	calculMontantCmd();
+	System.out.println("FIN DE public void ajouterChargesSurProduit()");
+	
+	
+	}
+
+}
+	
+	
 private List<Charge> listDesChargePr1Prod=null;
 public List<Charge> getListDesChargePr1Prod() {
 	
@@ -1105,6 +1261,9 @@ this.desactiveMaqPres=false;
 this.desactiveChemin=false;
 
 this.idCharge=0;
+this.titreProduit=null;
+calculMontantPrUnProd2();
+this.quantiteCharge=0;
 message="OK";
 
 	}
@@ -1129,6 +1288,13 @@ public void finirAjoutDesProdSurCmd()
 	this.desactiveNomClient=false;
 	this.activenif=false;
 	this.activesociete=false;
+	
+	
+	this.idProd=0;
+	this.titreProd=null;
+	this.nbrExemplaires=0;
+	this.idChemin=0;
+	this.coutMaqt=0;
 
 	message="OK";
 	}
@@ -1244,7 +1410,10 @@ while((i<this.com.getListProd().size())&&!(this.titreProduit.equalsIgnoreCase(th
 	i++;
 	}
 System.out.println("e");
-this.montantPourLeProdSelectionne=this.com.getListProd().get(i).getMontantTotalProd();
+//this.montantPourLeProdSelectionne=this.com.getListProd().get(i).getMontantTotalProd();
+
+this.montantPourLeProdSelectionne=this.com.getListProd().get(i).getCoutChemin()+this.com.getListProd().get(i).getCout_maqt();
+
 System.out.println("f");
 System.out.println("this.montantPourLeProdSelectionne "+this.montantPourLeProdSelectionne);
 if(this.com.getListProd().get(i).getCharge()!=null)//IL Y A DES CHARGES SUR CE PRODUIT
@@ -1260,7 +1429,7 @@ this.montantPourLeProdSelectionne=this.montantPourLeProdSelectionne+(j.getPrixUn
 System.out.println("j");
 }
 System.out.println("k");
-	
+this.com.getListProd().get(i).setMontantTotalProd(this.montantPourLeProdSelectionne);
 System.out.println("FIN");
 }
 
@@ -1270,7 +1439,19 @@ System.out.println("FIN");
 public void calculMontantPrUnProd2()
 {System.out.println("DEBUT");
 
+this.montantPourLeProdSelectionne=0;
+
+System.out.println("[][][][][][][][][][][][][][]");
+if((this.titreProduit==null)||(this.titreProduit.equalsIgnoreCase("")))
+{System.out.println("[1][1][1][1][1][1][1][][1][1][1][1][1][1]");
+	message="OK";
+	return;
+	}
+System.out.println("[2][2][2][2][2][2][2][2][2][2][2][2][2][2]");
+
+
 System.out.println("0");
+//this.montantPourLeProdSelectionne=0;
 if((this.com==null)||(this.com.getListProd()==null)||(this.com.getListProd().size()<1)||(this.titreProduit.length()<1)||(this.desactiveListProSurDmd==true)||(this.desactiveListCharges==true)||(this.desactiveQuantiteCharges==true))
 	{this.montantPourLeProdSelectionne=0;
 	return;
@@ -1278,12 +1459,16 @@ if((this.com==null)||(this.com.getListProd()==null)||(this.com.getListProd().siz
 System.out.println("1");
 int i=0;
 
+
 while((i<this.com.getListProd().size())&&!(this.titreProduit.equalsIgnoreCase(this.com.getListProd().get(i).getTitre())))
 {System.out.println("2");
 	i++;
 	}
 System.out.println("3");
-this.montantPourLeProdSelectionne=this.com.getListProd().get(i).getMontantTotalProd();
+//this.montantPourLeProdSelectionne=this.com.getListProd().get(i).getMontantTotalProd();
+this.montantPourLeProdSelectionne=this.com.getListProd().get(i).getCoutChemin()+this.com.getListProd().get(i).getCout_maqt();
+
+
 System.out.println("4");
 if(this.com.getListProd().get(i).getCharge()!=null)//IL Y A DES CHARGES SUR CE PRODUIT
 {Charge j=this.com.getListProd().get(i).getCharge();
@@ -1297,11 +1482,17 @@ this.montantPourLeProdSelectionne=this.montantPourLeProdSelectionne+(j.getPrixUn
 System.out.println("7");
 }
 
+this.com.getListProd().get(i).setMontantTotalProd(this.montantPourLeProdSelectionne);
 //this.com.getListProd().get(i).setMontantTotalProd(this.montantPourLeProdSelectionne);
 
 System.out.println("8");	
 System.out.println("FIN");
 }
+
+
+
+
+
 
 public float calculMontantPrUnProd3(String titre)
 {float m=0;
@@ -1320,7 +1511,8 @@ while((i<this.com.getListProd().size())&&!(titre.equalsIgnoreCase(this.com.getLi
 	i++;
 	}
 System.out.println("3");
-m=this.com.getListProd().get(i).getMontantTotalProd();
+//m=this.com.getListProd().get(i).getMontantTotalProd();
+m=this.com.getListProd().get(i).getCoutChemin()+this.com.getListProd().get(i).getCout_maqt();
 System.out.println("4");
 if(this.com.getListProd().get(i).getCharge()!=null)//IL Y A DES CHARGES SUR CE PRODUIT
 {Charge j=this.com.getListProd().get(i).getCharge();
@@ -1360,6 +1552,7 @@ while(i<this.com.getListProd().size())
 this.montantTotalDeLaCmd+=calculMontantPrUnProd3(this.com.getListProd().get(i).getTitre());
 	i++;
 	}
+this.com.setMontantTotal(this.montantTotalDeLaCmd);
 }
 
 private Produit p=null;
@@ -1390,6 +1583,9 @@ public void deleteProd(ActionEvent ev)
 	}
 	
 	this.com.getListProd().remove(j);
+	
+	this.titreProduit=null;
+	calculMontantPrUnProd2();
 	calculMontantCmd();
 	}
 //FIN DE LA FONCTION QUI ENLEVE UN PRODUIT SUR UNE COMMANDE
@@ -1444,18 +1640,23 @@ public void saveCmd()
 	return;	
 	}
 	
+	
+	FacesContext context = FacesContext.getCurrentInstance();
+	HttpSession session =(HttpSession)context.getExternalContext().getSession(true); 
+	
+	
 	int i;
 	float montant_pr_1_exe;
 	ResultSet res=null;
 	int n=0,m=0,idCmd=-1,idFig;
 	
 	//J'ENREGISTRE UNE COMMANDE
-	n=Connecteur.Insererdonnees("insert into commande (Idclient,NIF,Societe,Datecmd) values ("+this.com.getIdClient()+",'"+this.com.getNif()+"','"+this.com.getSociete()+"',now())");
+	n=Connecteur.Insererdonnees("insert into commande (Idclient,Idchef_prod,NIF,Societe,Datecmd) values ("+this.com.getIdClient()+","+session.getAttribute("idPersonneConnectee")+",'"+this.com.getNif()+"','"+this.com.getSociete()+"',now())");
 	if(n!=-1)
 		message="INSERTION REUSSIE!!";
 	idCmd=recupereIdDuDernierCmd();
 	
-	
+	this.idPersonneConnecte=0;
 	for(i=0;i<this.com.getListProd().size();i++)
 	{	montant_pr_1_exe=0;
 		n=-1;
@@ -1469,7 +1670,7 @@ public void saveCmd()
 			montant_pr_1_exe=p.getMontantTotalProd()/p.getNbre_exemplaire_prod();
 			
 
-			m=Connecteur.Insererdonnees("insert into figurer(Idcmd,Idprod,Idchemin,Titre,Nbre_tot_exemplr,Avecmaqt,Nbre_exemplr_paye,Montant_a_paye_pr_1_ex) values ("+idCmd+","+p.getIdProduit()+","+p.getIdChemin()+",'"+p.getTitre()+"',"+p.getNbre_exemplaire_prod()+","+p.isMaq_presentee()+",0,"+montant_pr_1_exe+")");	
+			m=Connecteur.Insererdonnees("insert into figurer(Idcmd,Idprod,Idchemin,Cout_Chemin,Titre,Nbre_tot_exemplr,Avecmaqt,cout_maqt,Nbre_exemplr_paye,Montant_a_paye_pr_1_ex,etat) values ("+idCmd+","+p.getIdProduit()+","+p.getIdChemin()+","+p.getCoutChemin()+",'"+p.getTitre()+"',"+p.getNbre_exemplaire_prod()+",'"+p.getMaq_presentee()+"',"+p.getCout_maqt()+",0,"+montant_pr_1_exe+",'COMMANDE')");	
 			if(m!=-1)
 				message="INSERTION REUSSIE!!";	
 			
@@ -1485,6 +1686,36 @@ public void saveCmd()
 			
 			int t=-1;
 			t=Connecteur.Insererdonnees("insert into disposer(Idfigure,Idcharge,Qtite_tot_charge,PU_charge) values ("+idFig+","+c.getIdCharge()+","+c.getQuantiteCharge()+",'"+c.getPrixUni()+"')");
+			ResultSet r=null;
+			
+			
+			//
+			r=Connecteur.Extrairedonnees("select * from charges where Idcharge="+c.getIdCharge()+"");
+			try {
+				if(r.next())
+				{
+					if(r.getInt("Idmat")!=0)//CETTE CHARGE EST DE TYPE CHARGE MATERIEL
+					{
+						ResultSet r1=null;
+						r1=Connecteur.Extrairedonnees("select * from materiel where Idmateriel="+r.getInt("Idmat")+"");
+						if(r1.next())
+						{
+							int q=0;
+							q=r1.getInt("qtiteRestteOChef");
+							q=q-(int)c.getQuantiteCharge();
+							
+							int tt=-1;
+							tt=Connecteur.Insererdonnees("update materiel set qtiteRestteOChef="+q+" where Idmateriel="+r.getInt("Idmat")+"");
+						}
+					}
+				}
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			//
+			
+			
 			if(t!=-1)
 				message="INSERTION REUSSIE!!";
 			while(c.getCharge()!=null)
@@ -1493,6 +1724,34 @@ public void saveCmd()
 				t=Connecteur.Insererdonnees("insert into disposer(Idfigure,Idcharge,Qtite_tot_charge,PU_charge) values ("+idFig+","+c.getIdCharge()+","+c.getQuantiteCharge()+",'"+c.getPrixUni()+"')");	
 				if(t!=-1)
 					message="INSERTION REUSSIE!!";
+	
+				r=null;
+				r=Connecteur.Extrairedonnees("select * from charges where Idcharge="+c.getIdCharge()+"");
+				try {
+					if(r.next())
+					{
+						if(r.getInt("Idmat")!=0)//CETTE CHARGE EST DE TYPE CHARGE MATERIEL
+						{
+							ResultSet r1=null;
+							r1=Connecteur.Extrairedonnees("select * from materiel where Idmateriel="+r.getInt("Idmat")+"");
+							if(r1.next())
+							{
+								int q=0;
+								q=r1.getInt("qtiteRestteOChef");
+								q=q-(int)c.getQuantiteCharge();
+								
+								int tt=-1;
+								tt=Connecteur.Insererdonnees("update materiel set qtiteRestteOChef="+q+" where Idmateriel="+r.getInt("Idmat")+"");
+							}
+						}
+					}
+				} catch (SQLException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				//
+				
+				
 			}
 			
 			}
@@ -1504,6 +1763,11 @@ public void saveCmd()
 	
 	this.com=null;
 	this.titreProduit=null;
+	this.idProd=0;
+	this.titreProd=null;
+	this.nbrExemplaires=0;
+	this.idChemin=0;
+	this.coutMaqt=0;
 }
 
 
@@ -1529,11 +1793,13 @@ public List<SelectItem> getListDesCliAyaDesCmdAvcDesProdEnCour() {
 	
 	listDesCliAyaDesCmdAvcDesProdEnCour.add(new SelectItem(0,""));
 	
-	res=Connecteur.Extrairedonnees("select p.Idpersonne,p.Nompersonne,p.Prenompersonne from personne p where p.Idpersonne in (select cli.Idclient from client cli,commande com,figurer fig,historique_etapes histo where cli.Idclient=com.Idclient and com.Idcmd=fig.Idcmd and fig.Idfigurer=histo.Idfigure and histo.Designation !='TERMINEE')");
+	//res=Connecteur.Extrairedonnees("select p.Idpersonne,p.Nompersonne,p.Prenompersonne from personne p where p.Idpersonne in (select cli.Idclient from client cli,commande com,figurer fig,historique_etapes histo where cli.Idclient=com.Idclient and com.Idcmd=fig.Idcmd and fig.Idfigurer=histo.Idfigure and histo.Designation !='TERMINEE' and cli.supprimee=0) order by p.Nompersonne");
+	//res=Connecteur.Extrairedonnees("select p.Idpersonne,p.Nompersonne,p.Prenompersonne from personne p where p.Idpersonne not in (select cli.Idclient from client cli,commande com,figurer fig,historique_etapes histo where cli.Idclient=com.Idclient and com.Idcmd=fig.Idcmd and fig.Idfigurer=histo.Idfigure and histo.Designation ='TERMINEE' and cli.supprimee=0) order by p.Nompersonne");
+	res=Connecteur.Extrairedonnees("select p.Idpersonne,p.Nompersonne,p.Prenompersonne from personne p where p.Idpersonne in (select cli.Idclient from client cli,commande com,figurer fig where cli.Idclient=com.Idclient and com.Idcmd=fig.Idcmd and fig.etat!='COMMANDE') and p.Idpersonne in (select Idclient from client where supprimee=0) order by Nompersonne");
 
 	try {
 		while(res.next())
-		{listDesCliAyaDesCmdAvcDesProdEnCour.add(new SelectItem(res.getInt("Idpersonne"),res.getString("Nompersonne")+" "+res.getString("Prenompersonne")));
+		{listDesCliAyaDesCmdAvcDesProdEnCour.add(new SelectItem(res.getInt("Idpersonne"),res.getString("Nompersonne")+"    "+res.getString("Prenompersonne")+"      "+res.getString("Idpersonne")));
 
 		}
 	} catch (SQLException e) {
@@ -1541,6 +1807,7 @@ public List<SelectItem> getListDesCliAyaDesCmdAvcDesProdEnCour() {
 		e.printStackTrace();
 	}
 	
+
 	return listDesCliAyaDesCmdAvcDesProdEnCour;
 }
 
@@ -1550,6 +1817,39 @@ public void setListDesCliAyaDesCmdAvcDesProdEnCour(
 }
 
 
+
+private List<SelectItem> listDesCliAyaDesCmdAvcDesProd;
+
+public List<SelectItem> getListDesCliAyaDesCmdAvcDesProd() {
+	
+	ResultSet res=null;
+	
+	if(listDesCliAyaDesCmdAvcDesProd==null)
+		listDesCliAyaDesCmdAvcDesProd=new ArrayList<SelectItem>();
+	else
+		listDesCliAyaDesCmdAvcDesProd.clear();
+	
+	listDesCliAyaDesCmdAvcDesProd.add(new SelectItem(0,""));
+	
+	res=Connecteur.Extrairedonnees("select p.Idpersonne,p.Nompersonne,p.Prenompersonne from personne p where p.Idpersonne in (select cli.Idclient from client cli,commande com,figurer fig,historique_etapes histo where cli.Idclient=com.Idclient and com.Idcmd=fig.Idcmd and fig.Idfigurer=histo.Idfigure and histo.Designation !='TERMINEE' and cli.supprimee=0) order by p.Nompersonne");
+
+	try {
+		while(res.next())
+		{listDesCliAyaDesCmdAvcDesProd.add(new SelectItem(res.getInt("Idpersonne"),res.getString("Nompersonne")+"    "+res.getString("Prenompersonne")+"      "+res.getString("Idpersonne")));
+
+		}
+	} catch (SQLException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}
+	
+	return listDesCliAyaDesCmdAvcDesProd;
+}
+
+public void setListDesCliAyaDesCmdAvcDesProd(
+		List<SelectItem> listDesCliAyaDesCmdAvcDesProd) {
+	this.listDesCliAyaDesCmdAvcDesProd = listDesCliAyaDesCmdAvcDesProd;
+}
 
 private List<SelectItem> listDesCmdAvcDesProdEnCour;
 private int idComd=0;
@@ -1579,11 +1879,17 @@ public List<SelectItem> getListDesCmdAvcDesProdEnCour() {
 	{
 	System.out.println("11");
 	System.out.println("11");
-	res=Connecteur.Extrairedonnees("select Idcmd from commande where Idclient="+this.idCli+" and Idcmd in (select com.Idcmd from commande com,figurer fig,historique_etapes histo where com.Idcmd=fig.Idcmd and fig.Idfigurer=histo.Idfigure and histo.Designation !='TERMINEE')");
+	//res=Connecteur.Extrairedonnees("select Idcmd from commande where Idclient="+this.idCli+" and Idcmd in (select com.Idcmd from commande com,figurer fig,historique_etapes histo where com.Idcmd=fig.Idcmd and fig.Idfigurer=histo.Idfigure and histo.Designation !='TERMINEE')");
+	//res=Connecteur.Extrairedonnees("select * from commande where Idclient="+this.idCli+" and Idcmd not in (select com.Idcmd from commande com,figurer fig,historique_etapes histo where com.Idclient="+this.idCli+" and com.Idcmd=fig.Idcmd and fig.Idfigurer=histo.Idfigure and histo.Designation ='TERMINEE')");
 
+	res=Connecteur.Extrairedonnees("select * from commande where Idclient="+this.idCli+" and Idcmd in (select com.Idcmd from commande com,figurer fig where com.Idcmd=fig.Idcmd and fig.etat!='COMMANDE')");
+
+	System.out.println("A");
 	try {
 		while(res.next())
-		{listDesCmdAvcDesProdEnCour.add(new SelectItem(res.getInt("Idcmd"),""+res.getInt("Idcmd")+""));
+		{	System.out.println("A1");
+			if((res.getString("bonCmd")!=null)||(res.getFloat("montantPaye")!=0))
+			listDesCmdAvcDesProdEnCour.add(new SelectItem(res.getInt("Idcmd"),""+res.getInt("Idcmd")+""));
 
 		}
 	} catch (SQLException e) {
@@ -1628,8 +1934,8 @@ public List<SelectItem> getListDesProdDuneCmdNonEncorTermns() {
 	System.out.println("11");
 	System.out.println("11");
 	//res=Connecteur.Extrairedonnees("select fig.Idfigurer,pro.Type,fig.Titre from commande com,figurer fig,produits pro,historique_etapes hist where com.Idcmd="+this.idComd+" and com.Idcmd=fig.Idcmd and fig.Idprod=pro.Idprod and fig.Idfigurer=hist.Idfigure and hist.Designation !='TERMINEE'");
-	res=Connecteur.Extrairedonnees("select figu.Idfigurer,prod.Type,figu.Titre from commande coma,figurer figu,produits prod where coma.Idcmd="+this.idComd+" and coma.Idcmd=figu.Idcmd and figu.Idprod=prod.Idprod and figu.Idfigurer in(select fig.Idfigurer from commande com,figurer fig,produits pro,historique_etapes hist where com.Idcmd="+this.idComd+" and com.Idcmd=fig.Idcmd and fig.Idprod=pro.Idprod and fig.Idfigurer=hist.Idfigure and hist.Designation !='TERMINEE')");
-	
+	//res=Connecteur.Extrairedonnees("select figu.Idfigurer,prod.Type,figu.Titre from commande coma,figurer figu,produits prod where coma.Idcmd="+this.idComd+" and coma.Idcmd=figu.Idcmd and figu.Idprod=prod.Idprod and figu.Idfigurer in(select fig.Idfigurer from commande com,figurer fig,produits pro,historique_etapes hist where com.Idcmd="+this.idComd+" and com.Idcmd=fig.Idcmd and fig.Idprod=pro.Idprod and fig.Idfigurer=hist.Idfigure and hist.Designation !='TERMINEE')");
+	res=Connecteur.Extrairedonnees("select figu.Idfigurer,prod.Type,figu.Titre from commande coma,figurer figu,produits prod where coma.Idcmd="+this.idComd+" and coma.Idcmd=figu.Idcmd and figu.Idprod=prod.Idprod and figu.Idfigurer not in(select fig.Idfigurer from commande com,figurer fig,produits pro,historique_etapes hist where com.Idcmd="+this.idComd+" and com.Idcmd=fig.Idcmd and fig.Idprod=pro.Idprod and fig.Idfigurer=hist.Idfigure and hist.Designation ='TERMINEE')");
 	
 	
 	try {
@@ -1782,9 +2088,33 @@ if(n!=-1)
 	message="OPERATION REUSSIE!!";
 else
 	message="OPERATION ECHOUEE!!";
+
+
+
+//SI CE PRODUIT A L'ETAT 'EN ATTENTE DE TRAITEMENT'
+//METTONS-LE DANS L'ETAT 'EN COURS DE TRAITEMENT'
+ResultSet re=null;
+re=Connecteur.Extrairedonnees("select * from figurer where Idfigurer="+this.idP+" and etat='EN ATTENTE DE TRAITEMENT'");
+try {
+	if(re.next())
+	{
+	int ne=-1;
+	ne=Connecteur.Insererdonnees("update figurer set etat='EN COURS DE TRAITEMENT' where Idfigurer="+this.idP+"");
+	}
+} catch (SQLException e1) {
+	// TODO Auto-generated catch block
+	e1.printStackTrace();
+}
+//
+
+
 	
 this.files.clear();
 	}
+
+
+
+
 //FIN DE LA PARTIE DE MANIPULATION DE <rich:fileUpload>
 
 
@@ -1843,7 +2173,7 @@ private List<SelectItem> listDesEtapNonEncorMarqPrUnProd;
 public List<SelectItem> getListDesEtapNonEncorMarqPrUnProd() {
 	
 	System.out.println("_@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@_");
-	ResultSet res=null,r0=null;
+	ResultSet res=null,r0=null,r1=null;
 	
 	if(listDesEtapNonEncorMarqPrUnProd==null)
 		listDesEtapNonEncorMarqPrUnProd=new ArrayList<SelectItem>();
@@ -1864,9 +2194,10 @@ public List<SelectItem> getListDesEtapNonEncorMarqPrUnProd() {
 	res=Connecteur.Extrairedonnees("select et.Designation from figurer fig,chemin che,chemin_etapes c_e,etapes et where fig.Idfigurer="+this.idP+" and fig.Idchemin=che.Idchemin and che.Idchemin=c_e.idchemin and c_e.Idetape=et.Idetape");	
 	try {
 	System.out.println("@0");
+	int idf=this.idP;
 		while(res.next())
 		{
-		int idf=this.idP;
+		//int idf=this.idP;
 		
 		//idf=recupereIdfigure(this.idComd,this.idP);
 		//if(idf==0)
@@ -1883,6 +2214,16 @@ public List<SelectItem> getListDesEtapNonEncorMarqPrUnProd() {
 		//}
 		
 		}
+		
+		
+		r1=Connecteur.Extrairedonnees("select * from historique_etapes where Idfigure="+idf+" and Designation='TERMINE'");
+		if(!r1.next())
+		{
+		listDesEtapNonEncorMarqPrUnProd.add(new SelectItem("TERMINE"));
+		//System.out.println("@1");
+		}
+		
+		
 	} catch (SQLException e) {
 		// TODO Auto-generated catch block
 		e.printStackTrace();
@@ -1956,7 +2297,9 @@ try {
 		return;
 	}
 	
-	n=Connecteur.Insererdonnees("insert into historique_etapes (Idfigure,Date,Designation) values ("+idFig+",now(),'"+this.etap+"')");
+	n=Connecteur.Insererdonnees("insert into historique_etapes (Idfigure,Idproducteur,Date,Designation) values ("+idFig+","+this.idPersonneConnecte+",now(),'"+this.etap+"')");
+	
+	this.idPersonneConnecte=0;
 	
 	if(n==-1)
 	{
@@ -1987,12 +2330,13 @@ public List<CheminOuEtape> getListHistorique() {
 	
 	System.out.println("!!!!!!!!!");
 	//res=Connecteur.Extrairedonnees("select p.Type,h.Date,h.Designation from produits p,figurer f,historique_etapes h where f.Idcmd="+this.idComd+" and f.Idprod="+this.idP+" and p.Idprod=f.Idprod and f.Idfigurer=h.Idfigure");
-	res=Connecteur.Extrairedonnees("select p.Type,h.Date,h.Designation from produits p,figurer f,historique_etapes h where f.Idfigurer="+this.idP+" and p.Idprod=f.Idprod and f.Idfigurer=h.Idfigure");
+	res=Connecteur.Extrairedonnees("select p.Type,h.Idhisto_etape,h.Date,h.Designation from produits p,figurer f,historique_etapes h where f.Idfigurer="+this.idP+" and p.Idprod=f.Idprod and f.Idfigurer=h.Idfigure");
 	int num=1;
 	try {
 		while(res.next())
 		{System.out.println("////////1");
 		CheminOuEtape p=new CheminOuEtape();
+		p.setIdHisto(res.getInt("Idhisto_etape"));
 		p.setDate(res.getDate("Date").toString());
 		p.setDesignationP(res.getString("Type"));
 		p.setEtap(res.getString("Designation"));
@@ -2205,8 +2549,8 @@ public void visualiseMaquette(ActionEvent ev)
 return;
 	}
 
-int idm=0;
-idm=m.getIdMaql();
+//int idm=0;
+//idm=m.getIdMaql();
 
 String nomMaq=null;
 nomMaq=m.getNomMaq();
@@ -2219,8 +2563,2515 @@ try {
 	e.printStackTrace();
 }
 
+
+this.pt=null;
+
 	}
 //FIN DE LA FONCTION QUI EST UTILISEE POUR VISUALISER UNE MAQUETTE
+
+
+
+//DEBUT DE LA PARTIE POUR LA CREATION DES GROUPES DES EMPLOYES
+private List<SelectItem> listDesCliAyaDesCmdAvcDesProdEnCour1;
+
+
+public List<SelectItem> getListDesCliAyaDesCmdAvcDesProdEnCour1() {
+	
+	ResultSet res=null;
+	
+	if(listDesCliAyaDesCmdAvcDesProdEnCour1==null)
+		listDesCliAyaDesCmdAvcDesProdEnCour1=new ArrayList<SelectItem>();
+	else
+		listDesCliAyaDesCmdAvcDesProdEnCour1.clear();
+	
+	listDesCliAyaDesCmdAvcDesProdEnCour1.add(new SelectItem(0,""));
+	
+	//res=Connecteur.Extrairedonnees("select p.Idpersonne,p.Nompersonne,p.Prenompersonne from personne p where p.Idpersonne in (select cli.Idclient from client cli,commande com,figurer fig,historique_etapes histo where cli.Idclient=com.Idclient and com.Idcmd=fig.Idcmd and fig.Idfigurer=histo.Idfigure and histo.Designation !='TERMINEE' and cli.supprimee=0) order by Nompersonne");
+	res=Connecteur.Extrairedonnees("select p.Idpersonne,p.Nompersonne,p.Prenompersonne from personne p where p.Idpersonne in (select cli.Idclient from client cli,commande com,figurer fig where cli.Idclient=com.Idclient and com.Idcmd=fig.Idcmd and fig.etat!='COMMANDE') and p.Idpersonne in (select Idclient from client where supprimee=0) order by Nompersonne");
+
+	try {
+		while(res.next())
+		{listDesCliAyaDesCmdAvcDesProdEnCour1.add(new SelectItem(res.getInt("Idpersonne"),res.getString("Nompersonne")+" "+res.getString("Prenompersonne")+"   "+res.getString("Idpersonne")));
+
+		}
+	} catch (SQLException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}
+	
+	return listDesCliAyaDesCmdAvcDesProdEnCour1;
+}
+
+public void setListDesCliAyaDesCmdAvcDesProdEnCour1(
+		List<SelectItem> listDesCliAyaDesCmdAvcDesProdEnCour1) {
+	this.listDesCliAyaDesCmdAvcDesProdEnCour1 = listDesCliAyaDesCmdAvcDesProdEnCour1;
+}
+
+private List<SelectItem> listDesCmdAvcDesProdEnCour1;
+
+public List<SelectItem> getListDesCmdAvcDesProdEnCour1() {
+	
+	ResultSet res=null;
+	
+	if(listDesCmdAvcDesProdEnCour1==null)
+		listDesCmdAvcDesProdEnCour1=new ArrayList<SelectItem>();
+	else
+		listDesCmdAvcDesProdEnCour1.clear();
+	
+	listDesCmdAvcDesProdEnCour1.add(new SelectItem(0,""));
+	System.out.println("00");
+	System.out.println("00");	
+	
+	if(this.idCli1!=0)//SI ON A SELECTIONNE UN CLIENT
+	{
+	System.out.println("11");
+	System.out.println("11");
+	//res=Connecteur.Extrairedonnees("select Idcmd from commande where Idclient="+this.idCli1+" and Idcmd in (select com.Idcmd from commande com,figurer fig,historique_etapes histo where com.Idcmd=fig.Idcmd and fig.Idfigurer=histo.Idfigure and histo.Designation !='TERMINEE')");
+	//res=Connecteur.Extrairedonnees("select * from commande where Idclient="+this.idCli1+" and Idcmd not in (select com.Idcmd from commande com,figurer fig,historique_etapes histo where com.Idclient="+this.idCli1+" and com.Idcmd=fig.Idcmd and fig.Idfigurer=histo.Idfigure and histo.Designation ='TERMINEE')");
+	res=Connecteur.Extrairedonnees("select * from commande where Idclient="+this.idCli1+" and Idcmd in (select com.Idcmd from commande com,figurer fig where com.Idcmd=fig.Idcmd and fig.etat!='COMMANDE')");
+
+	try {
+		while(res.next())
+		{
+		if((res.getString("bonCmd")!=null)||(res.getFloat("montantPaye")!=0))	
+		listDesCmdAvcDesProdEnCour1.add(new SelectItem(res.getInt("Idcmd"),""+res.getInt("Idcmd")+""));
+		}
+	} catch (SQLException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}
+	}
+	
+	return listDesCmdAvcDesProdEnCour1;
+}
+
+public void setListDesCmdAvcDesProdEnCour1(
+		List<SelectItem> listDesCmdAvcDesProdEnCour1) {
+	this.listDesCmdAvcDesProdEnCour1 = listDesCmdAvcDesProdEnCour1;
+}
+
+private List<SelectItem> listDesProdDuneCmdNonEncorTermns1;
+
+
+
+public List<SelectItem> getListDesProdDuneCmdNonEncorTermns1() {
+	
+	ResultSet res=null;
+	
+	if(listDesProdDuneCmdNonEncorTermns1==null)
+		listDesProdDuneCmdNonEncorTermns1=new ArrayList<SelectItem>();
+	else
+		listDesProdDuneCmdNonEncorTermns1.clear();
+	
+	listDesProdDuneCmdNonEncorTermns1.add(new SelectItem(0,""));
+	System.out.println("00");
+	System.out.println("00");	
+	
+	if((this.idComd1!=0)&&(this.idCli1!=0))//SI ON A SELECTIONNE UN CLIENT
+	{
+	System.out.println("11");
+	System.out.println("11");
+	//res=Connecteur.Extrairedonnees("select fig.Idfigurer,pro.Type,fig.Titre from commande com,figurer fig,produits pro,historique_etapes hist where com.Idcmd="+this.idComd+" and com.Idcmd=fig.Idcmd and fig.Idprod=pro.Idprod and fig.Idfigurer=hist.Idfigure and hist.Designation !='TERMINEE'");
+	//res=Connecteur.Extrairedonnees("select figu.Idfigurer,prod.Type,figu.Titre from commande coma,figurer figu,produits prod where coma.Idcmd="+this.idComd1+" and coma.Idcmd=figu.Idcmd and figu.Idprod=prod.Idprod and figu.Idfigurer in(select fig.Idfigurer from commande com,figurer fig,produits pro,historique_etapes hist where com.Idcmd="+this.idComd1+" and com.Idcmd=fig.Idcmd and fig.Idprod=pro.Idprod and fig.Idfigurer=hist.Idfigure and hist.Designation !='TERMINEE')");
+	
+	res=Connecteur.Extrairedonnees("select figu.Idfigurer,prod.Type,figu.Titre from commande coma,figurer figu,produits prod where coma.Idcmd="+this.idComd1+" and coma.Idcmd=figu.Idcmd and figu.Idprod=prod.Idprod and figu.Idfigurer not in(select fig.Idfigurer from commande com,figurer fig,produits pro,historique_etapes hist where com.Idcmd="+this.idComd1+" and com.Idcmd=fig.Idcmd and fig.Idprod=pro.Idprod and fig.Idfigurer=hist.Idfigure and hist.Designation ='TERMINEE')");
+
+	
+	try {
+		while(res.next())
+		{	
+				
+			listDesProdDuneCmdNonEncorTermns1.add(new SelectItem(res.getInt("Idfigurer"),res.getString("Type")+" : "+res.getString("Titre")));
+
+		}
+	} catch (SQLException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}
+	}
+	
+	return listDesProdDuneCmdNonEncorTermns1;
+}
+
+public void setListDesProdDuneCmdNonEncorTermns1(
+		List<SelectItem> listDesProdDuneCmdNonEncorTermns1) {
+	this.listDesProdDuneCmdNonEncorTermns1 = listDesProdDuneCmdNonEncorTermns1;
+}
+
+private List<SelectItem> listDesProducteursLibres;
+public List<SelectItem> getListDesProducteursLibres() {
+	
+	
+ResultSet res=null;
+	
+	if(listDesProducteursLibres==null)
+		listDesProducteursLibres=new ArrayList<SelectItem>();
+	else
+		listDesProducteursLibres.clear();
+	
+	
+	System.out.println("changeDateFormat(dteProvDeb) 0"+changeDateFormat(dteProvDeb));
+	System.out.println("changeDateFormat(dteProvFin) 0"+changeDateFormat(dteProvFin));
+	
+/*	listDesProducteursLibres.add(new SelectItem(0,""));
+	System.out.println("00");
+	System.out.println("00");*/	
+	
+	if((this.idComd1!=0)&&(this.idCli1!=0)&&(this.idP1!=0)&&(this.dteProvDeb!=null)&&(this.dteProvFin!=null))
+	//SI ON A SELECTIONNE UN CLIENT, UNE COMMANDE ET UN PRODUIT
+	{
+	System.out.println("11");
+	System.out.println("11");
+	System.out.println("changeDateFormat(dteProvDeb) "+changeDateFormat(dteProvDeb));
+	System.out.println("changeDateFormat(dteProvFin) "+changeDateFormat(dteProvFin));
+	//res=Connecteur.Extrairedonnees("select fig.Idfigurer,pro.Type,fig.Titre from commande com,figurer fig,produits pro,historique_etapes hist where com.Idcmd="+this.idComd+" and com.Idcmd=fig.Idcmd and fig.Idprod=pro.Idprod and fig.Idfigurer=hist.Idfigure and hist.Designation !='TERMINEE'");
+	res=Connecteur.Extrairedonnees("select * from personne p,producteur pr where p.Idpersonne=pr.Idproduct and pr.Etatproducteur='DISPONIBLE' and pr.supprimee=0");
+	
+	listDesProducteursLibres.add(new SelectItem(""));
+	
+	try {
+		while(res.next())
+		{	
+			System.out.println("ii");
+			
+			
+			//VERIFIONS SI CE PRODUCTEUR N'EST PAS DEJA SUR LA LISTE
+			boolean existe=false;
+			if((listDesProducteursD1Group!=null)&&(listDesProducteursD1Group.size()>0))
+			{	
+				int i=0;
+				while((i<listDesProducteursD1Group.size())&&(existe==false))
+				{	if(res.getInt("Idpersonne")==listDesProducteursD1Group.get(i).getIdPersonne())
+					existe=true;
+					i++;
+				}
+
+			}
+			
+			
+			
+			//VERIFIONS SI CE PRODUCTEUR N'EST PAS OCCUPE DANS CET INTERVALLE DE TEMPS
+			boolean occupe=false;
+			ResultSet r=null;
+			r=Connecteur.Extrairedonnees("select * from groupe_producteur gp,groupe g where gp.Idproduct="+res.getInt("Idpersonne")+" and gp.Idgroupe=g.Idgroupe and g.Dte_prov_debut<'"+changeDateFormat(this.dteProvDeb)+"' and g.Dte_prov_fin>'"+changeDateFormat(this.dteProvDeb)+"'");
+			if(r.next())
+				occupe=true;
+			
+			r=null;
+			r=Connecteur.Extrairedonnees("select * from groupe_producteur gp,groupe g where gp.Idproduct="+res.getInt("Idpersonne")+" and gp.Idgroupe=g.Idgroupe and g.Dte_prov_debut>'"+changeDateFormat(this.dteProvDeb)+"' and g.Dte_prov_fin<'"+changeDateFormat(this.dteProvFin)+"'");
+			if(r.next())
+				occupe=true;
+
+			r=null;
+			r=Connecteur.Extrairedonnees("select * from groupe_producteur gp,groupe g where gp.Idproduct="+res.getInt("Idpersonne")+" and gp.Idgroupe=g.Idgroupe and g.Dte_prov_debut>'"+changeDateFormat(this.dteProvDeb)+"' and g.Dte_prov_debut<'"+changeDateFormat(this.dteProvFin)+"' and g.Dte_prov_fin>'"+changeDateFormat(this.dteProvFin)+"'");
+			if(r.next())
+				occupe=true;
+			
+			
+			
+			if((existe==false)&&(occupe==false))
+			listDesProducteursLibres.add(new SelectItem(res.getInt("Idpersonne"),res.getString("Nompersonne")+" "+res.getString("Prenompersonne")+"  "+res.getInt("Idpersonne")));
+
+		}
+	} catch (SQLException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}
+	}
+	
+	return listDesProducteursLibres;
+}
+
+public void setListDesProducteursLibres(
+		List<SelectItem> listDesProducteursLibres) {
+	this.listDesProducteursLibres = listDesProducteursLibres;
+}
+
+private int idProducteur;
+public int getIdProducteur() {
+	return idProducteur;
+}
+
+public void setIdProducteur(int idProducteur) {
+	this.idProducteur = idProducteur;
+}
+
+private Date dteProvDeb;
+private Date dteProvFin;
+public Date getDteProvDeb() {
+	return dteProvDeb;
+}
+
+public void setDteProvDeb(Date dteProvDeb) {
+	this.dteProvDeb = dteProvDeb;
+}
+
+public Date getDteProvFin() {
+	return dteProvFin;
+}
+
+public void setDteProvFin(Date dteProvFin) {
+	this.dteProvFin = dteProvFin;
+}
+
+private List<Personne> listDesProducteursD1Group;
+public List<Personne> getListDesProducteursD1Group() {
+	
+	
+	return listDesProducteursD1Group;
+}
+
+public void setListDesProducteursD1Group(
+		List<Personne> listDesProducteursD1Group) {
+	this.listDesProducteursD1Group = listDesProducteursD1Group;
+}
+
+private int idCli1;
+private int idComd1;
+private int idP1;
+
+public int getIdCli1() {
+	return idCli1;
+}
+
+public void setIdCli1(int idCli1) {
+	this.idCli1 = idCli1;
+}
+
+public int getIdComd1() {
+	return idComd1;
+}
+
+public void setIdComd1(int idComd1) {
+	this.idComd1 = idComd1;
+}
+
+public int getIdP1() {
+	return idP1;
+}
+
+public void setIdP1(int idP1) {
+	this.idP1 = idP1;
 }
 
 
+private boolean showMessageClient=false;
+private boolean showMessageComd=false;
+private boolean showMessageProd=false;
+private boolean showMessageProducteur=false;
+
+
+
+public boolean isShowMessageClient() {
+	return showMessageClient;
+}
+
+public void setShowMessageClient(boolean showMessageClient) {
+	this.showMessageClient = showMessageClient;
+}
+
+public boolean isShowMessageComd() {
+	return showMessageComd;
+}
+
+public void setShowMessageComd(boolean showMessageComd) {
+	this.showMessageComd = showMessageComd;
+}
+
+public boolean isShowMessageProd() {
+	return showMessageProd;
+}
+
+public void setShowMessageProd(boolean showMessageProd) {
+	this.showMessageProd = showMessageProd;
+}
+
+public boolean isShowMessageProducteur() {
+	return showMessageProducteur;
+}
+
+public void setShowMessageProducteur(boolean showMessageProducteur) {
+	this.showMessageProducteur = showMessageProducteur;
+}
+
+public void ajouteProducteurDsGroup()
+{int j=0;
+
+if(this.idCli1==0)
+	{//message="CHOISISSER LE MATERIEL S'IL VOUS PLAIT!!!";
+	//System.out.println("Dans idMateriel==0 "+idMateriel);
+	this.showMessageClient=true;
+	return;
+	}
+
+//System.out.println("Dans quantiteMateriel il y a"+this.quantiteMateriel);
+
+if(this.idComd1==0)
+	{//message="SAISISSER LA QUANTITE S'IL VOUS PLAIT!!!";
+	this.showMessageComd=true;
+	return;
+	}
+
+if(this.idP1==0)
+{//message="SAISISSER LA QUANTITE S'IL VOUS PLAIT!!!";
+this.showMessageProd=true;
+return;
+}
+
+if(this.idProducteur==0)
+{//message="SAISISSER LA QUANTITE S'IL VOUS PLAIT!!!";
+this.showMessageProducteur=true;
+return;
+}
+
+
+if(listDesProducteursD1Group==null)
+	listDesProducteursD1Group=new ArrayList<Personne>();
+
+
+//System.out.println("Size  :"+listDesProdDmd.size());
+/*while((j<listDesProducteursD1Group.size())&&(listDesProdDmd.get(j).idMateriel!=this.idMateriel))
+{j++;
+	}
+
+	if((this.listDesProdDmd.size()==1)&&(this.listDesProdDmd.get(0).idMateriel==this.idMateriel))
+	j=0;
+//if(listDesProdDmd.size()!=0)
+if(j<listDesProdDmd.size())
+{listDesProdDmd.get(j).quantiteMateriel+=this.quantiteMateriel;
+return;
+}
+
+
+
+System.out.println("Size  :"+listDesProdDmd.size());*/
+
+ResultSet r=Connecteur.Extrairedonnees("Select * from personne where Idpersonne="+this.idProducteur+"");
+
+
+Personne p=new Personne();
+
+int num=1;
+if((listDesProducteursD1Group.size()>0))
+	num=listDesProducteursD1Group.size()+1;
+
+try {
+	r.next();
+	p.setIdPersonne(r.getInt("Idpersonne"));
+	p.setNumPersonne(num);
+	p.setNomPersonne(r.getString("Nompersonne"));
+	p.setPrenomPersonne(r.getString("Prenompersonne"));
+	
+} catch (SQLException e) {
+	// TODO Auto-generated catch block
+	e.printStackTrace();
+}
+listDesProducteursD1Group.add(p);
+
+if(listDesProducteursD1Group.size()>0)
+	this.desactiveClient1=true;
+	this.desactiveCmd1=true;
+	this.desactivePro1=true;
+
+//FIN  DE LA PARTIE POUR LA CREATION DES GROUPES DES EMPLOYES
+
+}
+
+
+
+
+
+
+public void listernInPutClient(ActionEvent e)
+{	//System.out.println("Dans quantiteMateriel il y a"+this.quantiteMateriel);
+	this.showMessageClient=false;
+}
+
+public void listernInPutCommande(ActionEvent e)
+{	//System.out.println("Dans quantiteMateriel il y a"+this.quantiteMateriel);
+	this.showMessageComd=false;
+}
+
+public void listernInPutProduit(ActionEvent e)
+{	//System.out.println("Dans quantiteMateriel il y a"+this.quantiteMateriel);
+	this.showMessageProd=false;
+}
+
+public void listernInPutProducteur(ActionEvent e)
+{	System.out.println("avant this.showMessageProducteur"+showMessageProducteur);
+	this.showMessageProducteur=false;
+	System.out.println("apres this.showMessageProducteur"+showMessageProducteur);
+}
+
+public void annulerGroupe()
+{
+if((listDesProducteursD1Group==null)||(listDesProducteursD1Group.size()==0))
+{message="IL N'Y A PAS DE GROUPE CREE!!";
+return;
+	}
+if(listDesProducteursD1Group!=null)
+	this.listDesProducteursD1Group=null;
+this.desactiveClient1=false;
+this.desactiveCmd1=false;
+this.desactivePro1=false;
+message="SUPPRESSION DU GROUPE REUSSIE!!";
+	}
+
+private boolean desactiveClient1=false;
+private boolean desactiveCmd1=false;
+private boolean desactivePro1=false;
+public boolean isDesactiveClient1() {
+	return desactiveClient1;
+}
+
+public void setDesactiveClient1(boolean desactiveClient1) {
+	this.desactiveClient1 = desactiveClient1;
+}
+
+public boolean isDesactiveCmd1() {
+	return desactiveCmd1;
+}
+
+public void setDesactiveCmd1(boolean desactiveCmd1) {
+	this.desactiveCmd1 = desactiveCmd1;
+}
+
+public boolean isDesactivePro1() {
+	return desactivePro1;
+}
+
+public void setDesactivePro1(boolean desactivePro1) {
+	this.desactivePro1 = desactivePro1;
+}
+
+private Personne pe=null;
+public Personne getPe() {
+	return pe;
+}
+
+public void setPe(Personne pe) {
+	this.pe = pe;
+}
+public void enleverPersonne(ActionEvent e)
+{if(pe==null)//CAS IMPOSSIBLE
+{message="PAS DE PERSONNE A SUPPRIMER!!";
+return;
+	}
+
+int idPe=0;
+idPe=pe.getIdPersonne();
+int i=1;
+//n=Connecteur.Insererdonnees("delete from p where Id="+idm+"");
+while((i<=listDesProducteursD1Group.size())&&(listDesProducteursD1Group.get(i-1).getIdPersonne()!=idPe))
+i++;
+
+if(listDesProducteursD1Group.get(i-1).getIdPersonne()==idPe)
+	listDesProducteursD1Group.remove(i-1);
+	
+i=1;
+if((listDesProducteursD1Group!=null)&&(listDesProducteursD1Group.size()>0))
+while((i<=listDesProducteursD1Group.size()))
+{listDesProducteursD1Group.get(i-1).setNumPersonne(i);
+i++;	
+}
+
+
+pe=null;
+	}
+
+
+//DEBUT DE LA FONCTION QUI RECUPERE LE ID DU DERNIER ENREGISTREMENT DE LA TABLE GROUPE
+public int recuperID()
+{
+int i=-1;
+ResultSet r=null;
+r=Connecteur.Extrairedonnees("SELECT Idgroupe FROM groupe order by Idgroupe desc limit 1");
+if(r!=null)
+	try {
+		if(r.next()){
+			i=r.getInt("Idgroupe");
+		}
+	} catch (SQLException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}
+return i;
+	}
+//FIN DE LA FONCTION QUI RECUPERE LE ID DU DERNIER ENREGISTREMENT DE LA TABLE GROUPE
+
+public String changeDateFormat(Date d)
+{if(d==null)
+	return "";
+ Format f=new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss");
+  return f.format(d);
+}
+
+public void createGroup() 
+{if((listDesProducteursD1Group==null)||(listDesProducteursD1Group.size()==0))
+{message="IL N'Y A PAS DE GROUPE CREE!";
+return;	
+}
+Date d=new Date();
+
+if((this.dteProvDeb!=null))
+System.out.println("this.dteProvDeb.getTime() "+this.dteProvDeb.getTime());
+
+System.out.println("d.getTime() "+d.getTime());
+System.out.println("d.getDate() "+d.getDate());
+		
+if((this.dteProvDeb!=null))
+if(this.dteProvDeb.getDate()<d.getDate())
+{message="LA DATE PROVISOIRE DEBUT N'EST PAS VALIDE!!";
+return;
+	}
+
+if((this.dteProvDeb!=null)&&(this.dteProvFin!=null))
+if(this.dteProvDeb.getTime()>this.dteProvFin.getTime())
+	{message="LES DATES NE SONT PAS VALIDE!!";
+	return;
+		}
+	
+
+if(this.idP1==0)
+{message="PAS DE PRODUIT SELECTIONNE!!";
+return;
+	}
+
+int n=-1;
+
+FacesContext context=FacesContext.getCurrentInstance();
+HttpSession session=(HttpSession) context.getExternalContext().getSession(true);
+
+if((this.dteProvDeb!=null)&&(this.dteProvFin!=null))
+n=Connecteur.Insererdonnees("insert into groupe (Idchefprod,Idfigure,Dte_prov_debut,Dte_prov_fin) values ("+session.getAttribute("idPersonneConnectee")+","+this.idP1+",'"+changeDateFormat(this.dteProvDeb)+"','"+changeDateFormat(this.dteProvFin)+"')");
+
+if((this.dteProvDeb==null)&&(this.dteProvFin==null))
+	n=Connecteur.Insererdonnees("insert into groupe (Idchefprod,Idfigure) values ("+session.getAttribute("idPersonneConnectee")+","+this.idP1+")");
+
+if((this.dteProvDeb!=null)&&(this.dteProvFin==null))
+	n=Connecteur.Insererdonnees("insert into groupe (Idchefprod,Idfigure,Dte_prov_debut) values ("+session.getAttribute("idPersonneConnectee")+","+this.idP1+",'"+changeDateFormat(this.dteProvDeb)+"')");
+
+if((this.dteProvDeb==null)&&(this.dteProvFin!=null))
+	n=Connecteur.Insererdonnees("insert into groupe (Idchefprod,Idfigure,Dte_prov_fin) values ("+session.getAttribute("idPersonneConnectee")+","+this.idP1+",'"+changeDateFormat(this.dteProvFin)+"')");
+
+
+if(n==-1)
+{message="OPERATION DE CREATION DU GROUPE ECHOUEE!!";
+return;
+	}
+
+int idg=-1;
+idg=recuperID();
+if(idg==-1)
+{message="ECHEC DE RECUPERATION DU DERNIER GROUPE!!";
+return;
+	}
+int k=-1;
+//int kk=-1;
+for(int m=0;m<listDesProducteursD1Group.size();m++)
+{
+	k=-1;
+	k=Connecteur.Insererdonnees("insert into groupe_producteur values ("+idg+","+listDesProducteursD1Group.get(m).getIdPersonne()+")");
+	
+	//kk=Connecteur.Insererdonnees("update producteur set Etatproducteur='OCCUPE' where Idproduct="+listDesProducteursD1Group.get(m).getIdPersonne()+"");
+}
+
+if(k!=-1)
+{
+message="OPERATION REUSSIE!!";
+
+this.desactiveClient1=false;
+this.desactiveCmd1=false;
+this.desactivePro1=false;
+
+
+//SI CE PRODUIT A L'ETAT 'EN ATTENTE DE TRAITEMENT'
+//METTONS-LE DANS L'ETAT 'EN COURS DE TRAITEMENT'
+ResultSet re=null;
+re=Connecteur.Extrairedonnees("select * from figurer where Idfigurer="+this.idP1+" and etat='EN ATTENTE DE TRAITEMENT'");
+try {
+	if(re.next())
+	{
+	int ne=-1;
+	ne=Connecteur.Insererdonnees("update figurer set etat='EN COURS DE TRAITEMENT' where Idfigurer="+this.idP1+"");
+	}
+} catch (SQLException e1) {
+	// TODO Auto-generated catch block
+	e1.printStackTrace();
+}
+//
+
+
+
+
+
+listDesProducteursD1Group.clear();
+}
+else
+message="OPERATION ECHOUEE!!";
+
+}
+/*private List<SelectItem> listDesH1;
+private List<SelectItem> listDesH2;
+private List<SelectItem> listDesMin1;
+private List<SelectItem> listDesMin2;
+ 
+public List<SelectItem> getListDesH1() {
+	
+	if(listDesH1==null)
+		listDesH1=new ArrayList<SelectItem>();
+	else 
+	listDesH1.clear();
+	for(int i=0;i<25;i++)
+	listDesH1.add(new SelectItem(i,""+i+""));
+	
+	return listDesH1;
+}
+
+public void setListDesH1(List<SelectItem> listDesH1) {
+	this.listDesH1 = listDesH1;
+}
+
+
+
+
+public List<SelectItem> getListDesH2() {
+	
+	if(listDesH2==null)
+		listDesH2=new ArrayList<SelectItem>();
+	else 
+		listDesH2.clear();
+	for(int i=0;i<25;i++)
+		listDesH2.add(new SelectItem(i,""+i+""));
+	
+	return listDesH2;
+}
+
+public void setListDesH2(List<SelectItem> listDesH2) {
+	this.listDesH2 = listDesH2;
+}
+
+public List<SelectItem> getListDesMin1() {
+	
+	if(listDesMin1==null)
+		listDesMin1=new ArrayList<SelectItem>();
+	else 
+		listDesMin1.clear();
+	for(int i=0;i<60;i++)
+		listDesMin1.add(new SelectItem(i,""+i+""));
+	
+	return listDesMin1;
+}
+
+public void setListDesMin1(List<SelectItem> listDesMin1) {
+	this.listDesMin1 = listDesMin1;
+}
+
+public List<SelectItem> getListDesMin2() {
+	
+	if(listDesMin2==null)
+		listDesMin2=new ArrayList<SelectItem>();
+	else 
+		listDesMin2.clear();
+	for(int i=0;i<60;i++)
+		listDesMin2.add(new SelectItem(i,""+i+""));
+	
+	return listDesMin2;
+}
+
+public void setListDesMin2(List<SelectItem> listDesMin2) {
+	this.listDesMin2 = listDesMin2;
+}*/
+
+//DEBUT DE LA PARTIE POUR LE PAYEMENT
+private List<SelectItem> listDesClientsAyaDesProTerminMNonPay;
+public List<SelectItem> getListDesClientsAyaDesProTerminMNonPay() {
+	
+	ResultSet res=null;
+	
+	if(listDesClientsAyaDesProTerminMNonPay==null)
+		listDesClientsAyaDesProTerminMNonPay=new ArrayList<SelectItem>();
+	else
+		listDesClientsAyaDesProTerminMNonPay.clear();
+	
+	listDesClientsAyaDesProTerminMNonPay.add(new SelectItem(0,""));
+	
+	res=Connecteur.Extrairedonnees("select p.Idpersonne,p.Nompersonne,p.Prenompersonne from personne p where p.Idpersonne in (select cli.Idclient from client cli,commande com,figurer fig,historique_etapes histo where cli.Idclient=com.Idclient and com.Idcmd=fig.Idcmd and fig.Idfigurer=histo.Idfigure and histo.Designation ='TERMINEE'and fig.Nbre_tot_exemplr>fig.Nbre_exemplr_paye) and p.Idpersonne in (select Idclient from client where supprimee=0) order by Nompersonne");
+
+	try {
+		while(res.next())
+		{listDesClientsAyaDesProTerminMNonPay.add(new SelectItem(res.getInt("Idpersonne"),res.getString("Nompersonne")+" "+res.getString("Prenompersonne")+"   "+res.getInt("Idpersonne")));
+
+		}
+	} catch (SQLException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}
+	
+	return listDesClientsAyaDesProTerminMNonPay;
+}
+
+public void setListDesClientsAyaDesProTerminMNonPay(
+		List<SelectItem> listDesClientsAyaDesProTerminMNonPay) {
+	this.listDesClientsAyaDesProTerminMNonPay = listDesClientsAyaDesProTerminMNonPay;
+}
+private List<SelectItem> listDesClientsAyaDesProAPay;
+
+public List<SelectItem> getListDesClientsAyaDesProAPay() {
+	
+	
+	ResultSet res=null;
+	
+	if(listDesClientsAyaDesProAPay==null)
+		listDesClientsAyaDesProAPay=new ArrayList<SelectItem>();
+	else
+		listDesClientsAyaDesProAPay.clear();
+	
+	listDesClientsAyaDesProAPay.add(new SelectItem(0,""));
+	
+	res=Connecteur.Extrairedonnees("select p.Idpersonne,p.Nompersonne,p.Prenompersonne from personne p where p.Idpersonne in (select cli.Idclient from client cli,commande com,figurer fig where cli.Idclient=com.Idclient and com.Idcmd=fig.Idcmd and fig.etat!='PAYE' and fig.Nbre_tot_exemplr>fig.Nbre_exemplr_paye) and p.Idpersonne in (select Idclient from client where supprimee=0) order by Nompersonne");
+
+	try {
+		while(res.next())
+		{listDesClientsAyaDesProAPay.add(new SelectItem(res.getInt("Idpersonne"),res.getString("Nompersonne")+" "+res.getString("Prenompersonne")+"   "+res.getInt("Idpersonne")));
+
+		}
+	} catch (SQLException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}
+	
+	
+	return listDesClientsAyaDesProAPay;
+}
+
+public void setListDesClientsAyaDesProAPay(
+		List<SelectItem> listDesClientsAyaDesProAPay) {
+	this.listDesClientsAyaDesProAPay = listDesClientsAyaDesProAPay;
+}
+
+private int idCli2;
+public int getIdCli2() {
+	return idCli2;
+}
+
+public void setIdCli2(int idCli2) {
+	this.idCli2 = idCli2;
+}
+
+
+private List<SelectItem> listDesCmdAvcDesProdTermnMNonPaye;
+public List<SelectItem> getListDesCmdAvcDesProdTermnMNonPaye() {
+	
+	ResultSet res=null;
+	
+	if(listDesCmdAvcDesProdTermnMNonPaye==null)
+		listDesCmdAvcDesProdTermnMNonPaye=new ArrayList<SelectItem>();
+	else
+		listDesCmdAvcDesProdTermnMNonPaye.clear();
+	
+	listDesCmdAvcDesProdTermnMNonPaye.add(new SelectItem(0,""));
+	System.out.println("00");
+	System.out.println("00");	
+	
+	if(this.idCli2!=0)//SI ON A SELECTIONNE UN CLIENT
+	{
+	System.out.println("11");
+	System.out.println("11");
+	res=Connecteur.Extrairedonnees("select Idcmd from commande where Idclient="+this.idCli2+" and Idcmd in (select com.Idcmd from commande com,figurer fig,historique_etapes histo where com.Idcmd=fig.Idcmd and fig.Idfigurer=histo.Idfigure and histo.Designation ='TERMINEE' and fig.Nbre_tot_exemplr>fig.Nbre_exemplr_paye)");
+
+	try {
+		while(res.next())
+		{listDesCmdAvcDesProdTermnMNonPaye.add(new SelectItem(res.getInt("Idcmd"),""+res.getInt("Idcmd")+""));
+
+		}
+	} catch (SQLException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}
+	}
+	
+	return listDesCmdAvcDesProdTermnMNonPaye;
+}
+
+public void setListDesCmdAvcDesProdTermnMNonPaye(
+		List<SelectItem> listDesCmdAvcDesProdTermnMNonPaye) {
+	this.listDesCmdAvcDesProdTermnMNonPaye = listDesCmdAvcDesProdTermnMNonPaye;
+}
+
+
+private List<SelectItem> listDesCmdAvcDesProdAPayer;
+public List<SelectItem> getListDesCmdAvcDesProdAPayer() {
+	
+	
+	ResultSet res=null;
+	
+	if(listDesCmdAvcDesProdAPayer==null)
+		listDesCmdAvcDesProdAPayer=new ArrayList<SelectItem>();
+	else
+		listDesCmdAvcDesProdAPayer.clear();
+	
+	listDesCmdAvcDesProdAPayer.add(new SelectItem(0,""));
+	System.out.println("00");
+	System.out.println("00");	
+	
+	if(this.idCli2!=0)//SI ON A SELECTIONNE UN CLIENT
+	{
+	System.out.println("11");
+	System.out.println("11");
+	res=Connecteur.Extrairedonnees("select Idcmd from commande where Idclient="+this.idCli2+" and Idcmd in (select com.Idcmd from commande com,figurer fig where com.Idcmd=fig.Idcmd and fig.etat!='PAYE' and fig.Nbre_tot_exemplr>fig.Nbre_exemplr_paye)");
+
+	try {
+		while(res.next())
+		{listDesCmdAvcDesProdAPayer.add(new SelectItem(res.getInt("Idcmd"),""+res.getInt("Idcmd")+""));
+
+		}
+	} catch (SQLException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}
+	}
+	
+	
+	return listDesCmdAvcDesProdAPayer;
+}
+
+public void setListDesCmdAvcDesProdAPayer(
+		List<SelectItem> listDesCmdAvcDesProdAPayer) {
+	this.listDesCmdAvcDesProdAPayer = listDesCmdAvcDesProdAPayer;
+}
+
+private int idComd2;
+public int getIdComd2() {
+	return idComd2;
+}
+
+public void setIdComd2(int idComd2) {
+	this.idComd2 = idComd2;
+}
+
+private float montantTotal;
+public float getMontantTotal() {
+	return montantTotal;
+}
+
+public void setMontantTotal(float montantTotal) {
+	this.montantTotal = montantTotal;
+}
+
+
+private List<Produit> listDesProdPourLePayement;
+public List<Produit> getListDesProdPourLePayement() {
+	System.out.println("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
+	if(listDesProdPourLePayement==null)
+		listDesProdPourLePayement=new ArrayList<Produit>();
+	else
+		listDesProdPourLePayement.clear();
+	
+	System.out.println("bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb");
+	if((this.idCli2==0)||(this.idComd2==0))
+	{	
+		listDesProdPourLePayement.clear();
+		return listDesProdPourLePayement;
+	}
+	
+	System.out.println("cccccccccccccccccccccccccccccccccccccc");
+	ResultSet res=null,res1=null;
+	
+	//res=Connecteur.Extrairedonnees("select * from commande c,figurer f,produits p, historique_etapes h where c.Idclient="+this.idCli2+" and c.Idcmd="+this.idComd2+" and c.Idcmd=f.Idcmd and f.Idfigurer=h.Idfigure and p.Idprod=f.Idprod and h.Designation='TERMINEE'");
+	//res=Connecteur.Extrairedonnees("select * from commande c,figurer f,produits p where c.Idclient="+this.idCli2+" and c.Idcmd="+this.idComd2+" and p.Idprod=f.Idprod and f.etat!='PAYE'");
+	res=Connecteur.Extrairedonnees("select * from commande c,figurer f where c.Idclient="+this.idCli2+" and c.Idcmd="+this.idComd2+" and c.Idcmd=f.Idcmd and f.etat!='PAYE'");
+
+	int n=1;
+	try {
+		//if(res.next())
+		//{System.out.println("dddddddddddddddddddddddddddddddddddddddddddd");
+			while(res.next())
+			{	System.out.println("==================================");
+				System.out.println("==================================");
+				Produit p=new Produit();
+			    p.setNum(n);
+			    p.setIdProduit(res.getInt("Idfigurer"));
+			    
+			    
+			    //RECUPERONS LE TYPE DU PRODUIT
+			    res1=Connecteur.Extrairedonnees("select * from produits where Idprod="+res.getInt("Idprod"));
+			    if(res1.next())
+			    {
+			    	p.setNomProduit(res1.getString("Type"));
+			    }
+			    
+			    res1=null;
+			    
+			    
+			    p.setTitre(res.getString("Titre"));
+			    p.setNbr_ex_dmd(res.getInt("Nbre_tot_exemplr"));
+			    p.setNbr_ex_djaPaye(res.getInt("Nbre_exemplr_paye"));
+			    p.setNbr_ex_tot_non_paye(res.getInt("Nbre_tot_exemplr")-res.getInt("Nbre_exemplr_paye"));
+			    if(res.getInt("Nbre_tot_exemplr")<=res.getInt("Nbre_exemplr_paye"))
+			    	p.setIcon("/image/updateBtn.png");
+			    else
+			    	p.setIcon("/image/close.png");
+			    
+			    p.setMontantTotalProd(res.getFloat("Montant_a_paye_pr_1_ex"));
+			    p.setNbr_ex_paye(0);
+			    p.setShowMessageQuantite(false);
+			    n++;
+			    listDesProdPourLePayement.add(p);
+			}
+			
+		//}
+	} catch (SQLException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}
+	
+	return listDesProdPourLePayement;
+}
+
+public void setListDesProdPourLePayement(List<Produit> listDesProdPourLePayement) {
+	this.listDesProdPourLePayement = listDesProdPourLePayement;
+}
+
+
+
+public void savePayement()
+{
+	if((listDesProdPourLePayement==null)||(listDesProdPourLePayement.size()<1))
+	{
+		message="AUCUN PAYEMENT N'A ETE EFFECTUE!!";
+		return;
+	}
+	
+	boolean enregistrer=false;
+	
+	FacesContext context=FacesContext.getCurrentInstance();
+	HttpSession session=(HttpSession) context.getExternalContext().getSession(true);
+	
+	
+	for(int i=0;i<listDesProdPourLePayement.size();i++)
+	{
+		if(listDesProdPourLePayement.get(i).getNbr_ex_paye()>0)
+			enregistrer=true;
+	}
+
+	if(enregistrer==false)
+	{message="VOUS N'AVEZ SAISI AUCUNE QUANTITE!!";
+	return;
+	}
+	
+	enregistrer=true;
+	int ii=0;
+	
+	while((ii<listDesProdPourLePayement.size())&&(enregistrer==true))
+	{
+		if(listDesProdPourLePayement.get(ii).getNbr_ex_paye()>listDesProdPourLePayement.get(ii).getNbr_ex_tot_non_paye())
+		{
+			enregistrer=false;
+		}
+		
+		ii++;
+	}
+	
+	if(enregistrer==false)
+	{
+		message="IL Y A UNE QUANTITE TROP GRANDE!!";
+		return;
+	}
+	
+	int n=-1;
+	n=Connecteur.Insererdonnees("insert into payement (Idcmd,Idcaissier,Dte_payement,Montant_paye,Livre) values ("+this.idComd2+","+session.getAttribute("idPersonneConnectee")+",now(),"+this.montantTotal+",0)");
+	
+	if(n==-1)
+	{
+		message="ENREGISTREMENT DU PAYEMENT ECHOUE!!";
+		return;
+	}
+	
+	//SI IL Y A SUR CETTE COMMANDE AU MOINS UN PRODUIT AVEC L'ETAT COMMANDE
+	//CE PAYEMENT EST UNE AVANCE POUR TOUS LES PRODUITS DE CETTE COMMANDE
+	ResultSet re=null;
+	re=Connecteur.Extrairedonnees("select * from figurer where Idcmd="+this.idComd2+" and etat='COMMANDE'");
+	try {
+		if(re.next())
+		{
+		int ne=-1;
+		ne=Connecteur.Insererdonnees("update figurer set etat='EN ATTENTE DE TRAITEMENT' where Idcmd="+this.idComd2+"");
+		}
+	} catch (SQLException e1) {
+		// TODO Auto-generated catch block
+		e1.printStackTrace();
+	}
+	//
+	
+int idpaye=0;
+idpaye=recuperIDP();
+
+if(idpaye==0)
+{message="ECHEC DE RECUPERATION DU PAYEMENT";
+return;
+	}
+
+int m=-1,mm=-1;
+ResultSet r=null;
+for(int k=0;k<listDesProdPourLePayement.size();k++)
+{
+if(listDesProdPourLePayement.get(k).getNbr_ex_paye()>0)
+{m=Connecteur.Insererdonnees("insert into prod_paye (Idpayement,Designation,Qtite_paye) values ("+idpaye+",'"+listDesProdPourLePayement.get(k).getTitre()+"',"+listDesProdPourLePayement.get(k).getNbr_ex_paye()+")");
+
+
+r=Connecteur.Extrairedonnees("select * from figurer where Idfigurer="+listDesProdPourLePayement.get(k).getIdProduit()+"");
+
+try {
+	if(r.next())
+	{
+	int nbre_ex=0,n1=0;
+	nbre_ex=r.getInt("Nbre_exemplr_paye");
+	nbre_ex=nbre_ex+listDesProdPourLePayement.get(k).getNbr_ex_paye();
+	//METTONS A JOUR LE NOMBRE D'EXEMPLAIRE PAYE
+	mm=Connecteur.Insererdonnees("update figurer set Nbre_exemplr_paye="+nbre_ex+" where Idfigurer="+listDesProdPourLePayement.get(k).getIdProduit()+"");
+		
+	//
+	n1=r.getInt("Nbre_tot_exemplr");
+	if(nbre_ex==n1)//ON VIENT DE PAYER TOUS LES EXEMPLAIRES
+	{
+		r=null;
+		r=Connecteur.Extrairedonnees("select * from figurer where Idfigurer="+listDesProdPourLePayement.get(k).getIdProduit()+" and etat='TERMINE'");
+		if(r.next())//SI CE PAYEMENT N'EST PAS UNE AVANCE, DONC, ON VIENT DE PAYER TOUS LES PRODUITS POUR LES RECUPERER
+		{
+			mm=-1;
+			mm=Connecteur.Insererdonnees("update figurer set etat='PAYE' where Idfigurer="+listDesProdPourLePayement.get(k).getIdProduit()+"");
+
+		}
+	}
+	}
+} catch (SQLException e) {
+	// TODO Auto-generated catch block
+	e.printStackTrace();
+}
+
+}
+
+
+r=null;
+r=Connecteur.Extrairedonnees("select * from commande where Idcmd="+this.idComd2+"");
+try {
+	if(r.next())
+	{
+	this.montantTotal+=r.getFloat("montantPaye");
+	mm=-1;
+	mm=Connecteur.Insererdonnees("update commande set montantPaye="+this.montantTotal+" where Idcmd="+this.idComd2+"");
+		}
+} catch (SQLException e) {
+	// TODO Auto-generated catch block
+	e.printStackTrace();
+}
+
+}
+if(m==-1)
+	message="ECHEC DE L'OPERATION!!";
+else
+	message="OPERATION REUSSIE!!";
+
+this.montantTotal=0;
+this.listDesProdPourLePayement.clear();
+	}
+
+
+public void calculMontantAPaye(ActionEvent e)
+{System.out.println("DEBUT DE LA FONCTION QUI ECOUTE!");
+this.montantTotal=0;
+boolean ok=true;
+int j=0;
+
+while((j<listDesProdPourLePayement.size())&&(ok==true))
+{if(listDesProdPourLePayement.get(j).getNbr_ex_paye()>listDesProdPourLePayement.get(j).getNbr_ex_tot_non_paye())
+	ok=false;
+j++;
+}
+
+/*for(int j=0;j<listDesProdPourLePayement.size();j++)
+	{if(listDesProdPourLePayement.get(j).getNbr_ex_paye()>listDesProdPourLePayement.get(j).getNbr_ex_tot_non_paye())
+		{listDesProdPourLePayement.get(j).setShowMessageQuantite(true);
+		
+		ok=false;
+		}
+	else
+		listDesProdPourLePayement.get(j).setShowMessageQuantite(false);
+	}*/
+	
+if(ok==false)
+{this.showErreurDeQte=true;
+	return;
+}
+
+this.showErreurDeQte=false;
+
+/*if(listDesProdPourLePayement.size()<1)
+{message="CAS IMPOSSIBLE!!";
+return;
+	}*/
+
+for(int i=0;i<listDesProdPourLePayement.size();i++)
+{System.out.println("this.montantTotal avant ajout "+this.montantTotal);
+	this.montantTotal=this.montantTotal+(listDesProdPourLePayement.get(i).getMontantTotalProd()*listDesProdPourLePayement.get(i).getNbr_ex_paye());
+System.out.println("this.montantTotal apres ajout "+this.montantTotal);	
+}
+
+	}
+
+
+private boolean showErreurDeQte=false;
+public boolean isShowErreurDeQte() {
+	return showErreurDeQte;
+}
+
+public void setShowErreurDeQte(boolean showErreurDeQte) {
+	this.showErreurDeQte = showErreurDeQte;
+}
+
+//DEBUT DE LA FONCTION QUI RECUPERE LE ID DU DERNIER ENREGISTREMENT DE LA TABLE payement
+public int recuperIDP()
+{
+int i=-1;
+ResultSet r=null;
+r=Connecteur.Extrairedonnees("SELECT Idpayement FROM payement order by Idpayement desc limit 1");
+if(r!=null)
+	try {
+		if(r.next()){
+			i=r.getInt("Idpayement");
+		}
+	} catch (SQLException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}
+return i;
+	}
+//FIN DE LA FONCTION QUI RECUPERE LE ID DU DERNIER ENREGISTREMENT DE LA TABLE payement
+
+public void listernChangeCmd(ActionEvent e)
+{this.montantTotal=0;
+	}
+
+//FIN DE LA PARTIE POUR LE PAYEMENT
+
+
+
+//DEBUT DE LA 2IEME ALTERNATIVE POUR MARQUER L'ETAPE A LAQUELLE SE TROUVE
+//UN PRODUIT
+
+private List<SelectItem> listDesProdEnCours;
+public List<SelectItem> getListDesProdEnCours() {
+	
+	
+	ResultSet res1,res2=null;
+	
+	if(listDesProdEnCours==null)
+		listDesProdEnCours=new ArrayList<SelectItem>();
+	else
+		listDesProdEnCours.clear();
+	
+	listDesProdEnCours.add(new SelectItem(0,""));
+
+
+	//res1=Connecteur.Extrairedonnees("select * from figurer f where f.Idfigurer not in(select fig.Idfigurer from figurer fig,historique_etapes hist where fig.Idfigurer=hist.Idfigure and hist.Designation ='TERMINEE')");
+	res1=Connecteur.Extrairedonnees("select * from figurer f where f.etat!='COMMANDE' and f.etat!='TERMINE'");
+
+	try {
+		while(res1.next())
+		{
+			//CHERCHONS LE TYPE DU PRODUIT
+			res2=Connecteur.Extrairedonnees("select * from produits where Idprod="+res1.getInt("Idprod")+"");
+			if(res2.next())
+			{
+		listDesProdEnCours.add(new SelectItem(res1.getInt("Idfigurer"),""+res2.getString("Type")+"  "+res1.getString("Titre")));
+			}
+				
+			
+		}
+	} catch (SQLException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}
+	
+	
+	return listDesProdEnCours;
+}
+
+
+
+
+
+public void setListDesProdEnCours(List<SelectItem> listDesProdEnCours) {
+	this.listDesProdEnCours = listDesProdEnCours;
+}
+
+
+private List<SelectItem> dteProvDebEtFin;
+public List<SelectItem> getDteProvDebEtFin() {
+	
+	
+	ResultSet res1=null;
+	
+	if(dteProvDebEtFin==null)
+		dteProvDebEtFin=new ArrayList<SelectItem>();
+	else
+		dteProvDebEtFin.clear();
+	
+	dteProvDebEtFin.add(new SelectItem(0,""));
+
+if(this.idP!=0)
+{
+	res1=Connecteur.Extrairedonnees("select * from groupe where Idfigure="+this.idP+" and Dte_fin is null");
+	try {
+		while(res1.next())
+		{
+
+				dteProvDebEtFin.add(new SelectItem(res1.getInt("Idgroupe"),""+res1.getDate("Dte_prov_debut")+" - "+res1.getDate("Dte_prov_fin")+""));
+		
+			
+		}
+	} catch (SQLException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}
+}	
+	
+	return dteProvDebEtFin;
+}
+
+public void setDteProvDebEtFin(List<SelectItem> dteProvDebEtFin) {
+	this.dteProvDebEtFin = dteProvDebEtFin;
+}
+
+private String dteProvDeF;
+public String getDteProvDeF() {
+	return dteProvDeF;
+}
+
+public void setDteProvDeF(String dteProvDeF) {
+	this.dteProvDeF = dteProvDeF;
+}
+
+
+private List<Personne> listDesMbresDuGpe;
+public List<Personne> getListDesMbresDuGpe() {
+	
+	
+	ResultSet res=null;
+	
+	if(listDesMbresDuGpe==null)
+		listDesMbresDuGpe=new ArrayList<Personne>();
+	else
+		listDesMbresDuGpe.clear();
+
+	System.out.println("////////0");
+if(this.idg!=0)
+	
+	System.out.println("////////01");
+	
+	
+	res=Connecteur.Extrairedonnees("select * from groupe g,groupe_producteur gp,producteur p,personne pe where g.Idgroupe="+this.idg+" and g.Idgroupe=gp.Idgroupe and gp.Idproduct=p.Idproduct and p.Idproduct=pe.Idpersonne and p.supprimee=0");
+	int num=1;
+	try {
+		while(res.next())
+		{System.out.println("////////1");
+		Personne p=new Personne();
+		p.setNumPersonne(num);
+		p.setNomPersonne(res.getString("Nompersonne"));
+		p.setPrenomPersonne(res.getString("Prenompersonne"));
+		p.setIdPersonne(res.getInt("Idpersonne"));
+		listDesMbresDuGpe.add(p);
+		
+	System.out.println("////////2");	
+		num++;
+		}
+	} catch (SQLException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}
+	
+	
+	return listDesMbresDuGpe;
+}
+
+public void setListDesMbresDuGpe(List<Personne> listDesMbresDuGpe) {
+	this.listDesMbresDuGpe = listDesMbresDuGpe;
+}
+
+private int idg;
+public int getIdg() {
+	return idg;
+}
+
+public void setIdg(int idg) {
+	this.idg = idg;
+}
+
+private List<SelectItem> listDesEtapNonEncorMarqPrUnProd1;
+
+
+
+
+
+
+
+
+//==============
+
+//System.out.println("_@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@_");
+public List<SelectItem> getListDesEtapNonEncorMarqPrUnProd1() {
+	
+	
+	ResultSet res=null,r0=null,r1=null;
+
+	if(listDesEtapNonEncorMarqPrUnProd1==null)
+		listDesEtapNonEncorMarqPrUnProd1=new ArrayList<SelectItem>();
+	else
+		listDesEtapNonEncorMarqPrUnProd1.clear();
+
+	listDesEtapNonEncorMarqPrUnProd1.add(new SelectItem(0,""));
+	System.out.println("00");
+	System.out.println("00");	
+
+	if(this.idP!=0)//SI ON A SELECTIONNE  UN PRODUIT
+	{
+	System.out.println("11");
+	System.out.println("11");
+	//res=Connecteur.Extrairedonnees("select et.Designation from figurer fig,chemin che,chemin_etapes c_e,etapes et where fig.Idcmd="+this.idComd+" and fig.Idprod="+this.idP+" and fig.Idchemin=che.Idchemin and che.Idchemin=c_e.idchemin and c_e.Idetape=et.Idetape");
+	System.out.println("LE ID DESIGNANT UN PRODUIT D'UNE COMMANDE EST-> "+this.idP);
+	res=Connecteur.Extrairedonnees("select et.Designation from figurer fig,chemin che,chemin_etapes c_e,etapes et where fig.Idfigurer="+this.idP+" and fig.Idchemin=che.Idchemin and che.Idchemin=c_e.idchemin and c_e.Idetape=et.Idetape");	
+	try {
+	System.out.println("@0");
+	int idf=this.idP;
+		while(res.next())
+		{
+		//int idf=this.idP;
+		
+		//idf=recupereIdfigure(this.idComd,this.idP);
+		//if(idf==0)
+			//break;
+		//else
+		//{
+		r0=Connecteur.Extrairedonnees("select * from historique_etapes where Idfigure="+idf+" and Designation='"+res.getString("Designation")+"'");
+		if(!r0.next())
+		{
+			listDesEtapNonEncorMarqPrUnProd1.add(new SelectItem(res.getString("Designation")));
+		System.out.println("@1");
+		}
+		
+		//}
+		
+		}
+		
+		
+		r1=Connecteur.Extrairedonnees("select * from historique_etapes where Idfigure="+idf+" and Designation='TERMINEE'");
+		if(!r1.next())
+		{
+			listDesEtapNonEncorMarqPrUnProd1.add(new SelectItem("TERMINE"));
+		//System.out.println("@1");
+		}
+		
+		
+	} catch (SQLException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}
+	}
+	
+	
+	
+	
+	return listDesEtapNonEncorMarqPrUnProd1;
+}
+
+public void setListDesEtapNonEncorMarqPrUnProd1(
+		List<SelectItem> listDesEtapNonEncorMarqPrUnProd1) {
+	this.listDesEtapNonEncorMarqPrUnProd1 = listDesEtapNonEncorMarqPrUnProd1;
+}
+
+
+private String etap1;
+
+public String getEtap1() {
+	return etap1;
+}
+
+public void setEtap1(String etap1) {
+	this.etap1 = etap1;
+}
+
+
+
+
+public void marquerEtape1()
+{
+int idFig=0;
+ResultSet r=null;
+
+if(this.idP==0)
+{message="SELECTIONNER UN PRODUIT S'IL VOUS PLAIT!!";
+return;
+	}
+
+if((this.etap1.length()<1)||(this.etap1.equalsIgnoreCase("0")||(this.etap1==null)))
+{message="SELECTIONNER UNE ETAPE S'IL VOUS PLAIT!!";
+return;
+	}
+
+System.out.println("this.etap1 "+this.etap1);
+System.out.println("this.etap1 "+this.etap1);
+
+
+FacesContext context=FacesContext.getCurrentInstance();
+HttpSession session=(HttpSession) context.getExternalContext().getSession(true);
+
+//r=Connecteur.Extrairedonnees("select Idfigurer from figurer where Idcmd="+this.idComd+" and Idprod="+this.idP+"");
+
+try {
+	//r.next();
+	//idFig=r.getInt("Idfigurer");
+	idFig=this.idP;
+	//if(idFig==0)
+		//return;
+	
+	int n=-1;
+	
+	r=null;
+	r=Connecteur.Extrairedonnees("select * from historique_etapes where Idfigure="+idFig+" and Designation='"+this.etap1+"'");
+	
+	if(r.next())
+	{
+		message="CETTE ETAPE EST DEJA MARQUEE!!";
+		return;
+	}
+	
+	
+	//SI C'EST LE GERANT QUI VEUT MARQUER L'ETAPE
+	//IL FAUT QU'IL SOIT D'ABORD DANS LA TABLE DES PRODUCTEURS
+	r=null;
+	r=Connecteur.Extrairedonnees("select * from producteur where Idproduct="+session.getAttribute("idPersonneConnectee"));
+	if(!r.next())//IL FAUT D'ABORD L'ENREGISTRER DANS LA TABLE DES PRODUCTEURS
+	{
+		n=-1;
+		n=Connecteur.Insererdonnees("insert into producteur(Idproduct,supprimee) values ("+session.getAttribute("idPersonneConnectee")+",1)");
+	
+		if(n==-1)
+		{
+			message="BIZARRE!CETTE PERSONNE N'EST PAS UN PRODUCTEUR!!";
+			return;
+		}
+	}
+	
+
+	
+	
+	
+	n=-1;
+	n=Connecteur.Insererdonnees("insert into historique_etapes (Idfigure,Idproducteur,Date,Designation) values ("+idFig+","+session.getAttribute("idPersonneConnectee")+",now(),'"+this.etap1+"')");
+	//n=Connecteur.Insererdonnees("insert into historique_etapes (Idfigure,Idproducteur,Date,Designation) values ("+idFig+",12,now(),'"+this.etap1+"')");
+	
+	//this.idPersonneConnecte=0;
+	
+	if(n==-1)
+	{
+		message="ECHEC D'INSERTION!!";
+		return;
+	}
+	
+	message="INSERTION REUSSIE!!";
+	
+	
+	
+	
+	//SI CE PRODUIT A L'ETAT 'EN ATTENTE DE TRAITEMENT'
+	//METTONS-LE DANS L'ETAT 'EN COURS DE TRAITEMENT'
+	ResultSet re=null;
+	re=Connecteur.Extrairedonnees("select * from figurer where Idfigurer="+this.idP+" and etat='EN ATTENTE DE TRAITEMENT'");
+	try {
+		if(re.next())
+		{
+		int ne=-1;
+		ne=Connecteur.Insererdonnees("update figurer set etat='EN COURS DE TRAITEMENT' where Idfigurer="+this.idP+"");
+		}
+	} catch (SQLException e1) {
+		// TODO Auto-generated catch block
+		e1.printStackTrace();
+	}
+	//
+	
+	if(this.etap1.equalsIgnoreCase("TERMINE"))
+	{
+		int ne=-1;
+		ne=Connecteur.Insererdonnees("update figurer set etat='TERMINE' where Idfigurer="+this.idP+"");
+		
+		
+		//S'IL A ETE PAYE D'AVANCE EN TOTALITE ON LE MET DIRECTEMENT A L'ETAT PAYE
+		int n1=0,n2=0;
+		re=null;
+		re=Connecteur.Extrairedonnees("select * from figurer where Idfigurer="+this.idP+"");
+		if(re.next())
+		{
+			n1=re.getInt("Nbre_tot_exemplr");
+			n2=re.getInt("Nbre_exemplr_paye");
+			if(n1==n2)
+			{
+				ne=-1;
+				ne=Connecteur.Insererdonnees("update figurer set etat='PAYE' where Idfigurer="+this.idP+"");
+
+			}
+		}
+		
+	}
+		
+	
+} catch (SQLException e) {
+	// TODO Auto-generated catch block
+	e.printStackTrace();
+}
+
+}
+
+public void marquerDbutTacheDuGpe()
+{
+	if(this.idP==0)
+	{message="SELECTIONNER UN PRODUIT S'IL VOUS PLAIT!!";
+	return;
+		}
+	
+	if(this.idg==0)
+	{
+	message="SELECTIONNER LE DELAIT ACCORDE AU GROUPE S'IL VOUS PLAIT!!";
+	return;
+	}
+	
+	ResultSet res=null;
+	
+	res=Connecteur.Extrairedonnees("select * from groupe where Idgroupe="+this.idg+" and Idfigure="+this.idP+" and Dte_debut is not null");
+	try {
+		if(res.next())
+		{message="CE GROUPE A DEJA MARQUE LE COMMENCEMENT DE CETTE TACHE!!";
+		return;	
+		}
+		
+	
+	int n=-1;
+	n=Connecteur.Insererdonnees("update groupe set Dte_debut=now() where Idgroupe="+this.idg+" and Idfigure="+this.idP+"");
+	if(n!=-1)
+		message="OPERATION DE MARQUE DE DEBUT REUSSIE!!";
+	else
+		message="OPERATION DE MARQUE DE DEBUT ECHOUEE!!";
+	
+	
+	
+	//SI CE PRODUIT A L'ETAT 'EN ATTENTE DE TRAITEMENT'
+	//METTONS-LE DANS L'ETAT 'EN COURS DE TRAITEMENT'
+	ResultSet re=null;
+	re=Connecteur.Extrairedonnees("select * from figurer where Idfigurer="+this.idP+" and etat='EN ATTENTE DE TRAITEMENT'");
+	try {
+		if(re.next())
+		{
+		int ne=-1;
+		ne=Connecteur.Insererdonnees("update figurer set etat='EN COURS DE TRAITEMENT' where Idfigurer="+this.idP+"");
+		}
+	} catch (SQLException e1) {
+		// TODO Auto-generated catch block
+		e1.printStackTrace();
+	}
+	//
+	
+	
+	
+	
+	} catch (SQLException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}
+	
+	
+	
+	
+	
+	
+	}
+public void marquerFinTacheDuGpe()
+{
+	if(this.idP==0)
+	{message="SELECTIONNER UN PRODUIT S'IL VOUS PLAIT!!";
+	return;
+		}
+	
+	if(this.idg==0)
+	{
+	message="SELECTIONNER LE DELAIT ACCORDE AU GROUPE S'IL VOUS PLAIT!!";
+	return;
+	}
+	
+	ResultSet res=null;
+	
+	res=Connecteur.Extrairedonnees("select * from groupe where Idgroupe="+this.idg+" and Idfigure="+this.idP+" and Dte_debut is null");
+	try {
+		if(res.next())
+		{message="CE GROUPE N'A PAS MARQUE LE DEBUT DE LEUR TACHE!!";
+		return;	
+		}
+	
+	
+	res=null;
+	res=Connecteur.Extrairedonnees("select * from groupe where Idgroupe="+this.idg+" and Idfigure="+this.idP+" and Dte_fin is not null");
+	
+		if(res.next())
+		{message="CE GROUPE A DEJA MARQUE LA FIN DE LEUR TACHE!!";
+		return;	
+		}
+		
+	
+	int n=-1;
+	n=Connecteur.Insererdonnees("update groupe set Dte_fin=now() where Idgroupe="+this.idg+" and Idfigure="+this.idP+"");
+	if(n!=-1)
+		message="OPERATION DE MARQUE DE FIN REUSSIE!!";
+	else
+		message="OPERATION DE MARQUE DE FIN ECHOUEE!!";
+	
+	} catch (SQLException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}
+	
+	}	
+
+
+private CheminOuEtape etape;
+
+public CheminOuEtape getEtape() {
+	return etape;
+}
+
+public void setEtape(CheminOuEtape etape) {
+	this.etape = etape;
+}
+
+public void supprimerEtape(ActionEvent e)
+{
+if(this.etape==null)//CAS IMPOSSIBLE
+{message="CAS IMPOSSIBLE";
+return;
+	}
+
+int n=-1;
+n=Connecteur.Insererdonnees("delete from historique_etapes where Idhisto_etape="+this.etape.getIdHisto()+"");
+if(n!=-1)
+	message="SUPPRESSION REUSSIE!!";
+else
+	message="SUPPRESSION ECHOUEE!!";
+
+	}
+
+public void annulerDteDebut()
+{
+	if(this.idP==0)
+	{message="SELECTIONNER UN PRODUIT S'IL VOUS PLAIT!!";
+	return;
+		}
+	
+	if(this.idg==0)
+	{
+	message="SELECTIONNER LE DELAIT ACCORDE AU GROUPE S'IL VOUS PLAIT!!";
+	return;
+	}
+	
+	ResultSet res=null;
+	
+	res=Connecteur.Extrairedonnees("select * from groupe where Idgroupe="+this.idg+" and Idfigure="+this.idP+" and Dte_debut is null");
+	
+		try {
+			if(res.next())
+			{message="LA DATE DE DEBUT DE LA TACHE N'EST PAS MARQUEE POUR CE GROUPE!!";
+			return;	
+			}
+			
+			
+			int n=-1;
+			n=Connecteur.Insererdonnees("update groupe set Dte_debut=null where Idgroupe="+this.idg+" and Idfigure="+this.idP+"");
+			if(n!=-1)
+				message="OPERATION D'ANNULATION DU DEBUT REUSSIE!!";
+			else
+				message="OPERATION D'ANNULATION DU DEBUT ECHOUEE!!";	
+		
+			
+			
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+}
+
+
+
+//FIN DE LA 2IEME ALTERNATIVE POUR MARQUER L'ETAPE A LAQUELLE SE TROUVE
+//UN PRODUIT
+
+
+//DEBUT DE LA PARTIE POUR LA LIVRAISON DES PRODUITS PAYES
+
+private int idCli3;
+public int getIdCli3() {
+	return idCli3;
+}
+
+public void setIdCli3(int idCli3) {
+	this.idCli3 = idCli3;
+}
+
+private List<SelectItem> listDesCliAyantDesProdPayeMNoLivre;
+public List<SelectItem> getListDesCliAyantDesProdPayeMNoLivre() {
+	
+	
+
+	
+	ResultSet res=null;
+	
+/*	this.idCmd3=0;
+	this.idPayet=0;*/
+	
+	if(listDesCliAyantDesProdPayeMNoLivre==null)
+		listDesCliAyantDesProdPayeMNoLivre=new ArrayList<SelectItem>();
+	else
+		listDesCliAyantDesProdPayeMNoLivre.clear();
+	
+	
+	
+	listDesCliAyantDesProdPayeMNoLivre.add(new SelectItem(0,""));
+	
+	res=Connecteur.Extrairedonnees("select * from personne pe where pe.Idpersonne in (select c.Idclient from commande c,payement p where c.Idcmd=p.Idcmd and Livre=0) and pe.Idpersonne in(select Idclient from client where supprimee=0) order by Nompersonne");
+	//res=Connecteur.Extrairedonnees("select * from personne pe where pe.Idpersonne in (select cli.Idclient from client cli,commande com,figurer fig where cli.Idclient=com.Idclient and com.Idcmd=fig.Idcmd and fig.etat!='PAYE') and pe.Idpersonne in(select Idclient from client where supprimee=0) order by Nompersonne");
+
+	try {
+		while(res.next())
+		{listDesCliAyantDesProdPayeMNoLivre.add(new SelectItem(res.getInt("Idpersonne"),res.getString("Nompersonne")+"   "+res.getString("Prenompersonne")+"  "+res.getInt("Idpersonne")));
+
+		}
+	} catch (SQLException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}
+	
+
+	
+	
+	
+	return listDesCliAyantDesProdPayeMNoLivre;
+}
+
+public void setListDesCliAyantDesProdPayeMNoLivre(
+		List<SelectItem> listDesCliAyantDesProdPayeMNoLivre) {
+	this.listDesCliAyantDesProdPayeMNoLivre = listDesCliAyantDesProdPayeMNoLivre;
+}
+
+private int idCmd3;
+public int getIdCmd3() {
+	return idCmd3;
+}
+
+public void setIdCmd3(int idCmd3) {
+	this.idCmd3 = idCmd3;
+}
+
+private List<SelectItem> listDesCmdAvecDesProdPayeMNoLivre;
+public List<SelectItem> getListDesCmdAvecDesProdPayeMNoLivre() {
+	
+	ResultSet res=null;
+	
+	if(listDesCmdAvecDesProdPayeMNoLivre==null)
+		listDesCmdAvecDesProdPayeMNoLivre=new ArrayList<SelectItem>();
+	else
+		listDesCmdAvecDesProdPayeMNoLivre.clear();
+	
+	listDesCmdAvecDesProdPayeMNoLivre.add(new SelectItem(0,""));
+	System.out.println("00");
+	System.out.println("00");	
+	
+	if(this.idCli3!=0)//SI ON A SELECTIONNE UN CLIENT
+	{
+	System.out.println("11");
+	System.out.println("11");
+	res=Connecteur.Extrairedonnees("select Idcmd from commande where Idclient="+this.idCli3+" and Idcmd in (select c.Idcmd from commande c,payement p where c.Idcmd=p.Idcmd and Livre=0)");
+
+	try {
+		while(res.next())
+		{listDesCmdAvecDesProdPayeMNoLivre.add(new SelectItem(res.getInt("Idcmd"),""+res.getInt("Idcmd")+""));
+
+		}
+	} catch (SQLException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}
+	}
+
+	return listDesCmdAvecDesProdPayeMNoLivre;
+}
+
+public void setListDesCmdAvecDesProdPayeMNoLivre(
+		List<SelectItem> listDesCmdAvecDesProdPayeMNoLivre) {
+	this.listDesCmdAvecDesProdPayeMNoLivre = listDesCmdAvecDesProdPayeMNoLivre;
+}
+
+
+private int idPayet;
+public int getIdPayet() {
+	return idPayet;
+}
+
+public void setIdPayet(int idPayet) {
+	this.idPayet = idPayet;
+}
+
+private List<SelectItem> listDesPayetNoLivres;
+public List<SelectItem> getListDesPayetNoLivres() {
+
+	
+	ResultSet res=null;
+	
+	this.pt=null;
+	
+	if(listDesPayetNoLivres==null)
+		listDesPayetNoLivres=new ArrayList<SelectItem>();
+	else
+		listDesPayetNoLivres.clear();
+	
+	listDesPayetNoLivres.add(new SelectItem(0,""));
+	System.out.println("00");
+	System.out.println("00");	
+	
+	if(this.idCmd3!=0)//SI ON A SELECTIONNE UN CLIENT
+	{
+	System.out.println("11");
+	System.out.println("11");
+	res=Connecteur.Extrairedonnees("select Idpayement from payement where Idcmd="+this.idCmd3+" and Livre=0");
+
+	try {
+		while(res.next())
+		{listDesPayetNoLivres.add(new SelectItem(res.getInt("Idpayement"),""+res.getInt("Idpayement")+""));
+
+		}
+	} catch (SQLException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}
+	}
+
+
+	
+	
+	return listDesPayetNoLivres;
+}
+
+public void setListDesPayetNoLivres(List<SelectItem> listDesPayetNoLivres) {
+	this.listDesPayetNoLivres = listDesPayetNoLivres;
+}
+
+private String nomEtPrenomCaissier=null;
+public String getNomEtPrenomCaissier() {
+	return nomEtPrenomCaissier;
+}
+
+public void setNomEtPrenomCaissier(String nomEtPrenomCaissier) {
+	this.nomEtPrenomCaissier = nomEtPrenomCaissier;
+}
+
+public void ecouteChangePayement(ActionEvent ee)
+{if(idPayet==0)
+{this.nomEtPrenomCaissier=null;
+return;
+	}
+
+ResultSet res=null;
+res=Connecteur.Extrairedonnees("select * from payement p,personne pe where p.Idpayement="+this.idPayet+" and p.Idcaissier=pe.Idpersonne");
+try {
+	if(res.next())
+	{this.nomEtPrenomCaissier=res.getString("Nompersonne")+"   "+res.getString("Prenompersonne");
+		}
+} catch (SQLException e) {
+	// TODO Auto-generated catch block
+	e.printStackTrace();
+}
+
+	}
+
+
+private List<Produit> listDesProdPayeMNonLivrePr1Payet;
+public List<Produit> getListDesProdPayeMNonLivrePr1Payet() {
+	
+	
+
+	System.out.println("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
+	if(listDesProdPayeMNonLivrePr1Payet==null)
+		listDesProdPayeMNonLivrePr1Payet=new ArrayList<Produit>();
+	else
+		listDesProdPayeMNonLivrePr1Payet.clear();
+	
+	System.out.println("bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb");
+	if(this.idPayet==0)
+	{	
+		listDesProdPayeMNonLivrePr1Payet.clear();
+		return listDesProdPayeMNonLivrePr1Payet;
+	}
+	
+	System.out.println("cccccccccccccccccccccccccccccccccccccc");
+	ResultSet res=null;
+	
+	res=Connecteur.Extrairedonnees("select * from prod_paye pro,payement p,commande co,figurer f,produits pt where p.Idpayement="+this.idPayet+" and pro.Idpayement=p.Idpayement and p.Idcmd=co.Idcmd and co.Idcmd=f.Idcmd and f.Titre=pro.Designation and f.Idprod=pt.Idprod");
+	int n=1;
+	try {
+		//if(res.next())
+		//{System.out.println("dddddddddddddddddddddddddddddddddddddddddddd");
+			while(res.next())
+			{	System.out.println("==================================");
+				System.out.println("==================================");
+				Produit p=new Produit();
+			    p.setNum(n);
+			    p.setTitre(res.getString("Designation"));
+			    p.setNomProduit(res.getString("pt.Type"));
+			    p.setNbr_ex_dmd(res.getInt("Nbre_tot_exemplr"));
+			    p.setNbr_ex_djaPaye(res.getInt("Nbre_exemplr_paye"));
+			    p.setNbr_ex_paye(res.getInt("Qtite_paye"));
+			    p.setIdProduit(res.getInt("Idfigurer"));
+			    n++;
+			    listDesProdPayeMNonLivrePr1Payet.add(p);
+			}
+			
+		//}
+	} catch (SQLException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}
+
+	
+	
+	return listDesProdPayeMNonLivrePr1Payet;
+}
+
+public void setListDesProdPayeMNonLivrePr1Payet(
+		List<Produit> listDesProdPayeMNonLivrePr1Payet) {
+	this.listDesProdPayeMNonLivrePr1Payet = listDesProdPayeMNonLivrePr1Payet;
+}
+
+
+public void marquerLivraison()
+{
+if(this.idCli3==0)
+{message="SELECTIONNER UN CLIENT S'IL VOUS PLAIT!!";
+return;
+	}
+if(this.idCmd3==0)
+{message="SELECTIONNER UNE COMMANDE S'IL VOUS PLAIT!!";
+return;
+	}
+if(this.idPayet==0)
+{message="SELECTIONNER LE NUMERO DE PAYEMENT S'IL VOUS PLAIT!!";
+return;
+	}
+
+
+int n=-1;
+n=Connecteur.Insererdonnees("update payement set Livre=1 where Idpayement="+this.idPayet+"");
+if(n==-1)
+{message="OPERATION ECHOUEE!!";
+return;
+	}
+message="OPERATION REUSSIE!!";
+
+
+//AXTRAYONS L'ID DE LA COMMANDE IMPLIQUEE DANS CE PAYEMENT
+int idcmd;
+ResultSet res,res1,res2=null;
+res=Connecteur.Extrairedonnees("select * from payement where Idpayement="+this.idPayet+"");
+try {
+	if(res.next())
+	{
+	idcmd=res.getInt("Idcmd");
+	
+	
+	res1=Connecteur.Extrairedonnees("select * from commande c,figurer f where c.Idcmd="+idcmd+" and c.Idcmd=f.Idcmd and Nbre_exemplr_paye<Nbre_tot_exemplr");
+	
+	if(!res1.next())//TOUTE LA QUANTITE COMMANDEE EST PAYEE
+	{
+		
+		
+		res2=Connecteur.Extrairedonnees("select * from payement where Idcmd="+idcmd+" and Livre=0");
+		
+		if(!res2.next())//TOUS LES PRODUITS SONT LIVRES. DONC, CLOTURONS LA COMMANDE
+		{
+		int m=-1;
+		m=Connecteur.Insererdonnees("update commande set Datecloture=now() where Idcmd="+idcmd+"");
+		if(m!=-1)
+			message="L'OPERATION EST REUSSIE ET LA COMMANDE EST CLOTUREE!!";
+		}
+	}
+	
+	
+	
+	//SI LA TOTALITE D'UN PRODUIT COMMANDE EST LIVREE, JE PENSES QU'IL FAUT LE 
+	//METTRE A L'ETAT LIVRE.====>C'EST PAS FAIT.
+	
+	
+	
+	
+	}
+	
+	this.idCli3=0;
+	this.idCmd3=0;
+	this.idPayet=0;
+	
+} catch (SQLException e) {
+	// TODO Auto-generated catch block
+	e.printStackTrace();
+}
+
+	}
+
+
+
+private Produit pt=null;
+public Produit getPt() {
+	return pt;
+}
+
+public void setPt(Produit pt) {
+	this.pt = pt;
+}
+
+private List<Maquette> listDesMaqtD1ProdSelectionne;
+public List<Maquette> getListDesMaqtD1ProdSelectionne() {
+	
+	System.out.println("QQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQ");
+	
+	if(this.listDesMaqtD1ProdSelectionne==null)
+		this.listDesMaqtD1ProdSelectionne=new ArrayList<Maquette>();
+	else
+		this.listDesMaqtD1ProdSelectionne.clear();
+	
+	if((pt==null)||(this.idCli3==0)||(this.idCmd3==0)||(this.idPayet==0))
+	{	this.listDesMaqtD1ProdSelectionne.clear();
+		return this.listDesMaqtD1ProdSelectionne;
+	}
+	
+	ResultSet res=null;
+	res=Connecteur.Extrairedonnees("select * from maquette where Idfigurer="+this.pt.getIdProduit()+"");
+	
+	try {
+		
+		int n=1;
+		
+		while(res.next())
+		{
+			Maquette m=new Maquette();
+			m.setNum(n);
+			m.setNomMaq(res.getString("Nomphoto"));
+			this.listDesMaqtD1ProdSelectionne.add(m);
+			
+			n++;
+		}
+	} catch (SQLException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}
+	
+	
+	
+	
+	return listDesMaqtD1ProdSelectionne;
+}
+
+public void setListDesMaqtD1ProdSelectionne(
+		List<Maquette> listDesMaqtD1ProdSelectionne) {
+	this.listDesMaqtD1ProdSelectionne = listDesMaqtD1ProdSelectionne;
+}
+
+//FIN DE LA PARTIE POUR LA LIVRAISON DES PRODUITS PAYES
+
+
+private int idCli4=0;
+public int getIdCli4() {
+	return idCli4;
+}
+
+public void setIdCli4(int idCli4) {
+	this.idCli4 = idCli4;
+}
+
+private List<SelectItem> listDesCliAyaDesCmdAvcDesProd1;
+
+public List<SelectItem> getListDesCliAyaDesCmdAvcDesProd1() {
+	
+	
+	ResultSet res=null;
+	
+	if(listDesCliAyaDesCmdAvcDesProd1==null)
+		listDesCliAyaDesCmdAvcDesProd1=new ArrayList<SelectItem>();
+	else
+		listDesCliAyaDesCmdAvcDesProd1.clear();
+	
+	listDesCliAyaDesCmdAvcDesProd1.add(new SelectItem(0,""));
+	
+	//res=Connecteur.Extrairedonnees("select p.Idpersonne,p.Nompersonne,p.Prenompersonne from personne p where p.Idpersonne in (select cli.Idclient from client cli,commande com,figurer fig,historique_etapes histo where cli.Idclient=com.Idclient and com.Idcmd=fig.Idcmd and fig.Idfigurer=histo.Idfigure and histo.Designation !='TERMINEE' and cli.supprimee=0) order by p.Nompersonne");
+	res=Connecteur.Extrairedonnees("select p.Idpersonne,p.Nompersonne,p.Prenompersonne from personne p where p.Idpersonne in (select cli.Idclient from client cli,commande com,figurer fig where cli.Idclient=com.Idclient and com.Idcmd=fig.Idcmd and fig.etat!='PAYE' and fig.Nbre_tot_exemplr>fig.Nbre_exemplr_paye) and p.Idpersonne in (select Idclient from client where supprimee=0) order by Nompersonne");
+
+	try {
+		while(res.next())
+		{listDesCliAyaDesCmdAvcDesProd1.add(new SelectItem(res.getInt("Idpersonne"),res.getString("Nompersonne")+"    "+res.getString("Prenompersonne")+"      "+res.getString("Idpersonne")));
+
+		}
+	} catch (SQLException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}
+	
+	
+	return listDesCliAyaDesCmdAvcDesProd1;
+}
+
+public void setListDesCliAyaDesCmdAvcDesProd1(
+		List<SelectItem> listDesCliAyaDesCmdAvcDesProd1) {
+	this.listDesCliAyaDesCmdAvcDesProd1 = listDesCliAyaDesCmdAvcDesProd1;
+}
+
+private int idComd4=0;
+public int getIdComd4() {
+	return idComd4;
+}
+public void setIdComd4(int idComd4) {
+	this.idComd4 = idComd4;
+}
+
+private List<SelectItem> listDesCmdAvcDesProdEnCour2;
+
+public List<SelectItem> getListDesCmdAvcDesProdEnCour2() {
+	
+	ResultSet res=null;
+	
+	if(listDesCmdAvcDesProdEnCour2==null)
+		listDesCmdAvcDesProdEnCour2=new ArrayList<SelectItem>();
+	else
+		listDesCmdAvcDesProdEnCour2.clear();
+	
+	listDesCmdAvcDesProdEnCour2.add(new SelectItem(0,""));
+	System.out.println("00");
+	System.out.println("00");	
+	
+	if(this.idCli4!=0)//SI ON A SELECTIONNE UN CLIENT
+	{
+	System.out.println("11");
+	System.out.println("11");
+	res=Connecteur.Extrairedonnees("select Idcmd from commande where Idclient="+this.idCli4+" and Idcmd in (select com.Idcmd from commande com,figurer fig,historique_etapes histo where com.Idcmd=fig.Idcmd and fig.Idfigurer=histo.Idfigure and histo.Designation !='TERMINEE')");
+
+	try {
+		while(res.next())
+		{listDesCmdAvcDesProdEnCour2.add(new SelectItem(res.getInt("Idcmd"),""+res.getInt("Idcmd")+""));
+
+		}
+	} catch (SQLException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}
+	}
+	
+	return listDesCmdAvcDesProdEnCour2;
+}
+public void setListDesCmdAvcDesProdEnCour2(
+		List<SelectItem> listDesCmdAvcDesProdEnCour2) {
+	this.listDesCmdAvcDesProdEnCour2 = listDesCmdAvcDesProdEnCour2;
+}
+
+private List<SelectItem> listDesCmdAvcDesProdCmd;
+
+public List<SelectItem> getListDesCmdAvcDesProdCmd() {
+	
+	ResultSet res=null;
+	
+	if(listDesCmdAvcDesProdCmd==null)
+		listDesCmdAvcDesProdCmd=new ArrayList<SelectItem>();
+	else
+		listDesCmdAvcDesProdCmd.clear();
+	
+	listDesCmdAvcDesProdCmd.add(new SelectItem(0,""));
+	System.out.println("00");
+	System.out.println("00");
+	
+	if(this.idCli4!=0)//SI ON A SELECTIONNE UN CLIENT
+	{
+	System.out.println("11");
+	System.out.println("11");
+	res=Connecteur.Extrairedonnees("select Idcmd from commande where Idclient="+this.idCli4+" and Idcmd in (select com.Idcmd from commande com,figurer fig where com.Idcmd=fig.Idcmd and fig.etat!='PAYE' and fig.Nbre_tot_exemplr>fig.Nbre_exemplr_paye)");
+
+	try {
+		while(res.next())
+		{listDesCmdAvcDesProdCmd.add(new SelectItem(res.getInt("Idcmd"),""+res.getInt("Idcmd")+""));
+
+		}
+	} catch (SQLException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}
+	}
+	
+	
+	return listDesCmdAvcDesProdCmd;
+}
+
+public void setListDesCmdAvcDesProdCmd(List<SelectItem> listDesCmdAvcDesProdCmd) {
+	this.listDesCmdAvcDesProdCmd = listDesCmdAvcDesProdCmd;
+}
+
+private int idP4=0;
+public int getIdP4() {
+	return idP4;
+}
+public void setIdP4(int idP4) {
+	this.idP4 = idP4;
+}
+
+private List<SelectItem> listDesProdDuneCmdNonEncorTermns2;
+
+public List<SelectItem> getListDesProdDuneCmdNonEncorTermns2() {
+	
+	ResultSet res=null;
+	
+	if(listDesProdDuneCmdNonEncorTermns2==null)
+		listDesProdDuneCmdNonEncorTermns2=new ArrayList<SelectItem>();
+	else
+		listDesProdDuneCmdNonEncorTermns2.clear();
+	
+	listDesProdDuneCmdNonEncorTermns2.add(new SelectItem(0,""));
+	System.out.println("00");
+	System.out.println("00");	
+	
+	if((this.idComd4!=0)&&(this.idCli4!=0))//SI ON A SELECTIONNE UN CLIENT
+	{
+	System.out.println("11");
+	System.out.println("11");
+	//res=Connecteur.Extrairedonnees("select fig.Idfigurer,pro.Type,fig.Titre from commande com,figurer fig,produits pro,historique_etapes hist where com.Idcmd="+this.idComd+" and com.Idcmd=fig.Idcmd and fig.Idprod=pro.Idprod and fig.Idfigurer=hist.Idfigure and hist.Designation !='TERMINEE'");
+	//res=Connecteur.Extrairedonnees("select figu.Idfigurer,prod.Type,figu.Titre from commande coma,figurer figu,produits prod where coma.Idcmd="+this.idComd4+" and coma.Idcmd=figu.Idcmd and figu.Idprod=prod.Idprod and figu.Idfigurer not in(select fig.Idfigurer from commande com,figurer fig,produits pro,historique_etapes hist where com.Idcmd="+this.idComd4+" and com.Idcmd=fig.Idcmd and fig.Idprod=pro.Idprod and fig.Idfigurer=hist.Idfigure and hist.Designation ='TERMINEE')");
+	res=Connecteur.Extrairedonnees("select figu.Idfigurer,prod.Type,figu.Titre from commande coma,figurer figu,produits prod where coma.Idcmd="+this.idComd4+" and coma.Idcmd=figu.Idcmd and figu.Idprod=prod.Idprod and figu.Idfigurer not in(select fig.Idfigurer from commande com,figurer fig,produits pro,historique_etapes hist where com.Idcmd="+this.idComd4+" and com.Idcmd=fig.Idcmd and fig.Idprod=pro.Idprod and fig.Idfigurer=hist.Idfigure and hist.Designation ='TERMINEE')");
+	
+	
+	try {
+		while(res.next())
+		{	
+				
+			listDesProdDuneCmdNonEncorTermns2.add(new SelectItem(res.getInt("Idfigurer"),res.getString("Type")+" : "+res.getString("Titre")));
+
+		}
+	} catch (SQLException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}
+	}
+	
+	return listDesProdDuneCmdNonEncorTermns2;
+}
+
+public void setListDesProdDuneCmdNonEncorTermns2(
+		List<SelectItem> listDesProdDuneCmdNonEncorTermns2) {
+	this.listDesProdDuneCmdNonEncorTermns2 = listDesProdDuneCmdNonEncorTermns2;
+}
+
+
+public void saveBon(){
+
+
+	if(this.idCli4==0)
+	{	message="VOUS N'AVEZ PAS SELECTONNER UN CLIENT!!";
+		return;
+		}
+
+	if(this.idComd4==0)
+	{message="VOUS N'AVEZ PAS SELECTIONNE DE COMMANDE!!";
+	return;
+		}
+
+	if(this.files1.size()<1)
+		{message="LA LISTE DES BONS DE COMMANDE EST VIDE!!";
+		return;
+		}
+	int n=-1;
+	//for(int j=0;j<this.files1.size();j++)
+	//{
+	int j=0;
+	System.out.println("+this.files1.get(j).getName()"+this.files1.get(j).getName());
+	String s=this.files1.get(j).getName();
+	System.out.println("s"+s);
+	n=Connecteur.Insererdonnees("update commande set bonCmd='"+s+"' where Idcmd="+this.idComd4+"");
+	//}
+	if(n!=-1)
+		message="OPERATION REUSSIE!!";
+	else
+		message="OPERATION ECHOUEE!!";
+	
+	
+	//SI IL Y A SUR CETTE COMMANDE AU MOINS UN PRODUIT AVEC L'ETAT COMMANDE
+	//CE BON EST UN GARANTI DE PAYEMENT POUR TOUS LES PRODUITS DE CETTE COMMANDE
+	ResultSet re=null;
+	re=Connecteur.Extrairedonnees("select * from figurer where Idcmd="+this.idComd4+" and etat='COMMANDE'");
+	try {
+		if(re.next())
+		{
+		int ne=-1;
+		ne=Connecteur.Insererdonnees("update figurer set etat='EN ATTENTE DE TRAITEMENT' where Idcmd="+this.idComd4+"");
+		}
+	} catch (SQLException e1) {
+		// TODO Auto-generated catch block
+		e1.printStackTrace();
+	}
+	//
+	
+	
+		
+	this.files1.clear();
+			
+	
+	}
+
+private ArrayList<File> files1 = new ArrayList<File>();
+public ArrayList<File> getFiles1() {
+	return files1;
+}
+
+public void setFiles1(ArrayList<File> files1) {
+	this.files1 = files1;
+}
+public int getSize1() {
+    if (getFiles1().size()>0){
+        return getFiles1().size();
+    }else 
+    {
+        return 0;
+    }
+}
+
+
+public void listener1(UploadEvent event) throws Exception{
+
+	System.out.println("debut ecouteur");
+	UploadItem item = event.getUploadItem();
+	String nomDuFic=null,nomDuFic0=null;
+
+	Date d=new Date();
+	System.out.println("1");
+	nomDuFic0=item.getFileName();
+	System.out.println("2");
+	nomDuFic=""+d.getYear()+"_"+d.getMonth()+"_"+d.getDate()+"_"+d.getDay()+"_"+d.getHours()+"_"+d.getMinutes()+"_"+d.getSeconds()+"_"+item.getFileName();
+	System.out.println("3");
+	File file = new File(nomDuFic);
+	//file.setLength(item.getData().length);
+	//file.setName(nomDuFic);
+	//file.setData(item.getData());
+	files1.add(file);
+
+
+	//============================================
+	//FAUT COPIER LE FICHIER CHARGE DANS LE REPERT
+	//============================================
+
+	FileOutputStream fos=null;
+
+	try{
+		
+	fos = new FileOutputStream(new File("C:\\Documents and Settings\\S\\Mes documents\\memoire\\bons\\"+nomDuFic));
+	fos.write(item.getData());
+	fos.close();
+
+	} catch (IOException e) {
+	e.printStackTrace();
+	}
+	}
+
+private List<Commande> listDuBon;
+public List<Commande> getListDuBon() {
+	if(this.listDuBon==null)
+		this.listDuBon=new ArrayList<Commande>();
+	else
+		this.listDuBon.clear();
+	
+	if(this.idComd4!=0)
+	{
+		ResultSet res=null;
+		res=Connecteur.Extrairedonnees("select * from commande where Idcmd="+this.idComd4+"");
+		try {
+			if(res.next())
+			{
+				String b=null;
+				b=res.getString("bonCmd");
+				if(b!=null)
+				{
+				Commande c=new Commande();
+				c.setIdcmd(res.getInt("Idcmd"));
+				c.setBon(res.getString("bonCmd"));
+				listDuBon.add(c);
+				}
+			}
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	
+	return listDuBon;
+}
+public void setListDuBon(List<Commande> listDuBon) {
+	this.listDuBon = listDuBon;
+}
+
+private Commande selectedcmd=null;
+public Commande getSelectedcmd() {
+	return selectedcmd;
+}
+public void setSelectedcmd(Commande selectedcmd) {
+	this.selectedcmd = selectedcmd;
+}
+
+public void enleverBon(ActionEvent e)
+{
+if(this.selectedcmd==null)//CAS IMPOSSIBLE
+{message="CAS IMPOSSIBLE!!";
+return;
+	}
+
+int n=-1;
+n=Connecteur.Insererdonnees("update commande set bonCmd=null where Idcmd="+this.selectedcmd.getIdcmd()+"");
+if(n==-1)
+	message="MISE A JOUR ECHOUEE!!";
+else
+	message="MISE A JOUR REUSSIE!!";
+
+this.selectedcmd=null;
+	}
+
+public void visualiseBon(ActionEvent ev)
+{if(this.selectedcmd==null)//CAS IMPOSSIBLE
+{message="CAS IMPOSSIBLE!!";
+return;
+	}
+
+//int idm=0;
+//idm=m.getIdMaql();
+
+String nomBon=null;
+nomBon=this.selectedcmd.getBon();
+
+Desktop desk = Desktop.getDesktop();
+try {
+	desk.open(new File("C:\\Documents and Settings\\S\\Mes documents\\memoire\\bons\\"+nomBon));
+} catch (IOException e) {
+	// TODO Auto-generated catch block
+	e.printStackTrace();
+}
+
+
+this.selectedcmd=null;
+
+	}
+
+}
